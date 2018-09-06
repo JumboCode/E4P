@@ -1,0 +1,24 @@
+{
+  "name": "e4p",
+  "version": "0.0.0",
+  "description": "E4P JumboCode Project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JumboCode/E4P.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JumboCode/E4P/issues"
+  },
+  "homepage": "https://github.com/JumboCode/E4P#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "path": "^0.12.7"
+  }
+}
