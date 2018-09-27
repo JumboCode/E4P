@@ -2,11 +2,20 @@
 <html>
 <head>
 	<title>E4P Messaging</title>
-	<link rel="stylesheet" href="css/style.css"/>
-	<script src="javascript/index.js"></script>
+	<link rel="stylesheet" href="css/index.css"/>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- TODO wrap index.js in onLoad for scripts  -->
+  <script src="javascript/index.js"></script>
 </head>
 
 <body>
 	<h1>E4P Messaging</h1>
+  <h3>Basic Socket Demo</h3>
+  <ul id="messages"></ul>
+  <form id="message-form">
+    <input id="message-text" autocomplete="off" placeholder="Type Message Here" /><button>Send</button>
+  </form>
 </body>
 </html>
