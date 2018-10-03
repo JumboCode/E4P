@@ -1,10 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>E4P Messaging</title>
+	<title>E4P Admin</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- TODO wrap admin.js in onLoad for scripts  -->
+  <script src="javascript/admin.js"></script>
 </head>
 
 <body>
 	<h1>Admin Page</h1>
+  <form id="debug">
+    <input id="user" autocomplete="off" placeholder="Paste User ID Here" /><button>Accept User</button>
+  </form>
 </body>
 </html>

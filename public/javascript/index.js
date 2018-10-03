@@ -2,15 +2,15 @@ $(document).ready(() => {
 
   const socket = io();
 
-  $('#message-form').submit((event) => {
-    event.preventDefault();
-    console.log($('#message-text').val());
-    socket.emit('message', $('#message-text').val());
-    $('#message-text').val('');
+  socket.on('connect', () => {
+    $('#user').html(socket.id);
   });
 
-  socket.on('message', (message) =>{
-    $('#messages').append($('<li>').text(message));
-  });
+  socket.on('admin matched', admin_matched);
 
+  // callback once admin connects to user
+  function admin_matched() {
+    console.log('admin matched')
+    // TODO - start chat protocol
+  }
 });
