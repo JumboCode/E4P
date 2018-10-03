@@ -1,0 +1,13 @@
+1.   default socket connect
+
+2.   'user waiting', user room id
+
+3.   'placeholder', user room id
+
+4.   'user matched', user room id
+
+4.5. 'admin matched'
+
+5.   'user chat', message, user room id
+
+5.5. 'admin chat', message
