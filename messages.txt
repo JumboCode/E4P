@@ -2,7 +2,7 @@
 
 2.   'user waiting', user room id
 
-3.   'placeholder', user room id
+3.   'accept user', user room id
 
 4.   'user matched', user room id
 
