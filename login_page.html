@@ -1,0 +1,36 @@
+<!DOCTYPE>
+<html>
+<head>
+	<title> Login Page </title>
+</head>
+
+<body>
+	<h1> Login </h1>
+	<p> 
+		<label> Username: </label>
+		<input type = "text" 
+			   id = "myText"
+			   value = "" />
+	</p>
+
+	<p> 
+		<label> Password: </label>
+		<input type = "password" 
+			   id = "myPwd"
+			   value = "" />
+	</p>		   
+
+	<button onclick = "getUserInfo()" >Login </button>
+
+	<script>
+		function getUserInfo() {
+			var username = document.getElementById("myText");
+			var password = document.getElementById("myPwd");
+			console.log(username);
+			alert("Username = " + username.value + "\nPassword = " + password.value);
+		}
+	</script>
+
+</body>
+
+</html>
