@@ -46,6 +46,21 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('user matched', user_room_id); // Remove Me after figuring out all_admins
     socket.broadcast.to(user_room_id).emit('admin matched');
   });
+
+  // User Disconnects:
+  socket.on('disconnect', () => {
+    var user_room_id = socket.id;
+    var num_connected = io.sockets.adapter.rooms[user_room_id].length;
+    if (num_connected == 0) {
+      // no one else connected, user was pending
+      // TODO what if admin disconnected first, dont need to send 'accept user'
+      // socket.broadcast.to(all_admins).emit('user matched', user_room_id);
+      socket.broadcast.emit('user matched', user_room_id);
+    } else {
+      // either admin or user left in room, send disconnect
+      socket.broadcast.to(user_room_id).emit('user disconnect');
+    }
+  });
 });
 
 server.listen(3000, () => console.log('App is running on port 3000'));
