@@ -13,7 +13,6 @@ function initialize() {
         username[i].className = username[i].className.replace(" active", "");
     }
 
-    exampleChatUsage();
 }
 
 
@@ -21,19 +20,15 @@ function exampleChatUsage() {
 
     // Creates new chat with a user called 'chat1'
     newChat('chat1');
-    console.log(chats);
 
-    // Example of creating a new chat with a duplicate user name
-    // will result in an error
+    // Creating a new chat with a duplicate user name will result in an error
     newChat('chat1');
 
     // Adds a message saying 'hello' from the 'chat1' user to the chat 
-    messageObject = { role: 'user', message: 'hello', timestamp: new Date()}
+    messageObject = createMessage('user', 'hello');
     addMessage('chat1', messageObject);
-    console.log(chats);
 
-    // Example of adding a message to a chat that does not exists
-    // will also result in an error
+    // Adding a message to a chat that does not exists will also result in an error
     addMessage('chat2', messageObject);
 
 }
@@ -66,9 +61,10 @@ function toggleChat(evt, chatName) {
     }
 }
 
-
-// Given a user identifier, creates a new chat for that user if the identifier is unique
-// and logs an error if it is a duplicate
+/*
+    Given a user identifier, creates a new chat for that user if the identifier is unique
+    and logs an error if it is a duplicate
+*/
 function newChat(user) {
     validUser = true;
     for (chat of chats) {
@@ -78,17 +74,27 @@ function newChat(user) {
         }
     }
     if (validUser) {
-        chats.push({ user: user, messageStream: { messages: [], active: true } });
+        chats.push({ user: user, messages: [], accepted: false, active: true });
     }
 }
 
-// Given a user identifier and a messageObject, appends the message object to that user's
-// chat if it exists, logs an error if that user chat doesn't exist 
+/*
+    To create a message object, we use the function createMessage. Given a role and a message string, 
+    this function appends creates a new messageObject that can be sent to addMessage.
+*/
+function createMessage(role, messageString) {
+    return { role: role, message: messageString, timestamp: new Date() };
+}
+
+/*
+    Given a user identifier and a messageObject, appends the message object to that user's
+    chat if it exists, logs an error if that user chat doesn't exist 
+*/
 function addMessage(user, messageObject) {
     foundUser = false;
     for (chat of chats) {
         if (user == chat.user) {
-            chat.messageStream.messages.push(messageObject);
+            chat.messages.push(messageObject);
             foundUser = true;
         }
     }
