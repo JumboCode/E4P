@@ -12,25 +12,6 @@ function initialize() {
     for (i = 0; i < username.length; i++) {
         username[i].className = username[i].className.replace(" active", "");
     }
-
-}
-
-
-function exampleChatUsage() {
-
-    // Creates new chat with a user called 'chat1'
-    newChat('chat1');
-
-    // Creating a new chat with a duplicate user name will result in an error
-    newChat('chat1');
-
-    // Adds a message saying 'hello' from the 'chat1' user to the chat 
-    messageObject = createMessage('user', 'hello');
-    addMessage('chat1', messageObject);
-
-    // Adding a message to a chat that does not exists will also result in an error
-    addMessage('chat2', messageObject);
-
 }
 
 function toggleChat(evt, chatName) {
@@ -65,16 +46,16 @@ function toggleChat(evt, chatName) {
     Given a user identifier, creates a new chat for that user if the identifier is unique
     and logs an error if it is a duplicate
 */
-function newChat(user) {
+function newChat(userId) {
     validUser = true;
     for (chat of chats) {
-        if (user == chat.user) {
+        if (userId == chat.userId) {
             console.log(Error('Cannot have multiple chats with identical user identifiers'));
             validUser = false;
         }
     }
     if (validUser) {
-        chats.push({ user: user, messages: [], accepted: false, active: true });
+        chats.push({ userId: userId, messages: [], accepted: false, active: true });
     }
 }
 
@@ -90,10 +71,10 @@ function createMessage(role, messageString) {
     Given a user identifier and a messageObject, appends the message object to that user's
     chat if it exists, logs an error if that user chat doesn't exist 
 */
-function addMessage(user, messageObject) {
+function addMessage(userId, messageObject) {
     foundUser = false;
     for (chat of chats) {
-        if (user == chat.user) {
+        if (userId == chat.userId) {
             chat.messages.push(messageObject);
             foundUser = true;
         }
