@@ -50,15 +50,15 @@ io.on('connection', (socket) => {
   // User Disconnects:
   socket.on('disconnect', () => {
     var user_room_id = socket.id;
-    var num_connected = io.sockets.adapter.rooms[user_room_id].length;
-    if (num_connected == 0) {
-      // no one else connected, user was pending
+    var room = io.sockets.adapter.rooms[user_room_id];
+    if (room) {
+      // room exists, either admin or user left in room, send disconnect
+      socket.broadcast.to(user_room_id).emit('user disconnect', user_room_id);
+    } else {
+      // room DNE, no one else connected, user was pending
       // TODO what if admin disconnected first, dont need to send 'accept user'
       // socket.broadcast.to(all_admins).emit('user matched', user_room_id);
       socket.broadcast.emit('user matched', user_room_id);
-    } else {
-      // either admin or user left in room, send disconnect
-      socket.broadcast.to(user_room_id).emit('user disconnect');
     }
   });
 });
