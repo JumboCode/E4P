@@ -2,27 +2,60 @@
 <html>
 <head>
 	<title> Login Page </title>
+
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+	<link href="login_page.css" rel="stylesheet"> 
+	
 </head>
 
-<body>
-	<h1> Login </h1>
-	<p> 
-		<label> Username: </label>
-		<input type = "text" 
+<body style = "background-color: #EFEBEA;">
+	<center>
+	<h1 style = "color:#4D4949;" class = "center"> <font size = "6" > Ears for Peers Admin Login </font></h1>
+
+	<!--
+	<form class="form-signin">
+      <label for="inputUsername" class="sr-only">Username</label>
+      <input type="username" id="inputEmail" class="form-control" placeholder="Username" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
+	 </form>
+	<-->
+
+	<p>
+		<input class = "input_box"
+			   type = "username" 
 			   id = "myText"
-			   value = "" />
+			   placeholder = "Username" />
 	</p>
 
 	<p> 
-		<label> Password: </label>
-		<input type = "password" 
+		<input class = "input_box"
+			   type = "password" 
 			   id = "myPwd"
-			   value = "" />
+			   placeholder= "Password" />
 	</p>		   
+	</div>
+	<button class = "login_button" onclick = "getUserInfo()" >Login </button>
 
-	<button onclick = "getUserInfo()" >Login </button>
+	<p>
+		<br>
+		<a href = "help_page.html"> Need Assistance?</a>
+	</p>
 
-	<script>
+	
+ </center>
+</body>
+
+<script>
 		function getUserInfo() {
 			var username = document.getElementById("myText");
 			var password = document.getElementById("myPwd");
@@ -30,7 +63,4 @@
 			alert("Username = " + username.value + "\nPassword = " + password.value);
 		}
 	</script>
-
-</body>
-
 </html>
