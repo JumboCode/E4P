@@ -41,11 +41,23 @@ io.on('connection', (socket) => {
   // 2. tell other admins to bug off
   // 3. tell user we joined
   socket.on('accept user', (user_room_id) => {
+	console.log('accept user');
     socket.join(user_room_id);
     // socket.broadcast.to(all_admins).emit('user matched', user_room_id); // Put Me Back after figuring out all_admins
     socket.broadcast.emit('user matched', user_room_id); // Remove Me after figuring out all_admins
     socket.broadcast.to(user_room_id).emit('admin matched');
   });
+
+  // recieve chat message from admin or user, and send it to a specific user's room
+  socket.on('chat message', function(data) {
+	console.log(data.message);
+
+	let message = data['message'];
+	let reciever = data['target'];
+	console.log('reciever: ' + reciever);
+	socket.broadcast.to(reciever).emit('chat message', message);
+  });
+
 });
 
 server.listen(3000, () => console.log('App is running on port 3000'));
