@@ -41,8 +41,9 @@ io.on('connection', (socket) => {
   // 2. tell other admins to bug off
   // 3. tell user we joined
   socket.on('accept user', (user_room_id) => {
+    // TODO what if user_room_id no longer exists
     socket.join(user_room_id);
-    // socket.broadcast.to(all_admins).emit('user matched', user_room_id); // Put Me Back after figuring out all_admins
+    // TODO socket.broadcast.to(all_admins).emit('user matched', user_room_id); // Put Me Back after figuring out all_admins
     socket.broadcast.emit('user matched', user_room_id); // Remove Me after figuring out all_admins
     socket.broadcast.to(user_room_id).emit('admin matched');
   });
@@ -57,7 +58,7 @@ io.on('connection', (socket) => {
     } else {
       // room DNE, no one else connected, user was pending
       // TODO what if admin disconnected first, dont need to send 'accept user'
-      // socket.broadcast.to(all_admins).emit('user matched', user_room_id);
+      // TODO socket.broadcast.to(all_admins).emit('user matched', user_room_id);
       socket.broadcast.emit('user matched', user_room_id);
     }
   });
