@@ -1,44 +1,25 @@
 chats = [];
 
 function initialize() {
-    // Get all elements with class="chatcontent" and hide them
-    chatcontent = document.getElementsByClassName("chatcontent");
-    for (i = 0; i < chatcontent.length; i++) {
-        chatcontent[i].style.display = "none";
-    }
 
-    // Get all elements with class="username" and remove the class "active"
-    username = document.getElementsByClassName("username");
-    for (i = 0; i < username.length; i++) {
-        username[i].className = username[i].className.replace(" active", "");
+    mockChats();
+
+    for (chat of chats) {
+        tab = document.getElementsByClassName("tab")[0];
+        tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
     }
 }
 
-function toggleChat(evt, chatName) {
-    // Declare all variables
-    var i, chatcontent, username;
-
-    // Get all elements with class="chatcontent" and hide them
-    chatcontent = document.getElementsByClassName("chatcontent");
-    for (i = 0; i < chatcontent.length; i++) {
-        chatcontent[i].style.display = "none";
-    }
-
-    // Get all elements with class="username" and remove the class "active"
-    username = document.getElementsByClassName("username");
-    for (i = 0; i < username.length; i++) {
-        username[i].className = username[i].className.replace(" active", "");
-    }
-
-    // Show the current tab, and add an "active" class to the link that opened the tab
-    var currentChat = document.getElementById(chatName);
-    currentChat.style.display = "block";
-    if (currentChat.classList.contains("active")) {
-        evt.currentTarget.className -= " active";
-    }
-
-    else {
-        evt.currentTarget.className += " active";
+function toggleChat(userId) {
+    for (chat of chats) {
+        if (chat.userId == userId) {
+            currentChat = document.getElementsByClassName("chatcontent")[0];
+            currentChat.innerHTML = "";
+            console.log(chat.messages);
+            for (message of chat.messages) {
+                currentChat.innerHTML = currentChat.innerHTML + "<p>" + message.role + ": " + message.message + "</p>";
+            }
+        }
     }
 }
 
@@ -82,4 +63,53 @@ function addMessage(userId, messageObject) {
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
+}
+
+function deactivateChat(userId) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.active = false;
+            foundUser = true;
+        }
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+}
+
+function acceptChat(userId) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.accepted = true;
+            foundUser = true;
+        }
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+}
+
+function mockChats() {
+
+    newChat('user1');
+    newChat('user2');
+    newChat('user3');
+
+    message1 = createMessage('user', 'hi');
+    addMessage('user1', message1);
+    addMessage('user2', message1);
+    addMessage('user3', message1);
+
+    message2 = createMessage('admin', 'hi user1');
+    addMessage('user1', message2);
+
+    message3 = createMessage('admin', 'hi user2');
+    addMessage('user2', message3);
+
+    message3 = createMessage('admin', 'hi user3');
+    addMessage('user3', message3);
+
+    console.log(chats);
 }
