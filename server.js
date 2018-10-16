@@ -30,11 +30,18 @@ app.get('/:folder/:file', function(req, res) {
 // TODO Look into socket.io p2p?
 
 io.on('connection', (socket) => {
-  console.log('A user connected.');
+  console.log('A user connected.' + socket.id);
 
   socket.on('message', (message) => {
     io.emit('message', message);
   });
+
+  // socket.broadcast.to(all_admins).emit('user waiting', socket.id);
+  socket.broadcast.emit('user waiting', socket.id); 
+
+  
+
 });
+
 
 server.listen(3000, () => console.log('App is running on port 3000'));
