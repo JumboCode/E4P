@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>E4P Messaging</title>
 	<link rel="stylesheet" href="css/index.css"/>
 	<script src="javascript/index.js"></script>
@@ -9,8 +10,21 @@
 <body>
 	<h1>E4P Messaging</h1>
 	<h2> Enter your name to start chatting! </h2>
-	<form>
-  		First name:<br><input type="text" name="firstname"><br>
+
+<button onclick="openChat()">Chat</button>
+
+<div class="chat" id="myChat">
+	<form class="chat-popup">
+
+		<textarea id = "messageString" placeholder="Type message.."></textarea>
+
+		<button onclick="getMessage()" type="submit" class="btn">Send</button>
+
+		<button type="button" class="btn cancel"
+		onclick="closeChat()">Close</button>
+
 	</form>
+</div>
+
 </body>
 </html>
