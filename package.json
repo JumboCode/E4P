@@ -25,9 +25,7 @@
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
-    "cors": "*",
     "body-parser": "*",
-    "connect-flash": "*",
     "express-session": "*",
     "mongodb": "*",
     "cookie-parser": "*"

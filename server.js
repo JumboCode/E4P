@@ -4,26 +4,26 @@ const app = express();
 const passport = require('passport');
 const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
-const flash = require('connect-flash');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 var db = mongoose.connection;
-mongoose.connect('mongodb://localhost/admin');
+mongoose.connect('mongodb://localhost/admin', { useNewUrlParser: true });
 
-app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use(session({ secret: 'secret' }));
+app.use(session({ secret: 'secret',
+				  resave: true,
+    			  saveUninitialized: true}));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
 
 // passport config
-var Admin = require('./models/AdminModel');
+var Admin = require('./models/adminModel');
 passport.use(new LocalStrategy(Admin.authenticate()));
 passport.serializeUser(Admin.serializeUser());
 passport.deserializeUser(Admin.deserializeUser());
