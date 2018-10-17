@@ -4,7 +4,7 @@
   "description": "E4P JumboCode Project",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --exit --recursive tests",
     "start": "node server.js"
   },
   "repository": {
@@ -29,5 +29,10 @@
     "express-session": "*",
     "mongodb": "*",
     "cookie-parser": "*"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^4.2",
+    "mocha": "^5.2"
   }
 }
