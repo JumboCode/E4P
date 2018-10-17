@@ -2,19 +2,33 @@ $(document).ready(() => {
 
   const socket = io();
 
-  $('#message-form').submit((event) => {
-    event.preventDefault();
-    console.log($('#message-text').val());
-    socket.emit('message', $('#message-text').val());
-    $('#message-text').val('');
+  socket.on('connect', () => {
+    $('#user').html(socket.id);
   });
 
-  socket.on('message', (message) =>{
-    $('#messages').append($('<li>').text(message));
+  socket.on('admin matched', admin_matched);
+
+  socket.on('chat message', function(msg) {
+    console.log('recieved chat message on index');
+    $('#messages').append($('<li>').text(msg));
   });
 
-  socket.on('user waiting', (user_room_id) => {
-    console.log('user waiting' + user_room_id);
+  // callback once admin connects to user
+  function admin_matched() {
+    console.log('admin matched');
+    // start chat protocol
+  }
+
+  // send chat message to server for user's own room
+  message = document.querySelector('#m');
+  $('form').submit(function(e) {
+    e.preventDefault();
+    $('#messages').append($('<li>').text(message.value)); // display your own message
+    socket.emit('chat message', {
+      message: message.value,
+      target: socket.id
+    });
+    message.value = '';
   });
 
 });
