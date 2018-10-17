@@ -20,9 +20,11 @@ app.get('/help', function(req, res) {
 });
 
 app.get('/:folder/:file', function(req, res) {
-	res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
 });
 
 app.listen(process.env.PORT || 3000, function() {
   	console.log('Node app is running on port 3000');
 });
+
+module.exports = app;

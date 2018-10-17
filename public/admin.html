@@ -1,10 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>E4P Messaging</title>
+	<link rel="stylesheet" href="css/admin.css"/>
+	<script src="javascript/admin.js"></script>
 </head>
 
-<body>
+<body onload = "initialize();">
 	<h1>Admin Page</h1>
+
+	<div class="tab">
+  		<button class="username" onclick="toggleChat(event, 'Username 1')">Username 1</button>
+  		<button class="username" onclick="toggleChat(event, 'Username 2')">Username 2</button>
+  		<button class="username" onclick="toggleChat(event, 'Username 3')">Username 3</button>
+	</div>
+
+	<div id='Username 1' class="chatcontent">
+  		<h3>Username 1</h3>
+  		<p>balhfladblh.</p>
+	</div>
+
+	<div id='Username 2' class="chatcontent">
+  		<h3>Username 2</h3>
+  		<p>stuff stuff stuff.</p> 
+	</div>
+
+	<div id='Username 3' class="chatcontent">
+  		<h3>Username 3</h3>
+  		<p>yes yes yes.</p>
+	</div>
 </body>
 </html>
