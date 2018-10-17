@@ -13,11 +13,19 @@ function initialize() {
 function toggleChat(userId) {
     for (chat of chats) {
         if (chat.userId == userId) {
-            currentChat = document.getElementsByClassName("chatcontent")[0];
+            currentChat = document.getElementsByClassName("messages")[0];
             currentChat.innerHTML = "";
-            console.log(chat.messages);
             for (message of chat.messages) {
                 currentChat.innerHTML = currentChat.innerHTML + "<p>" + message.role + ": " + message.message + "</p>";
+            }
+            actionDiv = document.getElementsByClassName("chatAction")[0];
+            if (chat.active) {
+                actionDiv.innerHTML = "<form action='sendMessage()'>"
+                                    + "<input id='messageBox' type='text' name='messageInput' placeholder='Message'>"
+                                    + "<input id='sendButton' type='submit' value='Send'>"
+                                    + "</form>";
+            } else {
+                actionDiv.innerHTML = "<button id='delete'>Delete Thread</button>";
             }
         }
     }
@@ -97,19 +105,22 @@ function mockChats() {
     newChat('user2');
     newChat('user3');
 
-    message1 = createMessage('user', 'hi');
-    addMessage('user1', message1);
-    addMessage('user2', message1);
-    addMessage('user3', message1);
+    message = createMessage('user', 'hi');
+    addMessage('user1', message);
+    addMessage('user2', message);
+    addMessage('user3', message);
 
-    message2 = createMessage('admin', 'hi user1');
-    addMessage('user1', message2);
+    message = createMessage('admin', 'hi user1');
+    addMessage('user1', message);
 
-    message3 = createMessage('admin', 'hi user2');
-    addMessage('user2', message3);
+    message = createMessage('admin', 'hi user2');
+    addMessage('user2', message);
+    message = createMessage('user', 'blah blah');
+    addMessage('user2', message);
 
-    message3 = createMessage('admin', 'hi user3');
-    addMessage('user3', message3);
+    message = createMessage('admin', 'hi user3');
+    addMessage('user3', message);
 
-    console.log(chats);
+    deactivateChat('user3');
+
 }
