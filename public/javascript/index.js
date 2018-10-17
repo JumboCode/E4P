@@ -17,4 +17,10 @@ $(document).ready(() => {
     console.log('user waiting' + user_room_id);
   });
 
+  // front-end implements the actual button
+  function user_connect() {
+    socket.emit('user connect');
+  };
+  
+
 });
