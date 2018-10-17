@@ -15,6 +15,14 @@ $(document).ready(() => {
     // TODO - remove user from whatever list
   }
 
+  socket.on('user disconnect', end_chat);
+
+  // ends a chat with given user
+  function end_chat(user) {
+    console.log('user disconnected ' + user);
+    // TODO - close chat
+  }
+
   // RECEIVE ^^^
   ///////////////////////////////////////
   // SEND    vvv

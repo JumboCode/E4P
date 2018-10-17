@@ -40,6 +40,7 @@ io.on('connection', (socket) => {
   // 2. tell user we joined
   // 3. tell other admins to remove user from their lists
   socket.on('accept user', (user_room_id) => {
+    // TODO what if user_room_id no longer exists
     socket.join(user_room_id);
     socket.broadcast.to(user_room_id).emit('admin matched');
     // socket.broadcast.to(all_admins).emit('user matched', user_room_id);
@@ -55,6 +56,22 @@ io.on('connection', (socket) => {
     let reciever = data['target'];
     console.log('reciever: ' + reciever);
     socket.broadcast.to(reciever).emit('chat message', message);
+  });
+
+  // PHASE IV
+  // User Disconnects:
+  socket.on('disconnect', () => {
+    var user_room_id = socket.id;
+    var room = io.sockets.adapter.rooms[user_room_id];
+    if (room) {
+      // room exists, either admin or user left in room, send disconnect
+      socket.broadcast.to(user_room_id).emit('user disconnect', user_room_id);
+    } else {
+      // room DNE, no one else connected, user was pending
+      // TODO what if admin disconnected first, dont need to send 'accept user'
+      // TODO socket.broadcast.to(all_admins).emit('user matched', user_room_id);
+      socket.broadcast.emit('user matched', user_room_id);
+    }
   });
 });
 
