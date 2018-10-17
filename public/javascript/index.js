@@ -13,4 +13,8 @@ $(document).ready(() => {
     $('#messages').append($('<li>').text(message));
   });
 
+  socket.on('user waiting', (user_room_id) => {
+    console.log('user waiting' + user_room_id);
+  });
+
 });
