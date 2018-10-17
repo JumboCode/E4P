@@ -31,5 +31,4 @@ $(document).ready(() => {
     message.value = '';
   });
 
-
 });
