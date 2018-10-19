@@ -32,7 +32,9 @@ io.on('connection', (socket) => {
   
   // PHASE I
   // socket.broadcast.to(all_admins).emit('user waiting', socket.id);
-  socket.broadcast.emit('user waiting', socket.id); 
+  socket.on('user connect', (user_connect) => { 
+  	socket.broadcast.emit('user waiting', socket.id);
+  }); 
 
   // PHASE II
   // Admin Accepts User:

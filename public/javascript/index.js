@@ -31,4 +31,10 @@ $(document).ready(() => {
     message.value = '';
   });
 
+  // front-end implements the actual button
+  function user_connect() {
+    socket.emit('user connect');
+  };
+  
+
 });
