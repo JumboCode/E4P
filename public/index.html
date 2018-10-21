@@ -8,23 +8,54 @@
 </head>
 
 <body>
-	<h1>E4P Messaging</h1>
-	<h2> Enter your name to start chatting! </h2>
+	<div class="chat-start" id="chat-start">
+		<button onclick="openChat()">Chat</button>
+	</div>
 
-<button onclick="openChat()">Chat</button>
+	<div class="chatbox" id="chatbox" >
+		<div class="chatlogs">
+		<div class="chat admin">
+			<div class="chat-message">
+			<p> Hi </p>
+		</div>
+	</div>
+	</div>
+
+	<div class="chat-form">
+		<textarea id="message"></textarea>
+		<button onclick="getMessage()">Send</button>
+	</div>
+
+</div>
+</body>
+
+
+
+
+
+
+
+
+<!-- <button onclick="openChat()">Chat</button>
 
 <div class="chat" id="myChat">
-	<form class="chat-popup">
+	<div class="chat-container">
+		<div class="chat-message">
+			<p>Hello</p>
+		</div>
+		<div class="chat-message">
+			<p>Hi</p>
+		</div>
+	</div>
+		<div class="chat-control">
+			<input class="chat-message" type="text" placeholder="Type message here"/>
+		</div>
+		<button onclick="getMessage()" type="button" class="btn">Send</button>
 
-		<textarea id = "messageString" placeholder="Type message.."></textarea>
-
-		<button onclick="getMessage()" type="submit" class="btn">Send</button>
-
-		<button type="button" class="btn cancel"
+		 <button type="button" class="btn cancel"
 		onclick="closeChat()">Close</button>
 
-	</form>
-</div>
+</div> -->
 
 </body>
 </html>
