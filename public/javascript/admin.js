@@ -1,44 +1,33 @@
 chats = [];
 
 function initialize() {
-    // Get all elements with class="chatcontent" and hide them
-    chatcontent = document.getElementsByClassName("chatcontent");
-    for (i = 0; i < chatcontent.length; i++) {
-        chatcontent[i].style.display = "none";
-    }
 
-    // Get all elements with class="username" and remove the class "active"
-    username = document.getElementsByClassName("username");
-    for (i = 0; i < username.length; i++) {
-        username[i].className = username[i].className.replace(" active", "");
+    mockChats();
+
+    for (chat of chats) {
+        tab = document.getElementsByClassName("tab")[0];
+        tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
     }
 }
 
-function toggleChat(evt, chatName) {
-    // Declare all variables
-    var i, chatcontent, username;
-
-    // Get all elements with class="chatcontent" and hide them
-    chatcontent = document.getElementsByClassName("chatcontent");
-    for (i = 0; i < chatcontent.length; i++) {
-        chatcontent[i].style.display = "none";
-    }
-
-    // Get all elements with class="username" and remove the class "active"
-    username = document.getElementsByClassName("username");
-    for (i = 0; i < username.length; i++) {
-        username[i].className = username[i].className.replace(" active", "");
-    }
-
-    // Show the current tab, and add an "active" class to the link that opened the tab
-    var currentChat = document.getElementById(chatName);
-    currentChat.style.display = "block";
-    if (currentChat.classList.contains("active")) {
-        evt.currentTarget.className -= " active";
-    }
-
-    else {
-        evt.currentTarget.className += " active";
+function toggleChat(userId) {
+    for (chat of chats) {
+        if (chat.userId == userId) {
+            currentChat = document.getElementsByClassName("messages")[0];
+            currentChat.innerHTML = "";
+            for (message of chat.messages) {
+                currentChat.innerHTML = currentChat.innerHTML + "<div class='" + message.role + "'> " + message.message + "</div>";
+            }
+            actionDiv = document.getElementsByClassName("chatAction")[0];
+            if (chat.active) {
+                actionDiv.innerHTML = "<form action='sendMessage()'>"
+                                    + "<input id='messageBox' type='text' name='messageInput' placeholder='Message'>"
+                                    + "<input id='sendButton' type='submit' value='Send'>"
+                                    + "</form>";
+            } else {
+                actionDiv.innerHTML = "<button id='delete'>Delete Thread</button>";
+            }
+        }
     }
 }
 
@@ -82,4 +71,57 @@ function addMessage(userId, messageObject) {
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
+}
+
+function deactivateChat(userId) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.active = false;
+            foundUser = true;
+        }
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+}
+
+function acceptChat(userId) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.accepted = true;
+            foundUser = true;
+        }
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+}
+
+function mockChats() {
+
+    newChat('user1');
+    newChat('user2');
+    newChat('user3');
+
+    message = createMessage('user', 'hi');
+    addMessage('user1', message);
+    addMessage('user2', message);
+    addMessage('user3', message);
+
+    message = createMessage('admin', 'hi user1');
+    addMessage('user1', message);
+
+    message = createMessage('admin', 'hi user2');
+    addMessage('user2', message);
+    message = createMessage('user', 'blah blah');
+    addMessage('user2', message);
+
+    message = createMessage('admin', 'hi user3');
+    addMessage('user3', message);
+
+    deactivateChat('user3');
+    console.log(chats);
+
 }

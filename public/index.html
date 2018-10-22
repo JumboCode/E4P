@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>E4P Messaging</title>
 	<link rel="stylesheet" href="css/index.css"/>
 	<script src="javascript/index.js"></script>
 </head>
 
 <body>
-	<h1>E4P Messaging</h1>
+
+	<header class="header"> Ears 4 Peers
+		<div class="header-links"> Feedback
+		</div>
+	</header>
+
+	<div class="chat-start" id="chat-start">
+		<button onclick="openChat()">Chat</button>
+	</div>
+
+	<div class="chatbox" id="chatbox" >
+		<div class="chatlogs">
+		<div class="chat admin">
+			<div class="chat-message">
+			<p> Hi </p>
+		</div>
+	</div>
+	</div>
+
+	<div class="chat-form">
+		<textarea id="message"></textarea>
+		<button onclick="getMessage()">Send</button>
+	</div>
+
+</div>
 </body>
 </html>
