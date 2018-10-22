@@ -16,7 +16,7 @@ function toggleChat(userId) {
             currentChat = document.getElementsByClassName("messages")[0];
             currentChat.innerHTML = "";
             for (message of chat.messages) {
-                currentChat.innerHTML = currentChat.innerHTML + "<p>" + message.role + ": " + message.message + "</p>";
+                currentChat.innerHTML = currentChat.innerHTML + "<div class='" + message.role + "'> " + message.message + "</div>";
             }
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (chat.active) {
@@ -122,5 +122,6 @@ function mockChats() {
     addMessage('user3', message);
 
     deactivateChat('user3');
+    console.log(chats);
 
 }
