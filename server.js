@@ -11,6 +11,14 @@ app.get('/admin', function(req, res) {
 	res.sendFile('admin.html', {root: path.join(__dirname, 'public')});
 });
 
+app.get('/login', function(req, res) {
+	res.sendFile('login_page.html', {root: path.join(__dirname, 'public')});
+});
+
+app.get('/help', function(req, res) {
+	res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
+});
+
 app.get('/:folder/:file', function(req, res) {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
 });
