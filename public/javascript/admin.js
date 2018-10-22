@@ -1,16 +1,78 @@
+const socket = io();
+
+socket.on('user matched', user_matched);
+
+socket.on('chat message', function(data) {
+  console.log('recieved chat message on admin: ' + data);
+
+  addMessage(data.id, createMessage('user', data.msg))
+});
+
+// removes a user from the waiting list
+function user_matched(user) {
+  console.log('user matched ' + user);
+  // TODO - remove user from whatever list
+}
+
+socket.on('user disconnect', end_chat);
+
+// ends a chat with given user
+function end_chat(user) {
+  console.log('user disconnected ' + user);
+  // TODO - Frontend: close chat
+}
+
+socket.on('user waiting', user_waiting);
+
+function user_waiting(user) {
+  console.log('user waiting ' + user);
+  console.log('creating new chat for user waiting');
+  newChat(user);
+  updateUserOverview();
+
+  // TODO: remove this when user accept button ready
+  // that button can use accept_user as a callback
+  console.log("accepting user: " + user);
+  accept_user(user);
+}
+
+// RECEIVE ^^^
+///////////////////////////////////////
+// SEND    vvv
+
+function send_message(user, msg) {
+  socket.emit('chat message', {
+    message: msg,
+    target: user
+  });
+}
+
+// accepts a waiting user
+function accept_user(user) {
+  socket.emit('accept user', user);
+}
+
 chats = [];
+CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
 
     mockChats();
+    updateUserOverview();
+}
+
+// updates the left chat menu to catch newly added users
+function updateUserOverview() {
+    tab = document.getElementsByClassName("tab")[0];
+    tab.innerHTML = '';
 
     for (chat of chats) {
-        tab = document.getElementsByClassName("tab")[0];
         tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
     }
 }
 
 function toggleChat(userId) {
+    CURRENT_CHAT_USER_ID = userId
     for (chat of chats) {
         if (chat.userId == userId) {
             currentChat = document.getElementsByClassName("messages")[0];
@@ -20,10 +82,10 @@ function toggleChat(userId) {
             }
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (chat.active) {
-                actionDiv.innerHTML = "<form action='sendMessage()'>"
+                actionDiv.innerHTML = "<div>"
                                     + "<input id='messageBox' type='text' name='messageInput' placeholder='Message'>"
-                                    + "<input id='sendButton' type='submit' value='Send'>"
-                                    + "</form>";
+                                    + "<span id='sendButton' onclick='sendMessage()'>Send</span>"
+                                    + "</div>";
             } else {
                 actionDiv.innerHTML = "<button id='delete'>Delete Thread</button>";
             }
@@ -56,6 +118,18 @@ function createMessage(role, messageString) {
     return { role: role, message: messageString, timestamp: new Date() };
 }
 
+function sendMessage() {
+    console.log("sending message")
+    message = $('#messageBox').val();
+    send_message(CURRENT_CHAT_USER_ID, message);
+    messageObject = createMessage("admin", message);
+
+    addMessage(CURRENT_CHAT_USER_ID, messageObject);
+            
+    message = $('#messageBox').val('');
+}
+
+
 /*
     Given a user identifier and a messageObject, appends the message object to that user's
     chat if it exists, logs an error if that user chat doesn't exist 
@@ -66,11 +140,16 @@ function addMessage(userId, messageObject) {
         if (userId == chat.userId) {
             chat.messages.push(messageObject);
             foundUser = true;
+            if (userId == CURRENT_CHAT_USER_ID) {
+              currentChat = document.getElementsByClassName("messages")[0];
+              currentChat.innerHTML = currentChat.innerHTML + "<div class='" + messageObject.role + "'> " + messageObject.message + "</div>";
+            }
         }
     }
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
+    console.log(chats)
 }
 
 function deactivateChat(userId) {

@@ -4,11 +4,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>E4P Messaging</title>
 	<link rel="stylesheet" href="css/index.css"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
 	<script src="javascript/index.js"></script>
+
 </head>
 
 <body>
-
 	<header class="header"> Ears 4 Peers
 		<div class="header-links"> Feedback
 		</div>
@@ -22,16 +24,16 @@
 		<div class="chatlogs">
 		<div class="chat admin">
 			<div class="chat-message">
-			<p> Hi </p>
+				<p> Hi </p>
+			</div>
 		</div>
-	</div>
-	</div>
+		</div>
 
-	<div class="chat-form">
-		<textarea id="message"></textarea>
-		<button onclick="getMessage()">Send</button>
-	</div>
+		<div class="chat-form">
+			<textarea id="message"></textarea>
+			<button onclick="getMessage()">Send</button>
+		</div>
 
-</div>
+	</div>
 </body>
 </html>
