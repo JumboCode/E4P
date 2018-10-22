@@ -36,10 +36,45 @@ body {font-family: "Lato", sans-serif;}
 
 /* Style the tab content */
 .chatcontent {
+    position: relative;
     float: left;
-    padding: 0px 12px;
     border: 1px solid #ccc;
     width: 70%;
     border-left: none;
     height: 500px;
+
+}
+
+.messages {
+    padding: 0px 12px;
+}
+
+.chatAction {
+    position: absolute;
+    margin: 0;
+    height: 10%;
+    width: 100%;
+    top: auto;
+    bottom: 0px;
+}
+
+.chatAction #delete {
+    height: 100%;
+    width: 100%;
+}
+
+.chatAction form {
+    height: 100%;
+    width: 100%;
+}
+
+.chatAction form #messageBox {
+    height: 100%;
+    width: 85%;
+}
+
+.chatAction form #sendButton {
+    box-sizing: unset;
+    height: 100%;
+    width: fit-content;
 }
