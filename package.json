@@ -19,7 +19,8 @@
   "homepage": "https://github.com/JumboCode/E4P#readme",
   "dependencies": {
     "express": "^4.16.3",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
