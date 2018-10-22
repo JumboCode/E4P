@@ -19,6 +19,14 @@ app.get('/admin', function(req, res) {
 	res.sendFile('admin.html', {root: path.join(__dirname, 'public')});
 });
 
+app.get('/login', function(req, res) {
+  res.sendFile('login_page.html', {root: path.join(__dirname, 'public')});
+});
+
+app.get('/help', function(req, res) {
+  res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
+});
+
 app.get('/:folder/:file', function(req, res) {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
 });
@@ -58,7 +66,7 @@ io.on('connection', (socket) => {
     let message = data['message'];
     let reciever = data['target'];
     console.log('reciever: ' + reciever);
-    socket.broadcast.to(reciever).emit('chat message', message);
+    socket.broadcast.to(reciever).emit('chat message', {msg: message, id: reciever});
   });
 
   // PHASE IV
@@ -79,4 +87,8 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3000, () => console.log('App is running on port 3000'));
+server.listen(process.env.PORT || 3000, function() {
+  	console.log('Node app is running on port 3000');
+});
+
+module.exports = app;
