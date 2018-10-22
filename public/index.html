@@ -3,8 +3,8 @@
 <head>
 	<title>E4P Messaging</title>
 	<link rel="stylesheet" href="css/index.css"/>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
 	<script src="javascript/index.js"></script>
 	<style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,9 +16,6 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
-	<script>
-		var socket = io();
-  </script>
 </head>
 
 <body>

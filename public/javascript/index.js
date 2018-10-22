@@ -24,17 +24,21 @@ $(document).ready(() => {
   $('form').submit(function(e) {
     e.preventDefault();
     $('#messages').append($('<li>').text(message.value)); // display your own message
-    socket.emit('chat message', {
-      message: message.value,
-      target: socket.id
-    });
+    send_message(message.value);
     message.value = '';
   });
+
+  function send_message(msg) {
+    socket.emit('chat message', {
+      message: msg,
+      target, socket.id
+    });
+  }
 
   // front-end implements the actual button
   function user_connect() {
     socket.emit('user connect');
   };
   
-
+  user_connect();
 });

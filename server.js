@@ -28,11 +28,12 @@ app.get('/:folder/:file', function(req, res) {
 ///////////////////////////////////////////////////////////////////////
 
 io.on('connection', (socket) => {
-  console.log('A user connected. ' + socket.id);
+  console.log('CONNECT ' + socket.id);
   
   // PHASE I
   // socket.broadcast.to(all_admins).emit('user waiting', socket.id);
-  socket.on('user connect', (user_connect) => { 
+  socket.on('user connect', () => {
+    console.log('user connect: ' + socket.id)
   	socket.broadcast.emit('user waiting', socket.id);
   }); 
 
@@ -63,6 +64,7 @@ io.on('connection', (socket) => {
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
+    console.log('DISCONNECT ' + socket.id)
     var user_room_id = socket.id;
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {

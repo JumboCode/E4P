@@ -23,6 +23,13 @@ $(document).ready(() => {
     // TODO - close chat
   }
 
+  socket.on('user waiting', user_waiting);
+
+  function user_waiting(user) {
+    console.log('user waiting ' + user);
+    // TODO front end stuff
+  }
+
   // RECEIVE ^^^
   ///////////////////////////////////////
   // SEND    vvv
@@ -44,12 +51,16 @@ $(document).ready(() => {
   $('#form').submit((event) => {
     event.preventDefault();
     $('#messages').append($('<li>').text(message.value)); // display your own message
-    socket.emit('chat message', {
-      message: message.value,
-      target: user
-    });
+    send_message(user, message.value);
     message.value = '';
   });
+
+  function send_message(user, msg) {
+    socket.emit('chat message', {
+      message: msg,
+      target: user
+    });
+  }
 
   // accepts a waiting user
   function accept_user(user) {
