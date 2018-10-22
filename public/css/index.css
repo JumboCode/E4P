@@ -1,14 +1,15 @@
 
 .chat-start button {
-  display: block;
-  background: #1ddced;
+  display: flex;
+  background: grey;
   padding: 5px 15px;
   font-size: 30px;
-  margin: 0 10px;
   border: none;
-  color: #fff;
+  color: white;
   border-radius: 3px;
   cursor: pointer;
+  align-items: center;
+  justify-content: center;
 }
 
 
@@ -16,7 +17,7 @@
   display: none;
   width: 75%;
   min-width: 390px;
-  background: #fff;
+  background: grey;
   padding: 25px;
   margin: 20px auto;
 }
@@ -81,4 +82,20 @@
   color: #fff;
   border-radius: 3px;
   cursor: pointer;
+}
+
+.header {
+
+  max-width: 100%;
+  background: aqua;
+  padding: 30px;
+  color: white;
+  font-size: 30px;
+  border-radius: 10px;
+  align-items: center;
+
+}
+
+.header .header-links {
+  align-items: center;
 }
