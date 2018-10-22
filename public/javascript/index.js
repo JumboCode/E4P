@@ -1,7 +1,7 @@
 const socket = io();
 
 socket.on('connect', () => {
-  console.log('connected to socket with id: ' + id);
+  console.log('connected to socket with');
 });
 
 socket.on('admin matched', admin_matched);
