@@ -1,13 +1,18 @@
 * {box-sizing: border-box}
 body {font-family: "Lato", sans-serif;}
 
+
+.main-content {
+    height: 80vh;
+}
 /* Style the tab */
 .tab {
     float: left;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
     width: 30%;
-    height: 500px;
+    height: 100%;
+    overflow-y: auto;
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -41,7 +46,7 @@ body {font-family: "Lato", sans-serif;}
     border: 1px solid #ccc;
     width: 70%;
     border-left: none;
-    height: 500px;
+    height: 100%;
 
 }
 
@@ -58,23 +63,23 @@ body {font-family: "Lato", sans-serif;}
     bottom: 0px;
 }
 
-.chatAction #delete {
+.chatAction #delete, #accept {
     height: 100%;
     width: 100%;
 }
 
-.chatAction form {
-    height: 100%;
+.chatAction {
     width: 100%;
+    display: flex;
+    flex-direction: row;
 }
 
-.chatAction form #messageBox {
+.chatAction #messageBox {
     height: 100%;
     width: 85%;
 }
 
-.chatAction form #sendButton {
-    box-sizing: unset;
+.chatAction #sendButton {
     height: 100%;
-    width: fit-content;
+    text-align: center;
 }

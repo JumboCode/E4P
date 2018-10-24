@@ -69,6 +69,7 @@ function updateUserOverview() {
     for (chat of chats) {
         tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
     }
+    clearView();
 }
 
 function toggleChat(userId) {
@@ -81,13 +82,14 @@ function toggleChat(userId) {
                 currentChat.innerHTML = currentChat.innerHTML + "<div class='" + message.role + "'> " + message.message + "</div>";
             }
             actionDiv = document.getElementsByClassName("chatAction")[0];
-            if (chat.active) {
-                actionDiv.innerHTML = "<div>"
-                                    + "<input id='messageBox' type='text' name='messageInput' placeholder='Message'>"
-                                    + "<span id='sendButton' onclick='sendMessage()'>Send</span>"
-                                    + "</div>";
+            if (!chat.accepted) {
+                actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
+            }
+            else if (chat.active) {
+                actionDiv.innerHTML = "<input id='messageBox' type='text' name='messageInput' placeholder='Message' autocomplete='off'>"
+                                    + "<div id='sendButton' onclick='sendMessage()'>Send</div>";
             } else {
-                actionDiv.innerHTML = "<button id='delete'>Delete Thread</button>";
+                actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
     }
@@ -119,14 +121,18 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-    console.log("sending message")
     message = $('#messageBox').val();
-    send_message(CURRENT_CHAT_USER_ID, message);
-    messageObject = createMessage("admin", message);
+    if (message != '') {
+        console.log("sending message")
+        message = $('#messageBox').val();
+        send_message(CURRENT_CHAT_USER_ID, message);
+        messageObject = createMessage("admin", message);
 
-    addMessage(CURRENT_CHAT_USER_ID, messageObject);
-            
-    message = $('#messageBox').val('');
+        addMessage(CURRENT_CHAT_USER_ID, messageObject);
+                
+        message = $('#messageBox').val('');
+    }
+
 }
 
 
@@ -176,6 +182,33 @@ function acceptChat(userId) {
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
+    toggleChat(userId);
+}
+
+function removeChat(userId) {
+    console.log('remove chat with ' + userId);
+    foundUser = false;
+    newChats = [];
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.active = false;
+            foundUser = true;
+        } else {
+            newChats.push(chat);
+        }
+    }
+    chats = newChats;
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+    updateUserOverview();
+    clearView(); 
+}
+
+function clearView() {
+    $('.chatAction').html("");
+    $('.messages').html("");
+
 }
 
 function mockChats() {
@@ -183,6 +216,10 @@ function mockChats() {
     newChat('user1');
     newChat('user2');
     newChat('user3');
+
+    for (i = 4; i < 20; i++) {
+        newChat('user' + i);
+    }
 
     message = createMessage('user', 'hi');
     addMessage('user1', message);
@@ -200,6 +237,8 @@ function mockChats() {
     message = createMessage('admin', 'hi user3');
     addMessage('user3', message);
 
+    acceptChat('user2');
+    acceptChat('user3');
     deactivateChat('user3');
     console.log(chats);
 
