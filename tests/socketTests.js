@@ -3,13 +3,31 @@ process.env.NODE_ENV = 'test';
 
 //Require the dev-dependencies
 let chai = require('chai');
-let server = require('../server').server;
+let expect = require('chai').expect;
+let server = require('../server');
 let http = require('http')
-// const server = http.createServer(app);
 let io = require('socket.io-client')
 let should = chai.should();
 
-const url = 'localhost:3000/';
+let chaiHttp = require('chai-http');
+
+chai.use(chaiHttp);
+
+/*
+ * Set up server
+ */
+describe('GET /', () => {
+  it('it should GET /', (done) => {
+    chai.request(server)
+        .get('/')
+        .end((err, res) => {
+          res.should.have.status(200);
+          done();
+        });
+  });
+});
+
+const url = 'http://localhost:3000/';
 const ioOpts = {
   transports: ['websocket'],
   forceNew: true,
@@ -22,30 +40,45 @@ const ioOpts = {
  */
 describe('socket tests', () => {
   beforeEach((done) => {
-    console.log("hi")
-    server.listen(3000, () => {console.log('start')});
-    setTimeout(() => {
     admin1 = io(url, ioOpts);
-    console.log(admin1)
     admin2 = io(url, ioOpts);
     user1 = io(url, ioOpts);
     user2 = io(url, ioOpts);
-    console.log("bye")
     done();
-    }, 1000);
+  });
+
+  afterEach(function(done) {
+    // disconnect io clients after each test
+    admin1.disconnect();
+    admin2.disconnect();
+    user1.disconnect();
+    user2.disconnect();
+
+    done()
   });
 
   describe('user connect', () => {
     it('should notify all admins a user connected', (done) => {
-      user1.emit('user connect');
+      adminsNotified = 0;
       admin1.on('user waiting', (id1) => {
         expect(id1).to.equal(user1.id);
-        done();
-        // admin2.on('user waiting', (id2) => {
-        //   expect(id2).to.equal(user1.id);
-        //   done();
-        // });
+        // TODO: Will this result in a race condition across both callbacks?
+        adminsNotified++;
+        if (adminsNotified == 2) {
+          done();
+        }
       });
+
+      admin2.on('user waiting', (id1) => {
+        expect(id1).to.equal(user1.id);
+        adminsNotified++;
+        if (adminsNotified == 2) {
+          done();
+        }
+      });
+
+      // wait 50 ms to let receiver create on message event handler
+      setTimeout(function(){ user1.emit('user connect'); }, 50);
     });
   });
 });

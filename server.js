@@ -106,5 +106,4 @@ server.listen(process.env.PORT || 3000, function() {
   	console.log('Node app is running on port 3000');
 });
 
-module.exports.app = app
-module.exports.server = server;
+module.exports = app
