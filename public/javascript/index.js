@@ -33,24 +33,30 @@ function user_connect() {
 var chat = {
   userId: 'user1',
   messages: [],
-  accepted: true,
-  active: false
+  accepted: false,
+  active: true
 };
 
+function initialize() {
+  document.getElementsBy
 
-function openChat() {
-  document.getElementById("chatbox").style.display = "block";
-  document.getElementById("chat-start").style.display = "none";
+}
+function openChat() {  
+  document.getElementById("chat").style.display = "block";
+  document.getElementById("open").style.display = "none";
+  document.getElementById("topnav").style.backgroundColor = "#B1C6C4";
+
   
   console.log("attempting to connect");
   user_connect();
 }
 
 function getMessage() {
-  var message = document.getElementById("message").value;
+  var message = document.getElementById("msg").value;
+  console.log(message);
   var messageObj = createMessage('user', message);
   chat.messages.push(messageObj);
-  document.getElementById("message").value="";
+  document.getElementById("msg").value="";
   updateChat(messageObj);
 
   send_message(message);
@@ -58,8 +64,18 @@ function getMessage() {
 }
 
 function updateChat(messageObj) {
-  messages = document.getElementsByClassName("chatlogs")[0];
-  messages.innerHTML = messages.innerHTML + "<div class='chat "+messageObj.role+"'><div class='chat-message'><p>"+messageObj.message+"</p></div></div>";
+  messages = document.getElementsByClassName("chat_history")[0];
+  console.log(messageObj.role);
+  console.log(messages)
+  if (messageObj.role == 'admin') {
+      newMessage = "<div class='chat_admin'><div class='received_msg'><p>"+messageObj.message+"</p></div></div>"
+  }
+  else {
+      console.log(messageObj.message);
+      newMessage = "<div class='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
+  }
+  console.log(messages.innerHTML);
+  messages.innerHTML = messages.innerHTML + newMessage;
 }
 
 
