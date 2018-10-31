@@ -66,6 +66,7 @@ body {font-family: "Lato", sans-serif;}
 .chatAction #delete, #accept {
     height: 100%;
     width: 100%;
+    cursor: pointer;
 }
 
 .chatAction {
@@ -81,5 +82,20 @@ body {font-family: "Lato", sans-serif;}
 
 .chatAction #sendButton {
     height: 100%;
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgb(241, 241, 241);
+    border-radius: 4%;
+    border: solid rgb(200, 200, 200) 1px;
+    cursor: pointer;
+}
+
+#sendButton:hover, #delete:hover, #accept:hover {
+    background-color: rgb(200, 200, 200);
+}
+
+.chatAction #sendButtonText {
     text-align: center;
 }

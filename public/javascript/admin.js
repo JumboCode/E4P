@@ -87,12 +87,17 @@ function toggleChat(userId) {
             }
             else if (chat.active) {
                 actionDiv.innerHTML = "<input id='messageBox' type='text' name='messageInput' placeholder='Message' autocomplete='off'>"
-                                    + "<div id='sendButton' onclick='sendMessage()'>Send</div>";
+                                    + "<div id='sendButton' onclick='sendMessage()'><div id='sendButtonText'>Send</div></div>";
             } else {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
     }
+    $("#messageBox").on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            sendMessage();
+        }
+    });
 }
 
 /*
@@ -155,7 +160,6 @@ function addMessage(userId, messageObject) {
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
-    console.log(chats)
 }
 
 function deactivateChat(userId) {
@@ -217,10 +221,6 @@ function mockChats() {
     newChat('user2');
     newChat('user3');
 
-    for (i = 4; i < 20; i++) {
-        newChat('user' + i);
-    }
-
     message = createMessage('user', 'hi');
     addMessage('user1', message);
     addMessage('user2', message);
@@ -240,6 +240,5 @@ function mockChats() {
     acceptChat('user2');
     acceptChat('user3');
     deactivateChat('user3');
-    console.log(chats);
 
 }
