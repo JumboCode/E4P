@@ -51,12 +51,12 @@ app.get('/:folder/:file', function(req, res) {
 ///////////////////////////////////////////////////////////////////////
 
 io.on('connection', (socket) => {
-  console.log('CONNECT ' + socket.id);
+  // console.log('CONNECT ' + socket.id);
   
   // PHASE I
   // socket.broadcast.to(all_admins).emit('user waiting', socket.id);
   socket.on('user connect', () => {
-    console.log('user connect: ' + socket.id)
+    // console.log('user connect: ' + socket.id)
   	socket.broadcast.emit('user waiting', socket.id);
   }); 
 
@@ -76,18 +76,18 @@ io.on('connection', (socket) => {
   // PHASE III
   // recieve chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', function(data) {
-    console.log(data.message);
+    // console.log(data.message);
 
     let message = data['message'];
-    let reciever = data['target'];
-    console.log('reciever: ' + reciever);
-    socket.broadcast.to(reciever).emit('chat message', {msg: message, id: reciever});
+    let reciever = data['room'];
+    // console.log('reciever: ' + reciever);
+    socket.broadcast.to(reciever).emit('chat message', {message: message, room: reciever});
   });
 
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
-    console.log('DISCONNECT ' + socket.id)
+    // console.log('DISCONNECT ' + socket.id)
     var user_room_id = socket.id;
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {
