@@ -38,6 +38,13 @@ app.get('/login', function(req, res) {
   res.sendFile('login_page.html', {root: path.join(__dirname, 'public')});
 });
 
+app.post('/login', function(req, res) {
+  // add authentication to this route
+  console.log(req.body)
+  console.log(req)
+  res.send('success');
+});
+
 app.get('/help', function(req, res) {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
 });
