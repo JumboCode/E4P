@@ -31,3 +31,17 @@ describe('GET /', () => {
 	    });
   	});
 });
+
+describe('POST /', () => {
+	it('it should POST /login', (done) => {
+    	chai.request(server)
+	        .post('/login')
+	        .set('content-type', 'application/json')
+			.send({username: 'foo', password: 'bar'})
+	        .end((err, res) => {
+	          res.should.have.status(200);
+	          res.text.should.equal('success')
+	          done();
+	    });
+  	});
+});
