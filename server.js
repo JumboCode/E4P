@@ -3,9 +3,17 @@ const http = require('http');
 const socketio = require('socket.io');
 const path = require('path');
 
+const bodyParser = require('body-parser');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+// parse application/json
+app.use(bodyParser.json());
+
 
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
@@ -39,9 +47,10 @@ app.get('/login', function(req, res) {
 });
 
 app.post('/login', function(req, res) {
-  // add authentication to this route
-  console.log(req.body)
-  console.log(req)
+  // TODO add authentication to this route and remove the following print statements:
+  console.log(req.body.username)
+  console.log(req.body.password)
+
   res.send('success');
 });
 

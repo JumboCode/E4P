@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/JumboCode/E4P#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "path": "^0.12.7",
     "socket.io": "^2.1.1"
