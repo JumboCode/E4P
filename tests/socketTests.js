@@ -57,12 +57,12 @@ describe('socket tests', () => {
     done()
   });
 
+  // Socket Tests
   describe('user connect', () => {
     it('should notify all admins a user connected', (done) => {
       adminsNotified = 0;
       admin1.on('user waiting', (id1) => {
         expect(id1).to.equal(user1.id);
-        // TODO: Will this result in a race condition across both callbacks?
         adminsNotified++;
         if (adminsNotified == 2) {
           done();
@@ -80,5 +80,7 @@ describe('socket tests', () => {
       // wait 50 ms to let receiver create on message event handler
       setTimeout(function(){ user1.emit('user connect'); }, 50);
     });
+
+    // TODO: Add more socket tests here like the one above
   });
 });
