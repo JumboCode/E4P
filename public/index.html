@@ -7,33 +7,37 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="javascript/index.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
-
-<body>
-	<header class="header"> Ears 4 Peers
-		<div class="header-links"> Feedback
+	<body>
+		<div class="topnav" id="topnav">
+		  	<a class="active" href="/">E4P</a>
+		  	<div class="topnav-right">
+		    	<a href="/help">Help</a>
+		    	<a href="/help">Feedback</a>
+		  	</div>
 		</div>
-	</header>
 
-	<div class="chat-start" id="chat-start">
-		<button onclick="openChat()">Chat</button>
-	</div>
+		<div class="flex-container" id = "open">
+			<button type="button" class="btn btn-outline-secondary" onclick="openChat()"> Open </button>
+		</div>
 
-	<div class="chatbox" id="chatbox" >
-		<div class="chatlogs">
-		<div class="chat admin">
-			<div class="chat-message">
-				<p> Hi </p>
+		<div class="flex-container" id="chat">
+			<div class="chat_history">
+
+				<!-- <div class="chat_admin">
+					<div class="received_msg"></div>
+				</div>
+				<div class="chat_user">
+					<div class="sent_msg"></div>
+				</div> -->
+			</div>
+			<div class="input-group mb-3">
+  				<input type="text" class="form-control" id="msg" placeholder="E4P Message..." value="">
+  				<button type="button" class="btn" onclick="getMessage()">Send</button> 
 			</div>
 		</div>
-		</div>
-
-		<div class="chat-form">
-			<textarea id="message"></textarea>
-			<button onclick="getMessage()">Send</button>
-		</div>
-
-	</div>
-</body>
+	</body>
 </html>
