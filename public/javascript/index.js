@@ -22,7 +22,7 @@ function admin_matched() {
 function send_message(msg) {
   socket.emit('chat message', {
     message: msg,
-    target: socket.id
+    room: socket.id
   });
 }
 

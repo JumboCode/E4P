@@ -4,14 +4,12 @@ process.env.NODE_ENV = 'test';
 //Require the dev-dependencies
 let chai = require('chai');
 let expect = require('chai').expect;
-let server = require('../server');
-let http = require('http')
-let io = require('socket.io-client')
 let should = chai.should();
-
+let server = require('../server');
 let chaiHttp = require('chai-http');
-
 chai.use(chaiHttp);
+
+let io = require('socket.io-client')
 
 /*
  * Set up server
@@ -35,8 +33,7 @@ const ioOpts = {
 }
 
 /*
- * Default behavior of every socket test
- * don't change these
+ * Socket Tests
  */
 describe('socket tests', () => {
   beforeEach((done) => {
@@ -53,14 +50,13 @@ describe('socket tests', () => {
     admin2.disconnect();
     user1.disconnect();
     user2.disconnect();
-
     done()
   });
 
-  // Socket Tests
-  describe('user connect', () => {
+  describe('Phase 1: Initial User Connect', () => {
     it('should notify all admins a user connected', (done) => {
       adminsNotified = 0;
+
       admin1.on('user waiting', (id1) => {
         expect(id1).to.equal(user1.id);
         adminsNotified++;
@@ -78,9 +74,64 @@ describe('socket tests', () => {
       });
 
       // wait 50 ms to let receiver create on message event handler
-      setTimeout(function(){ user1.emit('user connect'); }, 50);
+      setTimeout(() => { user1.emit('user connect'); }, 50);
     });
+  });
 
-    // TODO: Add more socket tests here like the one above
+  describe('Phase 2: Admin Pick Up', () => {
+    it('should notify the user and every other admin that user was picked up', (done) => {
+      // setup connections
+      admin1.on('user waiting', (id1) => {
+        admin1.emit('accept user', id1);
+      });
+
+      // admin/user matching messages
+      admin_notified = false;
+      user_notified = false;
+      admin2.on('user matched', (id1) => {
+        expect(id1).to.equal(user1.id);
+        admin_notified = true;
+        if (admin_notified && user_notified) {
+          done();
+        }
+      });
+
+      user1.on('admin matched', () => {
+        user_notified = true;
+        if (admin_notified && user_notified) {
+          done();
+        }
+      });
+
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+    });
+  });
+
+  describe('Phase 3: Chat', () => {
+    it('should send messages back and forth between admin and user', (done) => {
+      // setup connections
+      admin1.on('user waiting', (id1) => {
+        admin1.emit('accept user', id1);
+      });
+
+      user1.on('admin matched', () => {
+        user1.emit('chat message', { message: 'foobar', room: user1.id });
+      });
+
+      // chat messages
+      admin1.on('chat message', (msg) => {
+        expect(msg.message).to.equal('foobar');
+        expect(msg.room).to.equal(user1.id);
+        admin1.emit('chat message', { message: 'sgobos', room: msg.room });
+      });
+
+      user1.on('chat message', (msg) => {
+        expect(msg.message).to.equal('sgobos');
+        expect(msg.room).to.equal(user1.id);
+        done();
+      });
+
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+    });
   });
 });

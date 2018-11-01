@@ -5,7 +5,7 @@ socket.on('user matched', user_matched);
 socket.on('chat message', function(data) {
   console.log('recieved chat message on admin: ' + data);
 
-  addMessage(data.id, createMessage('user', data.msg))
+  addMessage(data.room, createMessage('user', data.msg))
 });
 
 // removes a user from the waiting list
@@ -38,7 +38,7 @@ function user_waiting(user) {
 function send_message(user, msg) {
   socket.emit('chat message', {
     message: msg,
-    target: user
+    room: user
   });
 }
 
