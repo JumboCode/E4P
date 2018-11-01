@@ -99,3 +99,33 @@ body {font-family: "Lato", sans-serif;}
 .chatAction #sendButtonText {
     text-align: center;
 }
+
+.user {
+    background-color: #f8f8f8;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    width: auto;
+    float: left;
+    padding: 20px;
+
+
+}
+
+
+.admin {
+    background-color: #f8f8f8;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    width: auto;
+    padding: 20px;
+    float: right;
+    
+
+}
+
+.container {
+    display: inline-block; 
+    position: relative;
+    background-color: white;
+    width: 100%;
+}

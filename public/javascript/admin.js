@@ -74,7 +74,7 @@ function toggleChat(userId) {
             currentChat = document.getElementsByClassName("messages")[0];
             currentChat.innerHTML = "";
             for (message of chat.messages) {
-                currentChat.innerHTML = currentChat.innerHTML + "<div class='" + message.role + "'> " + message.message + "</div>";
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(message.role, message.message)
             }
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
@@ -148,13 +148,20 @@ function addMessage(userId, messageObject) {
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
               currentChat = document.getElementsByClassName("messages")[0];
-              currentChat.innerHTML = currentChat.innerHTML + "<div class='" + messageObject.role + "'> " + messageObject.message + "</div>";
+              currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageObject.role, messageObject.message);
             }
         }
     }
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
+}
+
+/*
+ * Return a message div based on the role and message string.
+ */
+function createMessageDiv(role, message) {
+    return "<div class= 'container'><div class='" + role + "'> " + message + "</div></div>";
 }
 
 function deactivateChat(userId) {
