@@ -29,11 +29,6 @@ function user_waiting(user) {
   console.log('creating new chat for user waiting');
   newChat(user);
   updateUserOverview();
-
-  // TODO: remove this when user accept button ready
-  // that button can use accept_user as a callback
-  console.log("accepting user: " + user);
-  accept_user(user);
 }
 
 // RECEIVE ^^^
@@ -56,8 +51,8 @@ chats = [];
 CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
-
-    mockChats();
+    // Can be used for testing:
+    // mockChats();
     updateUserOverview();
 }
 
@@ -187,6 +182,7 @@ function acceptChat(userId) {
         console.log(Error('User with given identifier could not be found'));
     }
     toggleChat(userId);
+    accept_user(userId);
 }
 
 function removeChat(userId) {
