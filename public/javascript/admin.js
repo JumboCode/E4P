@@ -5,7 +5,7 @@ socket.on('user matched', user_matched);
 socket.on('chat message', function(data) {
   console.log('recieved chat message on admin: ' + data);
 
-  addMessage(data.room, createMessage('user', data.msg))
+  addMessage(data.room, createMessage('user', data.message))
 });
 
 // removes a user from the waiting list
