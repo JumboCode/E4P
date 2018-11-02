@@ -8,7 +8,7 @@ socket.on('admin matched', admin_matched);
 
 socket.on('chat message', function(data) {
   console.log('recieved chat message on index: ' + data);
-  updateChat(createMessage('admin', data.msg));
+  updateChat(createMessage('admin', data.message));
 });
 
 // callback once admin connects to user
