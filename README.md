@@ -4,7 +4,6 @@ JumboCode 2018-2019 project for Ears 4 Peers. This site is currently under const
 * [Design](https://github.com/JumboCode/E4P/wiki/Design "E4P Design")
 * [Frontend Chat Data Structures](https://github.com/JumboCode/E4P/wiki/Front-End-Data-Structure "Frontend Data Structures")
 * [Socket Messaging Architecture](https://github.com/JumboCode/E4P/wiki/Socket-IO-Architecture "Socket Messaging Architecture")
-* [Live Version](https://ears4peers.herokuapp.com/ "E4P Website")
 
 ## Setup
 ### To Clone:
@@ -23,7 +22,7 @@ npm start
 - Anika Agarwal
 - Jasmine Falk
 - Lucy Fan
-- Erena C Inoue
+- Erena Inoue
 - Alex Johnson
 - Melvin Lin
 - Sinclair Meggit
