@@ -100,6 +100,7 @@ function toggleChat(userId) {
     and logs an error if it is a duplicate
 */
 function newChat(userId) {
+    console.log("new chat");
     validUser = true;
     for (chat of chats) {
         if (userId == chat.userId) {

@@ -13,6 +13,7 @@ socket.on('chat message', function(data) {
 
 // callback once admin connects to user
 function admin_matched() {
+  startChat()
   console.log('admin matched');
   // TODO: Frontend should unlock chat input field here
   // start chat protocol
@@ -37,31 +38,31 @@ var chat = {
   active: true
 };
 
-function initialize() {
-  document.getElementsBy
 
-}
-function openChat() {  
+function openChat() {
   document.getElementById("chat").style.display = "block";
   document.getElementById("open").style.display = "none";
   document.getElementById("topnav").style.backgroundColor = "#B1C6C4";
-
-  
   console.log("attempting to connect");
   user_connect();
 }
 
+function startChat() {
+  document.getElementById("accept").style.display = "none";
+  document.getElementById("chat_bar").style.display = "block";
+  chat.accepted = true;
+}
+
+
 function getMessage() {
   var message = document.getElementById("msg").value;
-  console.log(message);
   var messageObj = createMessage('user', message);
   chat.messages.push(messageObj);
   document.getElementById("msg").value="";
   updateChat(messageObj);
-
   send_message(message);
-
 }
+
 
 function updateChat(messageObj) {
   messages = document.getElementsByClassName("chat_history")[0];
@@ -74,7 +75,6 @@ function updateChat(messageObj) {
       console.log(messageObj.message);
       newMessage = "<div class='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
   }
-  console.log(messages.innerHTML);
   messages.innerHTML = messages.innerHTML + newMessage;
 }
 
