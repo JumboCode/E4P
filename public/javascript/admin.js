@@ -147,8 +147,15 @@ function addMessage(userId, messageObject) {
             chat.messages.push(messageObject);
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
-              currentChat = document.getElementsByClassName("messages")[0];
-              currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageObject.role, messageObject.message);
+                currentChat = document.getElementsByClassName("messages")[0];
+                if (messageObject.role == 'admin') {
+                    messageSide = 'right';
+                }
+                else {
+                    messageSide = 'left';
+                }    
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
+                
             }
         }
     }
@@ -157,12 +164,7 @@ function addMessage(userId, messageObject) {
     }
 }
 
-/*
- * Return a message div based on the role and message string.
- */
-function createMessageDiv(role, message) {
-    return "<div class= 'container'><div class='" + role + "'> " + message + "</div></div>";
-}
+
 
 function deactivateChat(userId) {
     foundUser = false;
