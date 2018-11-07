@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 app.use(bodyParser.json());
 
+let admin = [];
 
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
@@ -60,6 +61,10 @@ app.get('/help', function(req, res) {
 
 app.get('/:folder/:file', function(req, res) {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
+});
+
+app.post('/admin', function(req, res ) {
+  admin.push(req.body.admin);
 });
 
 ///////////////////////////////////////////////////////////////////////
