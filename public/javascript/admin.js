@@ -54,6 +54,7 @@ function initialize() {
     // Can be used for testing:
     // mockChats();
     updateUserOverview();
+    generateAdminHeader();
 }
 
 // updates the left chat menu to catch newly added users

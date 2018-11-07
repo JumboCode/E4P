@@ -7,18 +7,14 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="javascript/index.js"></script>
+	<script src="javascript/header.js"></script>
+	<link rel="stylesheet" href="css/header.css"/>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
-	<body>
-		<div class="topnav" id="topnav">
-		  	<a class="active" href="/">E4P</a>
-		  	<div class="topnav-right">
-		    	<a href="/help">Help</a>
-		    	<a href="/help">Feedback</a>
-		  	</div>
-		</div>
+	<body onload="generateUserHeader()"">
+		<div class="topnav"></div>
 
 		<div class="flex-container" id = "open">
 			<button type="button" class="btn btn-outline-secondary" onclick="openChat()"> Open </button>
