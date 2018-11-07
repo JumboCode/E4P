@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/JumboCode/E4P#readme",
   "dependencies": {
+    "body-parser": "*",
     "express": "^4.16.3",
     "path": "^0.12.7",
     "mongoose": "*",
@@ -25,10 +26,10 @@
     "passport": "*",
     "passport-http": "*",
     "passport-local": "*",
-    "body-parser": "*",
     "express-session": "*",
     "mongodb": "*",
-    "cookie-parser": "*"
+    "cookie-parser": "*",
+    "socket.io": "^2.1.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

@@ -1,13 +1,18 @@
 * {box-sizing: border-box}
 body {font-family: "Lato", sans-serif;}
 
+
+.main-content {
+    height: 80vh;
+}
 /* Style the tab */
 .tab {
     float: left;
     border: 1px solid #ccc;
     background-color: #f1f1f1;
     width: 30%;
-    height: 500px;
+    height: 100%;
+    overflow-y: auto;
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -36,10 +41,91 @@ body {font-family: "Lato", sans-serif;}
 
 /* Style the tab content */
 .chatcontent {
+    position: relative;
     float: left;
-    padding: 0px 12px;
     border: 1px solid #ccc;
     width: 70%;
     border-left: none;
-    height: 500px;
+    height: 100%;
+
+}
+
+.messages {
+    padding: 0px 12px;
+}
+
+.chatAction {
+    position: absolute;
+    margin: 0;
+    height: 10%;
+    width: 100%;
+    top: auto;
+    bottom: 0px;
+}
+
+.chatAction #delete, #accept {
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+}
+
+.chatAction {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.chatAction #messageBox {
+    height: 100%;
+    width: 85%;
+}
+
+.chatAction #sendButton {
+    height: 100%;
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgb(241, 241, 241);
+    border-radius: 4%;
+    border: solid rgb(200, 200, 200) 1px;
+    cursor: pointer;
+}
+
+#sendButton:hover, #delete:hover, #accept:hover {
+    background-color: rgb(200, 200, 200);
+}
+
+.chatAction #sendButtonText {
+    text-align: center;
+}
+
+.user {
+    background-color: #f8f8f8;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    width: auto;
+    float: left;
+    padding: 20px;
+
+
+}
+
+
+.admin {
+    background-color: #f8f8f8;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    width: auto;
+    padding: 20px;
+    float: right;
+    
+
+}
+
+.container {
+    display: inline-block; 
+    position: relative;
+    background-color: white;
+    width: 100%;
 }
