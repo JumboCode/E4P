@@ -18,6 +18,7 @@ describe('GET /', () => {
 	        .get('/')
 	        .end((err, res) => {
 	              res.should.have.status(200);
+                res.should.be.html;
 	          done();
 	    });
   	});
@@ -27,6 +28,7 @@ describe('GET /', () => {
 	        .get('/allelse')
 	        .end((err, res) => {
 	              res.should.have.status(404);
+                res.should.be.html;
 	          done();
 	    });
   	});
@@ -36,6 +38,7 @@ describe('GET /', () => {
           .get('/admin')
           .end((err, res) => {
                 res.should.have.status(200);
+                res.should.be.html;
             done();
       });
     });
@@ -45,6 +48,7 @@ describe('GET /', () => {
           .get('/login')
           .end((err, res) => {
                 res.should.have.status(200);
+                res.should.be.html;
             done();
       });
     });
@@ -54,6 +58,7 @@ describe('GET /', () => {
           .get('/help')
           .end((err, res) => {
                 res.should.have.status(200);
+                res.should.be.html;
             done();
       });
     });
