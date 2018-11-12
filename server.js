@@ -20,8 +20,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({ secret: 'secret',
-				  resave: true,
-    			  saveUninitialized: true}));
+				          resave: true,
+    			        saveUninitialized: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
@@ -29,7 +29,7 @@ app.use(passport.session());
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
-// TODO: uncomment these functions to set up the Admin model authentication stuff
+
 var Admin = require('./models/adminModel');
 passport.use(new LocalStrategy(Admin.authenticate()));
 passport.serializeUser(Admin.serializeUser());
