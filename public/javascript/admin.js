@@ -155,7 +155,6 @@ function addMessage(userId, messageObject) {
                     messageSide = 'left';
                 }    
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
-                
             }
         }
     }
@@ -163,8 +162,6 @@ function addMessage(userId, messageObject) {
         console.log(Error('User with given identifier could not be found'));
     }
 }
-
-
 
 function deactivateChat(userId) {
     foundUser = false;

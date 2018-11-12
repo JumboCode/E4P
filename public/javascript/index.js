@@ -76,7 +76,7 @@ function updateChat(messageObj) {
       messageSide = 'right';
       //newMessage = "<div class='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
   }
-  newMessage = createMessageDiv(messageSide,messageObj.message);
+  newMessage = createMessageDiv(messageSide, messageObj.message);
   console.log(messages.innerHTML);
   messages.innerHTML = messages.innerHTML + newMessage;
 }
