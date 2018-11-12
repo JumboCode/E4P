@@ -12,32 +12,33 @@
 </head>
 
 <body style = "background-color: #EFEBEA;">
-	<center>
-	<h1 style = "color:#4D4949;" class = "center"> <font size = "6" > Ears for Peers Admin Login </font></h1>
+  <center>
+  <h1 style = "color:#4D4949;" class = "center"> <font size = "6" > Ears for Peers Admin Login </font></h1>
+  
 
-	<p>
-		<input class = "input_box"
-			   type = "username" 
-			   id = "myText"
-			   placeholder = "Username" />
-	</p>
+  <form action='/login', method='post'>
+    <p>
+    <input class = "input_box"
+           type = "username" 
+           id = "myText"
+           name = "username"
+           placeholder = "Username">
+    </p><p>
+    <input class = "input_box"
+           type = "password" 
+           id = "myPwd"
+           name = "password"
+           placeholder= "Password">
+    </p>
+    <input type='submit' value='Login'>
+  </form>
 
-	<p> 
-		<input class = "input_box"
-			   type = "password" 
-			   id = "myPwd"
-			   placeholder= "Password" />
-	</p>		   
-	</div>
-	<button class = "login_button" onclick = "getUserInfo()" >Login </button>
-
-	<p>
-		<br>
-		<a href = "help"> Need Assistance?</a>
-	</p>
-
-	
- </center>
+  <p>
+    <br>
+    <a href = "help"> Need Assistance?</a>
+  </p>
+  
+  </center>
 </body>
 
 

@@ -4,6 +4,6 @@ function getUserInfo() {
 
 	//alert("Username = " + username.value + "\nPassword = " + password.value);
 	$.post('/login', {username: username, password: password}, function(res) {
-		window.location = window.location.origin + "/admin";
+		// window.location = window.location.origin + "/admin";
 	});
 }

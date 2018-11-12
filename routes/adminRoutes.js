@@ -1,7 +1,9 @@
+// TODO abstract out admin router
+
 const express = require('express');
 const passport = require('passport');
 let router = express.Router();
-let Account = require('../models/adminModel');
+let Admin = require('../models/adminModel');
 
 router.get('/login', () => {});
 

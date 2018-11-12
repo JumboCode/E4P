@@ -12,6 +12,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+
 var db = mongoose.connection;
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/admin', { useNewUrlParser: true });
 
@@ -30,9 +31,9 @@ app.use(passport.session());
 ///////////////////////////////////////////////////////////////////////
 // TODO: uncomment these functions to set up the Admin model authentication stuff
 var Admin = require('./models/adminModel');
-//passport.use(new LocalStrategy(Admin.authenticate()));
-//passport.serializeUser(Admin.serializeUser());
-//passport.deserializeUser(Admin.deserializeUser());
+passport.use(new LocalStrategy(Admin.authenticate()));
+passport.serializeUser(Admin.serializeUser());
+passport.deserializeUser(Admin.deserializeUser());
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { 
@@ -71,19 +72,44 @@ app.get('/', function(req, res) {
 });
 
 app.get('/admin', ensureAuthenticated, function(req, res) {
+  console.log("ADMIN: GET")
 	res.sendFile('admin.html', {root: path.join(__dirname, 'public')});
 });
 
 app.get('/login', function(req, res) {
+  console.log("LOGIN: GET")
   res.sendFile('login_page.html', {root: path.join(__dirname, 'public')});
 });
 
-app.post('/login', function(req, res) {
-  // TODO add authentication to this route and remove the following print statements:
-  console.log(req.body.username)
-  console.log(req.body.password)
+app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), function(req, res) {
+  console.log("LOGIN: POST")
+  res.redirect('/admin');
+});
 
-  res.send('success');
+// TODO make logout accessible on the front end, do some other stuff to check not abandoning chats?
+app.get('/logout', ensureAuthenticated, function(req, res) {
+  req.logout();
+  res.redirect('/login');
+});
+
+// TODO figure out what to do with registering users
+app.get('/register', /*ensureAuthenticated,*/ function(req, res) {
+  console.log("REGISTER: GET")
+  res.sendFile('register_page.html', {root: path.join(__dirname, 'public')});
+});
+
+app.post('/register', /*ensureAuthenticated,*/ function(req, res) {
+  console.log("REGISTER: POST")
+  console.log('username: ' + req.body.username + ' password: ' + req.body.password)
+  Admin.register(new Admin({username : req.body.username }), req.body.password, function(err, admin) {
+    if (err) {
+      console.log("couldn't register")
+      res.sendStatus(500);
+    } else {
+      console.log("registered new user")
+      res.redirect('/login');
+    }
+  });
 });
 
 app.get('/help', function(req, res) {
