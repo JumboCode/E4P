@@ -13,40 +13,31 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-var db = mongoose.connection;
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/admin', { useNewUrlParser: true });
-
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(session({ secret: 'secret',
-				          resave: true,
-    			        saveUninitialized: true }));
-app.use(cookieParser());
-app.use(passport.initialize());
-app.use(passport.session());
+const admins = require('./routes/adminRoutes');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
+
+var db = mongoose.connection;
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/admin', { useNewUrlParser: true });
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
 
 var Admin = require('./models/adminModel');
 passport.use(new LocalStrategy(Admin.authenticate()));
 passport.serializeUser(Admin.serializeUser());
 passport.deserializeUser(Admin.deserializeUser());
 
-function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { 
-    return next(); 
-  }
-  res.redirect('/login');
-}
-
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // parse application/json
 app.use(bodyParser.json());
-
 
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
@@ -67,48 +58,17 @@ if (app.get('env') == 'production') {
 //        Routes
 ///////////////////////////////////////////////////////////////////////
 
+app.use('/admin', admins);
+
 app.get('/', function(req, res) {
-	res.sendFile('index.html', {root: path.join(__dirname, 'public')});
-});
-
-app.get('/admin', ensureAuthenticated, function(req, res) {
-	res.sendFile('admin.html', {root: path.join(__dirname, 'public')});
-});
-
-app.get('/login', function(req, res) {
-  res.sendFile('login_page.html', {root: path.join(__dirname, 'public')});
-});
-
-app.post('/login', passport.authenticate('local', { failureRedirect: '/login' }), function(req, res) {
-  res.redirect('/admin');
-});
-
-// TODO make logout accessible on the front end, do some other stuff to check not abandoning chats?
-app.get('/logout', ensureAuthenticated, function(req, res) {
-  req.logout();
-  res.redirect('/login');
-});
-
-// TODO figure out what to do with registering users
-app.get('/register', /*ensureAuthenticated,*/ function(req, res) {
-  res.sendFile('register_page.html', {root: path.join(__dirname, 'public')});
-});
-
-app.post('/register', /*ensureAuthenticated,*/ function(req, res) {
-  Admin.register(new Admin({username : req.body.username }), req.body.password, function(err, admin) {
-    if (err) {
-      console.log(err);
-      res.sendStatus(500);
-    } else {
-      res.redirect('/login');
-    }
-  });
+  res.sendFile('index.html', {root: path.join(__dirname, 'public')});
 });
 
 app.get('/help', function(req, res) {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
 });
 
+// TODO THIS IS NOT SECURE, PROTECT ALL ADMIN ROUTES BEHIND AUTH
 app.get('/:folder/:file', function(req, res) {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
 });

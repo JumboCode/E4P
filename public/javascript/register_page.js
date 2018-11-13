@@ -3,7 +3,7 @@ function getUserInfo() {
   var password = document.getElementById("myPwd").value;
 
   // alert("Username = " + username.value + "\nPassword = " + password.value);
-  $.post('/register', {username: username, password: password}, function(res) {
+  $.post('/admin/register', {username: username, password: password}, function(res) {
     // window.location = window.location.origin + "/admin";
   });
 }
