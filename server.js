@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
 app.use(bodyParser.json());
 
-let admin = [];
+let admins = [];
 
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
@@ -63,8 +63,8 @@ app.get('/:folder/:file', function(req, res) {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
 });
 
-app.post('/admin', function(req, res ) {
-  admin.push(req.body.admin);
+app.post('/admin', function(req, res) {
+  admins.push(req.body.admin);
 });
 
 ///////////////////////////////////////////////////////////////////////
@@ -75,10 +75,11 @@ io.on('connection', (socket) => {
   // console.log('CONNECT ' + socket.id);
   
   // PHASE I
-  // socket.broadcast.to(all_admins).emit('user waiting', socket.id);
   socket.on('user connect', () => {
     // console.log('user connect: ' + socket.id)
-  	socket.broadcast.emit('user waiting', socket.id);
+    for (let admin of admins) {
+      socket.broadcast.to(admin).emit('user waiting', socket.id);
+    }
   }); 
 
   // PHASE II
@@ -90,8 +91,9 @@ io.on('connection', (socket) => {
     // TODO what if user_room_id no longer exists
     socket.join(user_room_id);
     socket.broadcast.to(user_room_id).emit('admin matched');
-    // socket.broadcast.to(all_admins).emit('user matched', user_room_id);
-    socket.broadcast.emit('user matched', user_room_id);
+    for (let admin of admins) {
+      socket.broadcast.to(admin).emit('user matched', user_room_id);
+    }
   });
 
   // PHASE III
@@ -117,8 +119,9 @@ io.on('connection', (socket) => {
     } else {
       // room DNE, no one else connected, user was pending
       // TODO what if admin disconnected first, dont need to send 'accept user'
-      // TODO socket.broadcast.to(all_admins).emit('user matched', user_room_id);
-      socket.broadcast.emit('user matched', user_room_id);
+      for (let admin of admins) {
+        socket.broadcast.to(admin).emit('user matched', user_room_id);
+      }
     }
   });
 });
