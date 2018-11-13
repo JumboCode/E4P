@@ -13,7 +13,7 @@ socket.on('chat message', function(data) {
 
 // callback once admin connects to user
 function admin_matched() {
-  startChat()
+  startChat();
   console.log('admin matched');
   // TODO: Frontend should unlock chat input field here
   // start chat protocol
@@ -31,6 +31,10 @@ function user_connect() {
   socket.emit('user connect');
 };
 
+function warning() {
+  return "Are you sure you want to leave?";
+}
+
 var chat = {
   userId: 'user1',
   messages: [],
@@ -40,41 +44,58 @@ var chat = {
 
 
 function openChat() {
-  document.getElementById("chat").style.display = "block";
-  document.getElementById("open").style.display = "none";
-  document.getElementById("topnav").style.backgroundColor = "#B1C6C4";
+  open = document.getElementById("open");
+  open.innerHTML = '';
+  open.innerHTML = " <div class='row'>Waiting to connect to an ear!</div><div class='row'><div class='loader' id='load'></div></div>";
   console.log("attempting to connect");
   user_connect();
 }
 
 function startChat() {
-  document.getElementById("accept").style.display = "none";
-  document.getElementById("chat_bar").style.display = "block";
+  // get rid of open buttons
+  open = document.getElementById("open");
+  open.innerHTML = '';
+  open.style.display = "none";
+
+
+  //add input bar to page
+  a_chat = document.getElementById("chat");
+  a_chat.style.display = "block";
+  chatbox = document.getElementById("chatbox");
+  chatbox.style.display = "block";
+  
+  chatbar = document.getElementById("chatbar");
+  chatbar.style.visibility= "visible";
   chat.accepted = true;
 }
 
 
 function getMessage() {
+
   var message = document.getElementById("msg").value;
   var messageObj = createMessage('user', message);
   chat.messages.push(messageObj);
   document.getElementById("msg").value="";
   updateChat(messageObj);
   send_message(message);
+  window.onbeforeunload = warning;
 }
 
 
 function updateChat(messageObj) {
-  messages = document.getElementsByClassName("chat_history")[0];
-  console.log(messageObj.role);
-  console.log(messages)
+  messages = document.getElementById("chathistory");
+  chatbox = document.getElementById("chatbox");
   if (messageObj.role == 'admin') {
-      newMessage = "<div class='chat_admin'><div class='received_msg'><p>"+messageObj.message+"</p></div></div>"
+      newMessage = "<div class='p-2' id='chat_admin'><div class='received_msg'><p>"+messageObj.message+"</p></div></div>";
+
+
+
   }
   else {
-      console.log(messageObj.message);
-      newMessage = "<div class='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
+      newMessage = "<div class='p-2' id='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
   }
+
+  chatuser = document.getElementById("chat_user");
   messages.innerHTML = messages.innerHTML + newMessage;
 }
 

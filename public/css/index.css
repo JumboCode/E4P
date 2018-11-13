@@ -1,24 +1,8 @@
+* {box-sizing: border-box}
+body {font-family: "Lato", sans-serif;}
 
 html {
-  height: 90%;
-  padding: 20px;
   background-color: grey;
-}
-
-
-.topnav {
-    background-color: #B1C6C4;
-    overflow: hidden;
-}
-
-.topnav a {
-  float: left;
-  color: #B1C6C4;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-  background: white;
 }
 
 .topnav-right {
@@ -35,6 +19,21 @@ html {
   color: white;
 }
 
+.topnav {
+    position: fixed;
+    background-color: #B1C6C4;
+    overflow: hidden;
+}
+
+.topnav a {
+  float: left;
+  color: #B1C6C4;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  background: white;
+}
 
 #open.flex-container{
   display: flex;
@@ -42,8 +41,11 @@ html {
   justify-content: center;
   align-items: center;
   background-color: grey;
-
+  color: white;
+  text-decoration: bold;
+  flex-direction: column;
 }
+
 
 #open button{
   background-color: #B1C6C4;
@@ -51,29 +53,53 @@ html {
   border-color: white;
 }
 
-#chat.flex-container{
+#load{
+    position: relative;
+    border: 16px solid #B1C6C4;
+    border-top: 16px solid white;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    animation: spin 2s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
+#chat {
   display: none;
-  height: 600px;
-  justify-content: bottom;
-  align-items: bottom;
-  background-color: grey;
-  padding: 20px;
-  flex-direction: column;
+  top: 50px;
+  background: grey;
 
 }
 
-.chat_history {
-    height: 90%;
+
+#chatbox{
+  display: none;
+  height: 550px;
+  width: 90%;
+  background-color: grey;
+  margin: 10px;
+}
+
+
+#chathistory {
+
     background-color: grey;
-    height: 516px;
-    overflow-y: auto;
+    margin-top: 50px;
+    height: 500px;
+    overflow-y: scroll;
     
 }
-.chat_admin {
-  position: relative;
-  display: inline-block;
+
+#chat_admin {
+  position: inline-block;
   width: 100%;
-  overflow: hidden;
+  background: grey;
  }
 
 .received_msg {
@@ -92,14 +118,14 @@ html {
 }
 
 
-.chat_user { 
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
+#chat_user { 
+  position: inline-block;
   width: 100%;
+  background: grey;
 }
 
 .sent_msg {
+  background: grey;
   float: right;
   width: 50%;
 }
@@ -115,15 +141,13 @@ html {
   width: 95%;
 }
 
-#msg {
-  background: white none repeat scroll 0 0;
-  border: medium none;
-  color: grey;
-  font-size: 15px;
-  min-height: 48px;
+#chatbar{
+  visibility: hidden;
   width: 90%;
+  background: grey;
 }
 
-#msg button {
-  background-color: #B1C6C4;
+#type_msg {
+  background: white;
+
 }
