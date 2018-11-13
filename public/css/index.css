@@ -19,6 +19,7 @@ html {
   color: white;
 }
 
+<<<<<<< HEAD
 .topnav {
     position: fixed;
     background-color: #B1C6C4;
@@ -35,6 +36,8 @@ html {
   background: white;
 }
 
+=======
+>>>>>>> c4c62063d82a354b30aafcef2fc6ec87c4386adb
 #open.flex-container{
   display: flex;
   height: 600px;
