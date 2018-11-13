@@ -11,7 +11,14 @@ socket.on('chat message', function(data) {
 // removes a user from the waiting list
 function user_matched(user) {
   console.log('user matched ' + user);
-  // TODO - remove user from whatever list
+  
+  // remove user from chat list if it exists
+  for (let messageStream of chats) {
+    if (messageStream.userId == user) {
+        removeChat(user);
+        break;
+    }
+  }
 }
 
 socket.on('user disconnect', end_chat);
