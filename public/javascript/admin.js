@@ -11,7 +11,14 @@ socket.on('chat message', function(data) {
 // removes a user from the waiting list
 function user_matched(user) {
   console.log('user matched ' + user);
-  // TODO - remove user from whatever list
+  
+  // remove user from chat list if it exists
+  for (let messageStream of chats) {
+    if (messageStream.userId == user) {
+        removeChat(user);
+        break;
+    }
+  }
 }
 
 socket.on('user disconnect', end_chat);
@@ -150,21 +157,20 @@ function addMessage(userId, messageObject) {
             chat.messages.push(messageObject);
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
-              currentChat = document.getElementsByClassName("messages")[0];
-              currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageObject.role, messageObject.message);
+                currentChat = document.getElementsByClassName("messages")[0];
+                if (messageObject.role == 'admin') {
+                    messageSide = 'right';
+                }
+                else {
+                    messageSide = 'left';
+                }    
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
     }
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
-}
-
-/*
- * Return a message div based on the role and message string.
- */
-function createMessageDiv(role, message) {
-    return "<div class= 'container'><div class='" + role + "'> " + message + "</div></div>";
 }
 
 function deactivateChat(userId) {

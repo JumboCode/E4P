@@ -87,16 +87,16 @@ function updateChat(messageObj) {
   messages = document.getElementById("chathistory");
   chatbox = document.getElementById("chatbox");
   if (messageObj.role == 'admin') {
-      newMessage = "<div class='p-2' id='chat_admin'><div class='received_msg'><p>"+messageObj.message+"</p></div></div>";
-
-
-
+      messageSide = 'left';
+      //newMessage = "<div class='chat_admin'><div class='received_msg'><p>"+messageObj.message+"</p></div></div>"
   }
   else {
-      newMessage = "<div class='p-2' id='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
+      console.log(messageObj.message);
+      messageSide = 'right';
+      //newMessage = "<div class='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
   }
-
-  chatuser = document.getElementById("chat_user");
+  newMessage = createMessageDiv(messageSide, messageObj.message);
+  console.log(messages.innerHTML);
   messages.innerHTML = messages.innerHTML + newMessage;
 }
 

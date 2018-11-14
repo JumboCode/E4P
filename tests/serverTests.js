@@ -18,6 +18,7 @@ describe('GET /', () => {
 	        .get('/')
 	        .end((err, res) => {
 	              res.should.have.status(200);
+                res.should.be.html;
 	          done();
 	    });
   	});
@@ -27,9 +28,40 @@ describe('GET /', () => {
 	        .get('/allelse')
 	        .end((err, res) => {
 	              res.should.have.status(404);
+                res.should.be.html;
 	          done();
 	    });
   	});
+
+    it('it should GET /admin', (done) => {
+      chai.request(server)
+          .get('/admin')
+          .end((err, res) => {
+                res.should.have.status(200);
+                res.should.be.html;
+            done();
+      });
+    });
+
+    it('it should GET /login', (done) => {
+      chai.request(server)
+          .get('/login')
+          .end((err, res) => {
+                res.should.have.status(200);
+                res.should.be.html;
+            done();
+      });
+    });
+
+    it('it should GET /help', (done) => {
+      chai.request(server)
+          .get('/help')
+          .end((err, res) => {
+                res.should.have.status(200);
+                res.should.be.html;
+            done();
+      });
+    });
 });
 
 describe('POST /', () => {
