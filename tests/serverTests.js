@@ -10,7 +10,7 @@ let should = chai.should();
 chai.use(chaiHttp);
 
 /*
- * Server Tests
+ * Default Router GET Tests
  */
 describe('GET /', () => {
   	it('it should GET /', (done) => {
@@ -33,26 +33,6 @@ describe('GET /', () => {
 	    });
   	});
 
-    it('it should GET /admin', (done) => {
-      chai.request(server)
-          .get('/admin')
-          .end((err, res) => {
-                res.should.have.status(200);
-                res.should.be.html;
-            done();
-      });
-    });
-
-    it('it should GET /login', (done) => {
-      chai.request(server)
-          .get('/login')
-          .end((err, res) => {
-                res.should.have.status(200);
-                res.should.be.html;
-            done();
-      });
-    });
-
     it('it should GET /help', (done) => {
       chai.request(server)
           .get('/help')
@@ -64,16 +44,43 @@ describe('GET /', () => {
     });
 });
 
+/*
+ * Admin Router GET Tests
+ */
+describe('GET /admin', () => {
+  it('it should GET /admin', (done) => {
+    chai.request(server)
+        .get('/admin')
+        .end((err, res) => {
+              res.should.have.status(200);
+              res.should.be.html;
+              done();
+    });
+  });
+
+  it('it should GET /admin/login', (done) => {
+    chai.request(server)
+        .get('/admin/login')
+        .end((err, res) => {
+              res.should.have.status(200);
+              res.should.be.html;
+              done();
+    });
+  });
+});
+
+/*
+ * POST Tests
+ */
 describe('POST /', () => {
-	it('it should POST /login', (done) => {
+	it('it should POST /admin/login', (done) => {
     	chai.request(server)
-	        .post('/login')
+	        .post('/admin/login')
 	        .set('content-type', 'application/json')
 			.send({username: 'foo', password: 'bar'})
 	        .end((err, res) => {
 	          res.should.have.status(200);
             res.should.be.html;
-	          // res.text.should.equal('success')
 	          done();
 	    });
   	});
