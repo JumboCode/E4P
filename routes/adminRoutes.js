@@ -54,9 +54,4 @@ router.post('/register', ensureAuthenticated, (req, res) => {
   });
 });
 
-// TODO THIS IS NOT SECURE, PROTECT ALL ADMIN ROUTES BEHIND AUTH
-router.get('/:folder/:file', function(req, res) {
-  res.sendFile(req.params.file, {root: path.join(__dirname, '../public', req.params.folder)});
-});
-
 module.exports = router;

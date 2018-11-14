@@ -68,9 +68,12 @@ app.get('/help', function(req, res) {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
 });
 
-// TODO THIS IS NOT SECURE, PROTECT ALL ADMIN ROUTES BEHIND AUTH
-app.get('/:folder/:file', function(req, res) {
-  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
+app.get('/css/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'css')});
+});
+
+app.get('/javascript/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'javascript')});
 });
 
 ///////////////////////////////////////////////////////////////////////

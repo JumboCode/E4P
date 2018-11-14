@@ -44,8 +44,7 @@ describe('GET /', () => {
     });
   });
 
-  // TODO put these tests back in after we shore up admin security
-  /*it('it should not GET /admin.html', (done) => {
+  it('it should not GET /admin.html', (done) => {
     chai.request(server)
         .get('/admin.html')
         .end((err, res) => {
@@ -73,7 +72,7 @@ describe('GET /', () => {
           res.should.be.html;
           done();
     });
-  });*/
+  });
 });
 
 //////////////////////////////////////////////////////////////////
