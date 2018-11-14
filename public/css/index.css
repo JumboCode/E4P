@@ -5,7 +5,7 @@ html {
   background-color: grey;
 }
 
-.topnav-right {
+/*.topnav-right {
   float: right;
 }
 
@@ -17,16 +17,15 @@ html {
 .topnav a.active {
   background-color: #B1C6C4;
   color: white;
-}
+}*/
 
-<<<<<<< HEAD
 .topnav {
     position: fixed;
     background-color: #B1C6C4;
-    overflow: hidden;
+    width: 100% ;
 }
 
-.topnav a {
+/*.topnav a {
   float: left;
   color: #B1C6C4;
   text-align: center;
@@ -35,19 +34,8 @@ html {
   font-size: 17px;
   background: white;
 }
+*/
 
-=======
->>>>>>> c4c62063d82a354b30aafcef2fc6ec87c4386adb
-#open.flex-container{
-  display: flex;
-  height: 600px;
-  justify-content: center;
-  align-items: center;
-  background-color: grey;
-  color: white;
-  text-decoration: bold;
-  flex-direction: column;
-}
 
 
 #open button{
@@ -75,20 +63,56 @@ html {
 
 #chat {
   display: none;
-  top: 50px;
   background: grey;
 
 }
 
-
-#chatbox{
-  display: none;
-  height: 550px;
-  width: 90%;
+@media screen and (max-height: 600px) {
+  #chatbox{
+    display: none;
+    height: 60%;
+    width: 90%;
+    background-color: grey;
+  }
+  #open.flex-container{
+  display: flex;
+  height: 80vh;
+  justify-content: center;
+  align-items: center;
   background-color: grey;
-  margin: 10px;
+  color: white;
+  text-decoration: bold;
+  flex-direction: column;
+}
+#chathistory {
+
+    background-color: grey;
+    margin-top: 50px;
+    height: 60vh;
+    overflow-y: scroll;
+    
+}
 }
 
+@media screen and (min-height: 600px) {
+  #chatbox{
+    display: none;
+    height: 80%;
+    width: 90%;
+    background-color: grey;
+    margin: 10px;
+  }
+
+  #open.flex-container{
+  display: flex;
+  height: 60vh;
+  justify-content: center;
+  align-items: center;
+  background-color: grey;
+  color: white;
+  text-decoration: bold;
+  flex-direction: column;
+}
 
 #chathistory {
 
@@ -98,6 +122,9 @@ html {
     overflow-y: scroll;
     
 }
+}
+
+
 
 #chat_admin {
   position: inline-block;

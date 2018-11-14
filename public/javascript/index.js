@@ -71,7 +71,8 @@ function startChat() {
 
 
 function getMessage() {
-
+  var box = document.getElementById("chatbox");
+  box.scrollTop = box.scrollHeight;
   var message = document.getElementById("msg").value;
   var messageObj = createMessage('user', message);
   chat.messages.push(messageObj);
