@@ -71,12 +71,9 @@ app.post('/admin', function(req, res) {
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
 
-io.on('connection', (socket) => {
-  // console.log('CONNECT ' + socket.id);
-  
+io.on('connection', (socket) => {  
   // PHASE I
   socket.on('user connect', () => {
-    // console.log('user connect: ' + socket.id)
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id);
     }
@@ -110,7 +107,7 @@ io.on('connection', (socket) => {
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
-    // console.log('DISCONNECT ' + socket.id)
+    // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {
@@ -121,6 +118,12 @@ io.on('connection', (socket) => {
       // TODO what if admin disconnected first, dont need to send 'accept user'
       for (let admin of admins) {
         socket.broadcast.to(admin).emit('user matched', user_room_id);
+      }
+    }
+    // Removes admin ID from admins array when an admin disconnects
+    for (let i = 0; i < admins.length; i++) {
+      if (admins[i] == user_room_id) {
+        admins.splice(i, 1);
       }
     }
   });
