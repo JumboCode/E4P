@@ -8,9 +8,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-// Expose static public files
-app.use(express.static(path.join(__dirname, 'public')));
-
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 // parse application/json
@@ -58,6 +55,11 @@ app.post('/login', function(req, res) {
 
 app.get('/help', function(req, res) {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
+});
+
+// TODO THIS IS NOT SECURE, PROTECT ALL ADMIN ROUTES BEHIND AUTH
+app.get('/:folder/:file', function(req, res) {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
 });
 
 ///////////////////////////////////////////////////////////////////////
