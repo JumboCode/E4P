@@ -8,6 +8,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+// Expose static public files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -57,10 +59,6 @@ app.post('/login', function(req, res) {
 
 app.get('/help', function(req, res) {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
-});
-
-app.get('/:folder/:file', function(req, res) {
-  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
 });
 
 app.post('/admin', function(req, res) {

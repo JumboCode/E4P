@@ -1,6 +1,13 @@
 * {box-sizing: border-box}
 body {font-family: "Lato", sans-serif;}
 
+.wrapper {
+    margin: auto;
+    margin-top: 20px;
+    max-width: 800px;
+    min-width: 600px;
+    overflow-x: scroll;
+}
 
 .main-content {
     height: 80vh;
@@ -52,6 +59,8 @@ body {font-family: "Lato", sans-serif;}
 
 .messages {
     padding: 0px 12px;
+    max-height: 90%;
+    overflow-y: scroll;
 }
 
 .chatAction {
@@ -100,32 +109,3 @@ body {font-family: "Lato", sans-serif;}
     text-align: center;
 }
 
-.user {
-    background-color: #f8f8f8;
-    border: 1px solid #c8c8c8;
-    border-radius: 5px;
-    width: auto;
-    float: left;
-    padding: 20px;
-
-
-}
-
-
-.admin {
-    background-color: #f8f8f8;
-    border: 1px solid #c8c8c8;
-    border-radius: 5px;
-    width: auto;
-    padding: 20px;
-    float: right;
-    
-
-}
-
-.container {
-    display: inline-block; 
-    position: relative;
-    background-color: white;
-    width: 100%;
-}

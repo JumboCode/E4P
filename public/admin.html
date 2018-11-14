@@ -6,22 +6,26 @@
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="javascript/admin.js"></script>
 	<link rel="stylesheet" href="css/admin.css"/>
+  <script src="javascript/header.js"></script>
+  <script src="javascript/chat.js"></script>
+  <link rel="stylesheet" href="css/header.css"/>
+  <link rel="stylesheet" href="css/chat.css"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
 </head>
 
-<body onload = "initialize();">
-  <h1>Admin Page</h1>
-
-  <div class='main-content'>
-    <div class="tab">
-    </div>
-	  
-    <div class="chatcontent">
-      <div class="messages"></div>
-      <div class="chatAction"></div>
-    </div>
-   </div>
+<body onload = "initialize()">
+  <div class='wrapper'>
+    <div class="topnav"></div>
+    <div class='main-content'>
+      <div class="tab">
+      </div>
+  	  
+      <div class="chatcontent">
+        <div class="messages"></div>
+        <div class="chatAction"></div>
+      </div>
+     </div>
+  </div>
 
 </body>
 </html>
