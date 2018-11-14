@@ -1,0 +1,44 @@
+<!DOCTYPE>
+<html>
+<head>
+  <title> Registration Page </title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <link href="/css/login_page.css" rel="stylesheet"> 
+  <script src= "/javascript/register_page.js"></script>
+</head>
+
+<body style = "background-color: #EFEBEA;">
+  <center>
+  <h1 style = "color:#4D4949;" class = "center"> <font size = "6" > Ears for Peers Admin Registration </font></h1>
+  
+
+  <form action='/admin/register', method='post'>
+    <p>
+    <input class = "input_box"
+           type = "username" 
+           id = "myText"
+           name = "username"
+           placeholder = "Username">
+    </p><p>
+    <input class = "input_box"
+           type = "password" 
+           id = "myPwd"
+           name = "password"
+           placeholder= "Password">
+    </p>
+    <input class='login_button' type='submit' value='Register'>
+  </form>
+
+  <p>
+    <br>
+    <a href = "help"> Need Assistance?</a>
+  </p>
+  
+  </center>
+</body>
+
+
+</html>
