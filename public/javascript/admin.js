@@ -59,8 +59,10 @@ CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
     // Can be used for testing:
-    // mockChats();
+    mockChats();
+    populateChat();
     updateUserOverview();
+    generateAdminHeader();
 }
 
 // updates the left chat menu to catch newly added users
@@ -107,6 +109,7 @@ function toggleChat(userId) {
     and logs an error if it is a duplicate
 */
 function newChat(userId) {
+    console.log("new chat");
     validUser = true;
     for (chat of chats) {
         if (userId == chat.userId) {
@@ -249,5 +252,35 @@ function mockChats() {
     acceptChat('user2');
     acceptChat('user3');
     deactivateChat('user3');
+
+}
+
+function populateChat() {
+    for (i = 0; i < 10; i++) {
+        message = createMessage('user', 'short test');
+        addMessage('user1', message);
+        message = createMessage('admin', 'short test');
+        addMessage('user1', message);
+    }
+    for (i = 0; i < 10; i++) {
+        message = createMessage('user', 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test ');
+        addMessage('user1', message);
+        message = createMessage('admin', 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test ');
+        addMessage('user1', message);
+    }
 
 }

@@ -1,6 +1,13 @@
 * {box-sizing: border-box}
 body {font-family: "Lato", sans-serif;}
 
+.wrapper {
+    margin: auto;
+    margin-top: 20px;
+    max-width: 800px;
+    min-width: 600px;
+    overflow-x: scroll;
+}
 
 .main-content {
     height: 80vh;
@@ -52,6 +59,8 @@ body {font-family: "Lato", sans-serif;}
 
 .messages {
     padding: 0px 12px;
+    max-height: 90%;
+    overflow-y: scroll;
 }
 
 .chatAction {
