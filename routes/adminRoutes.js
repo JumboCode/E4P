@@ -11,12 +11,17 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/admin/login');
 }
 
+function loggedIn(req, res, next) {
+  if (req.isAuthenticated()) { return res.redirect('/admin') }
+  next();
+}
+
 router.get('/', ensureAuthenticated, (req, res) => {
   // console.log("GET /admin")
   res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
 });
 
-router.get('/login', (req, res) => {
+router.get('/login', loggedIn, (req, res) => {
   // console.log("GET /admin/login")
   res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
 });
@@ -42,7 +47,7 @@ router.post('/register', ensureAuthenticated, (req, res) => {
   Admin.register(new Admin({username : req.body.username }), req.body.password, function(err, admin) {
     if (err) {
       console.log(err);
-      res.sendStatus(500);
+      res.redirect('/admin/register');
     } else {
       res.redirect('/admin/login');
     }
