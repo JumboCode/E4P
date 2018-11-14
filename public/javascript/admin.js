@@ -26,7 +26,10 @@ socket.on('user disconnect', end_chat);
 // ends a chat with given user
 function end_chat(user) {
   console.log('user disconnected ' + user);
-  // TODO - Frontend: close chat
+  deactivateChat(user);
+
+  // reload the current window:
+  toggleChat(CURRENT_CHAT_USER_ID);
 }
 
 socket.on('user waiting', user_waiting);
@@ -59,8 +62,8 @@ CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
     // Can be used for testing:
-    mockChats();
-    populateChat();
+    //mockChats();
+    //populateChat();
     updateUserOverview();
     generateAdminHeader();
 }
