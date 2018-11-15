@@ -77,7 +77,6 @@ function updateUserOverview() {
     for (chat of chats) {
         tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
     }
-    clearView();
 }
 
 function toggleChat(userId) {
@@ -218,7 +217,10 @@ function removeChat(userId) {
         console.log(Error('User with given identifier could not be found'));
     }
     updateUserOverview();
-    clearView(); 
+    clearView();
+    if (chats.length > 0) {
+        toggleChat(chats[0].userId)
+    }
 }
 
 function clearView() {
