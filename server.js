@@ -2,20 +2,44 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 const path = require('path');
-
-const bodyParser = require('body-parser');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-// Expose static public files
-app.use(express.static(path.join(__dirname, 'public')));
+const passport = require('passport');
+const mongoose = require('mongoose');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+
+const admins = require('./routes/adminRoutes');
+
+///////////////////////////////////////////////////////////////////////
+//        Passport Config
+///////////////////////////////////////////////////////////////////////
+
+var db = mongoose.connection;
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/admin', { useNewUrlParser: true });
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
+
+var Admin = require('./models/adminModel');
+passport.use(new LocalStrategy(Admin.authenticate()));
+passport.serializeUser(Admin.serializeUser());
+passport.deserializeUser(Admin.deserializeUser());
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // parse application/json
 app.use(bodyParser.json());
 
+// initialize admin id array
 let admins = [];
 
 ///////////////////////////////////////////////////////////////////////
@@ -37,28 +61,22 @@ if (app.get('env') == 'production') {
 //        Routes
 ///////////////////////////////////////////////////////////////////////
 
+app.use('/admin', admins);
+
 app.get('/', function(req, res) {
-	res.sendFile('index.html', {root: path.join(__dirname, 'public')});
-});
-
-app.get('/admin', function(req, res) {
-	res.sendFile('admin.html', {root: path.join(__dirname, 'public')});
-});
-
-app.get('/login', function(req, res) {
-  res.sendFile('login_page.html', {root: path.join(__dirname, 'public')});
-});
-
-app.post('/login', function(req, res) {
-  // TODO add authentication to this route and remove the following print statements:
-  console.log(req.body.username)
-  console.log(req.body.password)
-
-  res.send('success');
+  res.sendFile('index.html', {root: path.join(__dirname, 'public')});
 });
 
 app.get('/help', function(req, res) {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
+});
+
+app.get('/css/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'css')});
+});
+
+app.get('/javascript/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'javascript')});
 });
 
 app.post('/admin', function(req, res) {

@@ -15,9 +15,20 @@ git clone https://github.com/JumboCode/E4P.git
 npm install
 ```
 ### Run
+#### Run the Database (in a Separate Tab)
 ```sh
-npm start
+mongod
 ```
+#### Run the Server
+- Run normally with the authentication module:
+  ```sh
+  npm start
+  ```
+
+- Run without the authentication module
+  ```sh
+  NOAUTH=true npm start
+  ```
 ## Team Members
 - Anika Agarwal
 - Jasmine Falk
