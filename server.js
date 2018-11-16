@@ -13,7 +13,7 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const admins = require('./routes/adminRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
@@ -61,7 +61,7 @@ if (app.get('env') == 'production') {
 //        Routes
 ///////////////////////////////////////////////////////////////////////
 
-app.use('/admin', admins);
+app.use('/admin', adminRoutes);
 
 app.get('/', function(req, res) {
   res.sendFile('index.html', {root: path.join(__dirname, 'public')});
