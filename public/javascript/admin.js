@@ -1,5 +1,10 @@
 const socket = io();
 
+socket.on('connect', () => {
+  // send as POST request
+  $.post("/admin", { admin: socket.id });
+});
+
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
