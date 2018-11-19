@@ -20,7 +20,7 @@ const admins = require('./routes/adminRoutes');
 ///////////////////////////////////////////////////////////////////////
 
 var db = mongoose.connection;
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/admin', { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useNewUrlParser: true });
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
@@ -29,9 +29,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 var Admin = require('./models/adminModel');
-passport.use(new LocalStrategy(Admin.authenticate()));
-passport.serializeUser(Admin.serializeUser());
-passport.deserializeUser(Admin.deserializeUser());
+passport.use(new LocalStrategy(Admin.authenticate));
+passport.serializeUser(Admin.serializeUser);
+passport.deserializeUser(Admin.deserializeUser);
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));

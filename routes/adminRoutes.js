@@ -6,7 +6,7 @@ let router = express.Router();
 let Admin = require('../models/adminModel');
 
 function ensureAuthenticated(req, res, next) {
-  if (process.env.NOAUTH) { return next(); }
+  // if (process.env.NOAUTH) { return next(); }
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/admin/login');
 }
@@ -26,7 +26,7 @@ router.get('/login', loggedIn, (req, res) => {
   res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/login', passport.authenticate('local', { failureRedirect: '/admin/login' }), (req, res) => {
+router.post('/login', passport.authenticate('local', { failureRedirect: '/admin/register' }), (req, res) => {
   // console.log("POST /admin/login")
   res.redirect('/admin');
 });
@@ -37,12 +37,12 @@ router.get('/logout', ensureAuthenticated, (req, res) => {
   res.redirect('/admin/login');
 });
 
-router.get('/register', ensureAuthenticated, (req, res) => {
+router.get('/register', /*ensureAuthenticated,*/ (req, res) => {
   // console.log("GET /admin/register")
   res.sendFile('register_page.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/register', ensureAuthenticated, (req, res) => {
+router.post('/register', /*ensureAuthenticated,*/ (req, res) => {
   // console.log("POST /admin/register")
   Admin.register(new Admin({username : req.body.username }), req.body.password, function(err, admin) {
     if (err) {
