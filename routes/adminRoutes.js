@@ -42,12 +42,12 @@ router.get('/logout', ensureAuthenticated, (req, res) => {
   res.redirect('/admin/login');
 });
 
-router.get('/register', /*ensureAuthenticated,*/ (req, res) => {
+router.get('/register', ensureAuthenticated, (req, res) => {
   // console.log("GET /admin/register")
   res.sendFile('register_page.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/register', /*ensureAuthenticated,*/ (req, res) => {
+router.post('/register', ensureAuthenticated, (req, res) => {
   // console.log("POST /admin/register")
   Admin.register(new Admin({username : req.body.username }), req.body.password, function(err, admin) {
     if (err) {
