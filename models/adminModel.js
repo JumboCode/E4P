@@ -9,9 +9,6 @@ const Admin = new Schema({
   },
   password: { 
     type: String
-  },
-  approved: {
-    type: Boolean
   }
 });
 
@@ -23,9 +20,6 @@ AdminModel.authenticate = (username, password, done) => {
     
     // admin not found
     if (!admin) { return done(null, false); }
-
-    // admin not approved
-    if (!admin.approved) { return done(null, false); }
 
     bcrypt.compare(password, admin.password, (err, match) => {
       if (err) throw err;
@@ -50,27 +44,9 @@ AdminModel.deserializeUser = (id, done) => {
 AdminModel.register = (admin, password, done) => {
   var password_salt = bcrypt.genSaltSync(10);
   var password_hash = bcrypt.hashSync(password, password_salt);
-
-  var username_salt = bcrypt.genSaltSync(10);
-  var username_hash = bcrypt.hashSync(admin.username, username_salt);
-
-  // TODO send username hash
   
   admin.password = password_hash;
-  admin.approved = false;
-  admin.username_hash = username_hash;
   admin.save(done);
-}
-
-AdminModel.approve = (username_hash, done) => {
-  AdminModel.findOne({ username_hash: username_hash }, (err, admin) => {
-    if (err) throw err;
-
-    if (!admin) { return done(null, false); }
-
-    admin.approved = true;
-    admin.save(done)
-  });
 }
 
 module.exports = AdminModel;
