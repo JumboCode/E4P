@@ -19,20 +19,23 @@ const adminRoutes = require('./routes/adminRoutes');
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
 
-var db = mongoose.connection;
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/admin', { useNewUrlParser: true });
+if (process.env.NODB) {
+  console.log('NODB flag set, running without database and no authentication!');
+} else {
+  var db = mongoose.connection;
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useNewUrlParser: true });
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
-app.use(cookieParser());
-app.use(passport.initialize());
-app.use(passport.session());
+  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+  app.use(cookieParser());
+  app.use(passport.initialize());
+  app.use(passport.session());
 
-var Admin = require('./models/adminModel');
-passport.use(new LocalStrategy(Admin.authenticate()));
-passport.serializeUser(Admin.serializeUser());
-passport.deserializeUser(Admin.deserializeUser());
-
+  var Admin = require('./models/adminModel');
+  passport.use(new LocalStrategy(Admin.authenticate));
+  passport.serializeUser(Admin.serializeUser);
+  passport.deserializeUser(Admin.deserializeUser);
+}
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 

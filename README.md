@@ -25,9 +25,14 @@ mongod
   npm start
   ```
 
-- Run without the authentication module
+- Run without the authentication module (to register the initial user)
   ```sh
   NOAUTH=true npm start
+  ```
+  
+  Run without the database module (you don't need the mongod tab and disables database and authentication)
+  ```sh
+  NODB=true npm start
   ```
 ## Team Members
 - Anika Agarwal

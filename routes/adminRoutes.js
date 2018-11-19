@@ -6,13 +6,13 @@ let router = express.Router();
 let Admin = require('../models/adminModel');
 
 function ensureAuthenticated(req, res, next) {
-  if (process.env.NOAUTH) { return next(); }
+  if (process.env.NOAUTH || process.env.NODB) { return next(); }
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/admin/login');
 }
 
 function loggedIn(req, res, next) {
-  if (req.isAuthenticated()) { return res.redirect('/admin') }
+  if (req.isAuthenticated()) { return res.redirect('/admin'); }
   next();
 }
 
@@ -26,7 +26,12 @@ router.get('/login', loggedIn, (req, res) => {
   res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/login', passport.authenticate('local', { failureRedirect: '/admin/login' }), (req, res) => {
+function flagCheck(req, res, next) {
+  if (process.env.NOAUTH || process.env.NODB) { return res.redirect('/admin'); }
+  next();
+}
+
+router.post('/login', flagCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), (req, res) => {
   // console.log("POST /admin/login")
   res.redirect('/admin');
 });
