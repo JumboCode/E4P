@@ -1,5 +1,10 @@
 const socket = io();
 
+socket.on('connect', () => {
+  // send as POST request
+  $.post("/admin", { admin: socket.id });
+});
+
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
@@ -26,7 +31,10 @@ socket.on('user disconnect', end_chat);
 // ends a chat with given user
 function end_chat(user) {
   console.log('user disconnected ' + user);
-  // TODO - Frontend: close chat
+  deactivateChat(user);
+
+  // reload the current window:
+  toggleChat(CURRENT_CHAT_USER_ID);
 }
 
 socket.on('user waiting', user_waiting);
@@ -59,8 +67,9 @@ CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
     // Can be used for testing:
-    mockChats();
-    populateChat();
+    //mockChats();
+    //populateChat();
+  
     updateUserOverview();
     generateAdminHeader();
 }
@@ -73,7 +82,6 @@ function updateUserOverview() {
     for (chat of chats) {
         tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
     }
-    clearView();
 }
 
 function toggleChat(userId) {
@@ -83,7 +91,8 @@ function toggleChat(userId) {
             currentChat = document.getElementsByClassName("messages")[0];
             currentChat.innerHTML = "";
             for (message of chat.messages) {
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(message.role, message.message)
+                messageSide = message.role == 'admin' ? 'right' : 'left';
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
             }
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
@@ -158,12 +167,7 @@ function addMessage(userId, messageObject) {
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
                 currentChat = document.getElementsByClassName("messages")[0];
-                if (messageObject.role == 'admin') {
-                    messageSide = 'right';
-                }
-                else {
-                    messageSide = 'left';
-                }    
+                messageSide = messageObject.role == 'admin' ? 'right' : 'left';
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
@@ -218,7 +222,10 @@ function removeChat(userId) {
         console.log(Error('User with given identifier could not be found'));
     }
     updateUserOverview();
-    clearView(); 
+    clearView();
+    if (chats.length > 0) {
+        toggleChat(chats[0].userId)
+    }
 }
 
 function clearView() {

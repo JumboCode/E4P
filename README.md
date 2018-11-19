@@ -34,7 +34,6 @@ mongod
   ```sh
   NODB=true npm start
   ```
-  
 ## Team Members
 - Anika Agarwal
 - Jasmine Falk
