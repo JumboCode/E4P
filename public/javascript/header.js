@@ -11,7 +11,7 @@ function generateHeader(role) {
 
 	buttons = role === 'user' ? 
 		"<a href='/help'>Help</a><a href='/help'>Feedback</a>" :
-		"<button>Logout</button>";
+		"<a href='/admin/logout'>Logout</a>";
 
 	document.getElementsByClassName("topnav")[0].innerHTML = 
 		"<a class='active' href='" + href + "'>E4P</a>"
