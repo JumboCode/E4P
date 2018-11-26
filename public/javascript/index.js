@@ -15,9 +15,6 @@ socket.on('chat message', function(data) {
 function admin_matched() {
   startChat();
   console.log('admin matched');
-  // TODO: Frontend should unlock chat input field here
-  // start chat protocol
-
 }
 
 function send_message(msg) {
