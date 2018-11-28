@@ -93,12 +93,17 @@ app.post('/admin', function(req, res) {
 ///////////////////////////////////////////////////////////////////////
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
+var icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
+             "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
+             "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
+             "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
 
 io.on('connection', (socket) => {  
   // PHASE I
   socket.on('user connect', () => {
+    socket.icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
     for (let admin of admins) {
-      socket.broadcast.to(admin).emit('user waiting', socket.id);
+      socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
   }); 
 
@@ -132,6 +137,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
+    icons.push(socket.icon);
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {
       // room exists, either admin or user left in room, send disconnect
