@@ -1,5 +1,5 @@
 $(document).ready(() => {
-
+ 
     const socket = io();
 
     if (window.localStorage.getItem('user_id')) {
