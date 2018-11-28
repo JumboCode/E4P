@@ -67,12 +67,18 @@ CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
     // Can be used for testing:
-    //mockChats();
-    //populateChat();
+    mockChats();
+    populateChat();
   
     updateUserOverview();
     generateAdminHeader();
 }
+
+const ICON_SRC = "img/Animal Icons Small.png";
+var   icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
+               "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
+               "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
+               "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
@@ -80,7 +86,7 @@ function updateUserOverview() {
     tab.innerHTML = '';
 
     for (chat of chats) {
-        tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
+        tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
     }
 }
 
@@ -127,7 +133,8 @@ function newChat(userId) {
         }
     }
     if (validUser) {
-        chats.push({ userId: userId, messages: [], accepted: false, active: true });
+        let icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
+        chats.push({ userId: userId, messages: [], accepted: false, active: true , icon: icon});
     }
 }
 
@@ -213,6 +220,7 @@ function removeChat(userId) {
         if (userId == chat.userId) {
             chat.active = false;
             foundUser = true;
+            icons.push(chat.icon);
         } else {
             newChats.push(chat);
         }
