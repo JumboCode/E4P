@@ -67,8 +67,8 @@ CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
     // Can be used for testing:
-    mockChats();
-    populateChat();
+    // mockChats();
+    // populateChat();
   
     updateUserOverview();
     generateAdminHeader();
