@@ -6,3 +6,4 @@ services: mongodb
 branches:
   only:
   - master
+  - socket-tests
