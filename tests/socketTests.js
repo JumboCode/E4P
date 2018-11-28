@@ -6,6 +6,7 @@ let chai = require('chai');
 let expect = require('chai').expect;
 let should = chai.should();
 let server = require('../server');
+let admins = require('../server').admins;
 let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
@@ -38,7 +39,15 @@ const ioOpts = {
 describe('socket tests', () => {
   beforeEach((done) => {
     admin1 = io(url, ioOpts);
+    admin1.on('connect', () => {
+      admins.push(admin1.id)
+    });
+
     admin2 = io(url, ioOpts);
+    admin2.on('connect', () => {
+      admins.push(admin2.id)
+    });
+
     user1 = io(url, ioOpts);
     user2 = io(url, ioOpts);
     done();

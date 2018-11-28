@@ -1,0 +1,29 @@
+.left-chat-bubble {
+    background-color: #f8f8f8;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    width: auto;
+    max-width: 62%;
+    overflow: hidden;
+    word-break: break-all;
+    float: left;
+    padding: 20px;
+}
+
+.right-chat-bubble {
+    background-color: #f8f8f8;
+    border: 1px solid #c8c8c8;
+    border-radius: 5px;
+    width: auto;
+    max-width: 62%;
+    overflow: hidden;
+    word-break: break-all;
+    padding: 20px;
+    float: right;
+}
+
+.container {
+    display: inline-block; 
+    position: relative;
+    width: 100%;
+}

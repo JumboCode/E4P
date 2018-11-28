@@ -9,71 +9,116 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-/*
- * Server Tests
- */
+//////////////////////////////////////////////////////////////////
+// Default Router GET Tests
+//////////////////////////////////////////////////////////////////
+
 describe('GET /', () => {
-  	it('it should GET /', (done) => {
-    	chai.request(server)
-	        .get('/')
-	        .end((err, res) => {
-	              res.should.have.status(200);
-                res.should.be.html;
-	          done();
-	    });
-  	});
-
-  	it('it should not GET /allelse', (done) => {
-    	chai.request(server)
-	        .get('/allelse')
-	        .end((err, res) => {
-	              res.should.have.status(404);
-                res.should.be.html;
-	          done();
-	    });
-  	});
-
-    it('it should GET /admin', (done) => {
-      chai.request(server)
-          .get('/admin')
-          .end((err, res) => {
-                res.should.have.status(200);
-                res.should.be.html;
-            done();
-      });
+  it('it should GET /', (done) => {
+    chai.request(server)
+        .get('/')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
     });
+  });
 
-    it('it should GET /login', (done) => {
-      chai.request(server)
-          .get('/login')
-          .end((err, res) => {
-                res.should.have.status(200);
-                res.should.be.html;
-            done();
-      });
+  it('it should GET /help', (done) => {
+    chai.request(server)
+        .get('/help')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
     });
+  });
 
-    it('it should GET /help', (done) => {
-      chai.request(server)
-          .get('/help')
-          .end((err, res) => {
-                res.should.have.status(200);
-                res.should.be.html;
-            done();
-      });
+  it('it should not GET /notapage', (done) => {
+    chai.request(server)
+        .get('/notapage')
+        .end((err, res) => {
+          res.should.have.status(404);
+          res.should.be.html;
+          done();
     });
+  });
+
+  it('it should not GET /admin.html', (done) => {
+    chai.request(server)
+        .get('/admin.html')
+        .end((err, res) => {
+          res.should.have.status(404);
+          res.should.be.html;
+          done();
+    });
+  });
+
+  it('it should not GET /public/admin.html', (done) => {
+    chai.request(server)
+        .get('/public/admin.html')
+        .end((err, res) => {
+          res.should.have.status(404);
+          res.should.be.html;
+          done();
+    });
+  });
+
+  it('it should not GET /./admin.html', (done) => {
+    chai.request(server)
+        .get('/./admin.html')
+        .end((err, res) => {
+          res.should.have.status(404);
+          res.should.be.html;
+          done();
+    });
+  });
 });
 
+//////////////////////////////////////////////////////////////////
+// Admin Router GET Tests
+//////////////////////////////////////////////////////////////////
+
+// TODO these tests don't really check what pages are returned, just that
+// pages are always returned so we should really create more specific tests.
+describe('GET /admin', () => {
+  it('it should GET /admin', (done) => {
+    chai.request(server)
+        .get('/admin')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
+    });
+  });
+
+  it('it should GET /admin/login', (done) => {
+    chai.request(server)
+        .get('/admin/login')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
+    });
+  });
+});
+
+//////////////////////////////////////////////////////////////////
+// POST Tests
+//////////////////////////////////////////////////////////////////
+
+// TODO these tests don't really check what pages are returned, just that
+// pages are always returned so we should really create more specific tests.
 describe('POST /', () => {
-	it('it should POST /login', (done) => {
-    	chai.request(server)
-	        .post('/login')
-	        .set('content-type', 'application/json')
-			.send({username: 'foo', password: 'bar'})
-	        .end((err, res) => {
-	          res.should.have.status(200);
-	          res.text.should.equal('success')
-	          done();
-	    });
-  	});
+  it('it should POST /admin/login', (done) => {
+    chai.request(server)
+        .post('/admin/login')
+        .set('content-type', 'application/json')
+        .send({username: 'foo', password: 'bar'})
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
+    });
+  });
 });

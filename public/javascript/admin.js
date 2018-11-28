@@ -30,6 +30,12 @@ function resetStorage() {
 
 // chats.push({ userId: userId, messages: [], accepted: false, active: true });
 
+socket.on('connect', () => {
+  // send as POST request
+  $.post("/admin", { admin: socket.id });
+});
+
+
 socket.on('user matched', user_matched);
 
 socket.emit('assign as admin');
@@ -70,7 +76,14 @@ let rejoinButton = document.querySelector('#rejoin');
 // removes a user from the waiting list
 function user_matched(user) {
   console.log('user matched ' + user);
-  // TODO - remove user from whatever list
+
+  // remove user from chat list if it exists
+  for (let messageStream of chats) {
+    if (messageStream.userId == user) {
+        removeChat(user);
+        break;
+    }
+  }
 }
 
 socket.on('user disconnect', end_chat);
@@ -78,8 +91,10 @@ socket.on('user disconnect', end_chat);
 // ends a chat with given user
 function end_chat(user) {
   console.log('user disconnected ' + user);
-  // TODO - Frontend: close chat
-  // TODO - also delete the chat from local storage
+  deactivateChat(user);
+
+  // reload the current window:
+  toggleChat(CURRENT_CHAT_USER_ID);
 }
 
 socket.on('user waiting', user_waiting);
@@ -112,6 +127,7 @@ function initialize() {
     // mockChats();
     retrieveLocalStorage();
     updateUserOverview();
+    generateAdminHeader();
 }
 
 // updates the left chat menu to catch newly added users
@@ -123,7 +139,6 @@ function updateUserOverview() {
     for (chat of chats) {
         tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
     }
-    clearView();
 }
 
 function toggleChat(userId) {
@@ -133,7 +148,8 @@ function toggleChat(userId) {
             currentChat = document.getElementsByClassName("messages")[0];
             currentChat.innerHTML = "";
             for (message of chat.messages) {
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(message.role, message.message)
+                messageSide = message.role == 'admin' ? 'right' : 'left';
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
             }
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
@@ -159,6 +175,7 @@ function toggleChat(userId) {
     and logs an error if it is a duplicate
 */
 function newChat(userId) {
+    console.log("new chat");
     validUser = true;
     for (chat of chats) {
         if (userId == chat.userId) {
@@ -223,21 +240,15 @@ function addMessage(userId, messageObject) {
             chat.messages.push(messageObject);
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
-              currentChat = document.getElementsByClassName("messages")[0];
-              currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageObject.role, messageObject.message);
+                currentChat = document.getElementsByClassName("messages")[0];
+                messageSide = messageObject.role == 'admin' ? 'right' : 'left';
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
     }
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
-}
-
-/*
- * Return a message div based on the role and message string.
- */
-function createMessageDiv(role, message) {
-    return "<div class= 'container'><div class='" + role + "'> " + message + "</div></div>";
 }
 
 function deactivateChat(userId) {
@@ -287,6 +298,9 @@ function removeChat(userId) {
     }
     updateUserOverview();
     clearView();
+    if (chats.length > 0) {
+        toggleChat(chats[0].userId)
+    }
 }
 
 function clearView() {
@@ -320,5 +334,35 @@ function mockChats() {
     acceptChat('user2');
     acceptChat('user3');
     deactivateChat('user3');
+
+}
+
+function populateChat() {
+    for (i = 0; i < 10; i++) {
+        message = createMessage('user', 'short test');
+        addMessage('user1', message);
+        message = createMessage('admin', 'short test');
+        addMessage('user1', message);
+    }
+    for (i = 0; i < 10; i++) {
+        message = createMessage('user', 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test ');
+        addMessage('user1', message);
+        message = createMessage('admin', 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test '
+            + 'this is a long test ');
+        addMessage('user1', message);
+    }
 
 }
