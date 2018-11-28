@@ -82,6 +82,10 @@ app.get('/javascript/:file', (req, res) => {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'javascript')});
 });
 
+app.get('/img/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'img')});
+});
+
 app.post('/admin', function(req, res) {
   admins.push(req.body.admin);
 });
