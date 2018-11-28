@@ -3,6 +3,9 @@
     border: 1px solid #c8c8c8;
     border-radius: 5px;
     width: auto;
+    max-width: 62%;
+    overflow: hidden;
+    word-break: break-all;
     float: left;
     padding: 20px;
 }
@@ -12,6 +15,9 @@
     border: 1px solid #c8c8c8;
     border-radius: 5px;
     width: auto;
+    max-width: 62%;
+    overflow: hidden;
+    word-break: break-all;
     padding: 20px;
     float: right;
 }
