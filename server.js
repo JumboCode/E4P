@@ -116,6 +116,20 @@ io.on('connection', (socket) => {
       socket.broadcast.emit('user matched', user_room_id);
     }
   });
+
+  //User Typing Event:
+  socket.on('typing', function(data) => {
+    let reciever = data['room']; 
+    socket.broadcast.to(receiver).emit('typing', {room: reciever});
+    console.log("User is typing"); 
+  }); 
+
+  socket.on('stop typing', function(data) => {
+    let reciever = data['room']; 
+    socket.broadcast.to(receiver).emit('stop typing', {room: reciever}); 
+    console.log("User is not typing"); 
+  }); 
+
 });
 
 server.listen(process.env.PORT || 3000, function() {

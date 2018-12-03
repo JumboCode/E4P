@@ -284,3 +284,19 @@ function populateChat() {
     }
 
 }
+
+function sendTypingMessage(user_id, is_typing) {
+  if (is_typing == true) {
+      socket.emit('typing', {
+      user_id: socket.id 
+    });
+  } else {
+      socket.emit('stop typing', {
+      user_id: socket.id
+    }); 
+  }
+}
+
+
+
+

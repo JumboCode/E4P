@@ -42,7 +42,6 @@ var chat = {
   active: true
 };
 
-
 function openChat() {
   open = document.getElementById("open");
   open.innerHTML = '';
@@ -104,6 +103,20 @@ function updateChat(messageObj) {
 function createMessage(role, messageString) {
   return { role: role, message: messageString, timestamp: new Date() };
 }
+
+function sendTypingMessage(user_id, is_typing) {
+  if (is_typing == true) {
+      socket.emit('typing', {
+      user_id: socket.id 
+    });
+  } else {
+      socket.emit('stop typing', {
+      user_id: socket.id
+    }); 
+  }
+}
+
+
 
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
