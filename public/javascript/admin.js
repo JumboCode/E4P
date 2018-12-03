@@ -82,7 +82,12 @@ function updateUserOverview() {
     tab.innerHTML = '';
 
     for (chat of chats) {
-        tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
+        console.log(chat.icon)
+        if (isNaN(parseInt(chat.icon))) {
+            tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
+        } else {
+            tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><div class='icon'>" + chat.icon + "</div><div class='username'>" + user + "</div></button>";
+        }
     }
 }
 
@@ -129,6 +134,7 @@ function newChat(userId, icon) {
         }
     }
     if (validUser) {
+        console.log("HERE " + icon);
         chats.push({ userId: userId, messages: [], accepted: false, active: true , icon: icon});
     }
 }

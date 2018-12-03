@@ -46,11 +46,20 @@ body {font-family: "Lato", sans-serif;}
     background-color: #ccc;
 }
 
-.icon {
+img.icon {
     object-fit: none;
     object-position: 0 0;
     width: 60px;
     height: 60px;
+}
+
+div.icon {
+    display: inline-block;
+    vertical-align: top;
+    width: 60px;
+    height: 60px;
+    margin: 0;
+    padding: 22px 16px;
 }
 
 .username {

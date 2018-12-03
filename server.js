@@ -93,15 +93,25 @@ app.post('/admin', function(req, res) {
 ///////////////////////////////////////////////////////////////////////
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
-var icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
-             "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
-             "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
-             "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
+// var icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
+//              "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
+//              "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
+//              "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
+
+var icons = [];
+
+num_users = 0;
 
 io.on('connection', (socket) => {  
   // PHASE I
   socket.on('user connect', () => {
-    socket.icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
+    console.log("user connect");
+    num_users++;
+    if (icons.length == 0) {
+      socket.icon = num_users.toString();
+    } else {
+      socket.icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
+    }
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
@@ -137,7 +147,14 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
-    icons.push(socket.icon);
+    if (!admins.includes(user_room_id)) {
+      console.log("user disconnect");
+      if (num_users > 0)
+        num_users--;
+    }
+    if (isNaN(parseInt(socket.icon))) {
+      icons.push(socket.icon);
+    }
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {
       // room exists, either admin or user left in room, send disconnect
