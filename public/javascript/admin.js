@@ -169,7 +169,7 @@ function createMessage(role, messageString) {
 function sendMessage() {
     message = $('#messageBox').val();
     if (message != '') {
-        ("sending message")
+        console.log("sending message")
         message = $('#messageBox').val();
         send_message(CURRENT_CHAT_USER_ID, message);
         messageObject = createMessage("admin", message);
