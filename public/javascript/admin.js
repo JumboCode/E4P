@@ -39,10 +39,10 @@ function end_chat(user) {
 
 socket.on('user waiting', user_waiting);
 
-function user_waiting(user) {
+function user_waiting(user, icon) {
   console.log('user waiting ' + user);
   console.log('creating new chat for user waiting');
-  newChat(user);
+  newChat(user, icon);
   updateUserOverview();
 }
 
@@ -74,10 +74,6 @@ function initialize() {
 }
 
 const ICON_SRC = "img/Animal Icons Small.png";
-var   icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
-               "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
-               "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
-               "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
@@ -142,7 +138,7 @@ function scrollDown() {
     Given a user identifier, creates a new chat for that user if the identifier is unique
     and logs an error if it is a duplicate
 */
-function newChat(userId) {
+function newChat(userId, icon) {
     console.log("new chat");
     validUser = true;
     for (chat of chats) {
@@ -152,7 +148,6 @@ function newChat(userId) {
         }
     }
     if (validUser) {
-        let icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
         chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon });
     }
 }
@@ -240,7 +235,6 @@ function removeChat(userId) {
         if (userId == chat.userId) {
             chat.active = false;
             foundUser = true;
-            icons.push(chat.icon);
         } else {
             newChats.push(chat);
         }
