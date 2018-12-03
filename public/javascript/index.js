@@ -68,7 +68,6 @@ function startChat() {
 
 
 function getMessage() {
-
   var box = document.getElementById("chatbox");
   box.scrollTop = box.scrollHeight;
   var message = document.getElementById("msg").value;
@@ -96,8 +95,6 @@ function updateChat(messageObj) {
   newMessage = createMessageDiv(messageSide, messageObj.message);
   console.log(messages.innerHTML);
   messages.innerHTML = messages.innerHTML + newMessage;
-
-
 }
 
 
