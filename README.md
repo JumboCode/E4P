@@ -1,4 +1,8 @@
 # E4P
+
+
+[![Build Status](https://travis-ci.org/JumboCode/E4P.svg?branch=master)](https://travis-ci.com/JumboCode/E4P)
+
 JumboCode 2018-2019 project for Ears 4 Peers. This site is currently under construction and not actively used by Tufts Ears 4 Peers. If you'd like to reach out to Ears 4 Peers, go to their website: [Ears 4 Peers](http://sites.tufts.edu/ears4peers/ "Ears 4 Peers Site").
 
 * [Design](https://github.com/JumboCode/E4P/wiki/Design "E4P Design")
