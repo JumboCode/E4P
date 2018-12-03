@@ -86,7 +86,7 @@ function updateUserOverview() {
         if (isNaN(parseInt(chat.icon))) {
             tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
         } else {
-            tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><div class='icon'>" + chat.icon + "</div><div class='username'>" + user + "</div></button>";
+            tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><div class='icon'>" + chat.icon + "</div><div class='username'>user</div></button>";
         }
     }
 }
