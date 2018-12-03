@@ -152,5 +152,10 @@ html {
 
 #type_msg {
   background: white;
+}
+
+#msg {
+  min-height: 10px;
+  resize: none;
 
 }
