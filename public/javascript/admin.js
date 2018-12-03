@@ -67,9 +67,8 @@ CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
     // Can be used for testing:
-    // mockChats();
-    // populateChat();
-  
+    mockChats();
+    populateChat();
     updateUserOverview();
     generateAdminHeader();
 }
@@ -86,12 +85,19 @@ function updateUserOverview() {
     tab.innerHTML = '';
 
     for (chat of chats) {
-        tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
+        userTypingHidden = chat.typing ? '' : 'hidden';
+        tab.innerHTML = tab.innerHTML 
+                      + "<button class='username' onclick='toggleChat(`" + chat.userId + "`)'>"
+                      + "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>" 
+                      + "<div class='buttonId'>" + chat.userId + "</div>"
+                      + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
+                      + "<img class='buttonTypingIcon' src='img/typing_icon.png'></div></button>";
     }
 }
 
 function toggleChat(userId) {
     CURRENT_CHAT_USER_ID = userId
+    tabId = 0;
     for (chat of chats) {
         if (chat.userId == userId) {
             currentChat = document.getElementsByClassName("messages")[0];
@@ -100,6 +106,10 @@ function toggleChat(userId) {
                 messageSide = message.role == 'admin' ? 'right' : 'left';
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
             }
+
+            currentUserTyping = chat.typing ? 'block' : 'none';
+            $('#typingIcon').css('display', currentUserTyping);
+
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
                 actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
@@ -111,12 +121,21 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
+        tabId++;
     }
     $("#messageBox").on('keyup', function (e) {
         if (e.keyCode == 13) {
             sendMessage();
         }
     });
+    scrollDown()
+
+
+}
+
+function scrollDown() {
+    messageBox = document.getElementsByClassName("messagesBox")[0];
+    messageBox.scrollTop = messageBox.scrollHeight;
 }
 
 /*
@@ -134,7 +153,7 @@ function newChat(userId) {
     }
     if (validUser) {
         let icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
-        chats.push({ userId: userId, messages: [], accepted: false, active: true , icon: icon});
+        chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon });
     }
 }
 
@@ -178,6 +197,7 @@ function addMessage(userId, messageObject) {
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
+        scrollDown();
     }
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
@@ -242,11 +262,37 @@ function clearView() {
 
 }
 
+
+function userIsTyping(userId) {
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.typing = true;
+        }
+    }
+    updateUserOverview();
+    if (userId == CURRENT_CHAT_USER_ID) {
+        toggleChat(CURRENT_CHAT_USER_ID);
+    }
+}
+
+function userNotTyping(userId) {
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.typing = false;
+        }
+    }
+    updateUserOverview();
+    if (userId == CURRENT_CHAT_USER_ID) {
+        toggleChat(CURRENT_CHAT_USER_ID);
+    }
+}
+
 function mockChats() {
 
     newChat('user1');
     newChat('user2');
     newChat('user3');
+    newChat('this_is_a_really_long_username')
 
     message = createMessage('user', 'hi');
     addMessage('user1', message);
@@ -264,10 +310,13 @@ function mockChats() {
     message = createMessage('admin', 'hi user3');
     addMessage('user3', message);
 
-    acceptChat('user2');
-    acceptChat('user3');
+    // acceptChat('user2');
+    // acceptChat('user3');
     deactivateChat('user3');
+}
 
+function getImageURL() {
+    return 'img/cow.jpg';
 }
 
 function populateChat() {

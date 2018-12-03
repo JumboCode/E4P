@@ -5,38 +5,11 @@ html {
   background-color: grey;
 }
 
-/*.topnav-right {
-  float: right;
-}
-
-.topnav a:hover {
-  background-color: #B1C6C4;
-  color: grey;
-}
-
-.topnav a.active {
-  background-color: #B1C6C4;
-  color: white;
-}*/
-
 .topnav {
     position: fixed;
     background-color: #B1C6C4;
     width: 100% ;
 }
-
-/*.topnav a {
-  float: left;
-  color: #B1C6C4;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-  background: white;
-}
-*/
-
-
 
 #open button{
   background-color: #B1C6C4;
