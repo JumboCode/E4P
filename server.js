@@ -93,19 +93,18 @@ app.post('/admin', function(req, res) {
 ///////////////////////////////////////////////////////////////////////
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
-var icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
+let overflow_id = 0;
+let icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
              "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
              "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
              "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
 
-num_users = 0;
-
 io.on('connection', (socket) => {
   // PHASE I
   socket.on('user connect', () => {
-    num_users++;
     if (icons.length == 0) {
-      socket.icon = num_users.toString();
+      overflow_id++;
+      socket.icon = overflow_id.toString();
     } else {
       socket.icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
     }
@@ -145,14 +144,9 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
-    if (!admins.includes(user_room_id)) {
-      // ensures that the overflow 'icon' id number is unique
-      // if (num_users > 0)
-      //   num_users--;
 
-      if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
-        icons.push(socket.icon);
-      }
+    if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
+      icons.push(socket.icon);
     }
 
     var room = io.sockets.adapter.rooms[user_room_id];

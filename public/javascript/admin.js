@@ -82,10 +82,11 @@ function updateUserOverview() {
 
     for (chat of chats) {
         let iconTag = "";
-        if (isNaN(parseInt(chat.icon)))
+        if (isNaN(parseInt(chat.icon))) {
             iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
-        else
+        } else {
             iconTag = "<div class='icon'>" + chat.icon + "</div>";
+        }
       
         userTypingHidden = chat.typing ? '' : 'hidden';
         tab.innerHTML = tab.innerHTML 
