@@ -4,7 +4,7 @@
   "description": "E4P JumboCode Project",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --exit --recursive tests",
     "start": "node server.js"
   },
   "repository": {
@@ -18,8 +18,23 @@
   },
   "homepage": "https://github.com/JumboCode/E4P#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "*",
+    "cookie-parser": "*",
     "express": "^4.16.3",
+    "express-session": "*",
+    "mongodb": "*",
+    "mongoose": "^5.3.11",
+    "nodemailer": "^4.6.8",
+    "passport": "^0.4.0",
+    "passport-http": "*",
+    "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "socket.io": "^2.1.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^4.2",
+    "mocha": "^5.2"
   }
 }

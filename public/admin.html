@@ -1,36 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>E4P Admin</title>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-  <!-- TODO wrap admin.js in onLoad for scripts  -->
-  <script src="javascript/admin.js"></script>
-  <style>
-	* { margin: 0; padding: 0; box-sizing: border-box; }
-	body { font: 13px Helvetica, Arial; }
-	form#form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-	form#form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-	form#form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-	#messages { list-style-type: none; margin: 0; padding: 0; }
-	#messages li { padding: 5px 10px; }
-	#messages li:nth-child(odd) { background: #eee; }
-  </style>
+	<title>E4P Admin</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/javascript/admin.js"></script>
+  <script src="/javascript/header.js"></script>
+  <script src="/javascript/chat.js"></script>
+	<link rel="stylesheet" href="/css/admin.css"/>
+  <link rel="stylesheet" href="/css/header.css"/>
+  <link rel="stylesheet" href="/css/chat.css"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body>
-  <h1>Admin Page</h1>
-  <h3 id="adminuser"></h3>
-  <form id="debug">
-    <input id="user" autocomplete="off" placeholder="Paste User ID Here" /><button>Accept User</button>
-  </form>
 
-  <ul id="messages"></ul>
-  <form action="" id="form" onsubmit="false">
-	<input id="m" autocomplete="off" />
-	<button type="button">Send</button>
-  </form>
+
+<body onload = "initialize()">
+  <button onClick="resetStorage()">Reset Local Storage</button> - for debugging purposes only
+  <div class='wrapper'>
+    <div class="topnav"></div>
+    <div class='main-content'>
+      <div class="tab">
+      </div>
+
+      <div class="chatcontent">
+        <div class="messages"></div>
+        <div class="chatAction"></div>
+      </div>
+     </div>
+  </div>
 
 </body>
 </html>

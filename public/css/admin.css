@@ -1,0 +1,111 @@
+* {box-sizing: border-box}
+body {font-family: "Lato", sans-serif;}
+
+.wrapper {
+    margin: auto;
+    margin-top: 20px;
+    max-width: 800px;
+    min-width: 600px;
+    overflow-x: scroll;
+}
+
+.main-content {
+    height: 80vh;
+}
+/* Style the tab */
+.tab {
+    float: left;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    width: 30%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+    display: block;
+    background-color: inherit;
+    color: black;
+    padding: 22px 16px;
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.chatcontent {
+    position: relative;
+    float: left;
+    border: 1px solid #ccc;
+    width: 70%;
+    border-left: none;
+    height: 100%;
+
+}
+
+.messages {
+    padding: 0px 12px;
+    max-height: 90%;
+    overflow-y: scroll;
+}
+
+.chatAction {
+    position: absolute;
+    margin: 0;
+    height: 10%;
+    width: 100%;
+    top: auto;
+    bottom: 0px;
+}
+
+.chatAction #delete, #accept {
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+}
+
+.chatAction {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.chatAction #messageBox {
+    height: 100%;
+    width: 85%;
+}
+
+.chatAction #sendButton {
+    height: 100%;
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgb(241, 241, 241);
+    border-radius: 4%;
+    border: solid rgb(200, 200, 200) 1px;
+    cursor: pointer;
+}
+
+#sendButton:hover, #delete:hover, #accept:hover {
+    background-color: rgb(200, 200, 200);
+}
+
+.chatAction #sendButtonText {
+    text-align: center;
+}
+

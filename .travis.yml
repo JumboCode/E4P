@@ -1,0 +1,9 @@
+branches: 
+  only: master
+language: node_js
+node_js: "7"
+services: mongodb
+branches:
+  only:
+  - master
+  - socket-tests
