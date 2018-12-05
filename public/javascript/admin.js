@@ -81,10 +81,17 @@ function updateUserOverview() {
     tab.innerHTML = '';
 
     for (chat of chats) {
+        let iconTag = "";
+        if (isNaN(parseInt(chat.icon))) {
+            iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
+        } else {
+            iconTag = "<div class='icon'>" + chat.icon + "</div>";
+        }
+      
         userTypingHidden = chat.typing ? '' : 'hidden';
         tab.innerHTML = tab.innerHTML 
                       + "<button class='username' onclick='toggleChat(`" + chat.userId + "`)'>"
-                      + "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>" 
+                      + iconTag
                       + "<div class='buttonId'>" + chat.userId + "</div>"
                       + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
                       + "<img class='buttonTypingIcon' src='img/typing_icon.png'></div></button>";
