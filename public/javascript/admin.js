@@ -64,6 +64,9 @@ function accept_user(user) {
 
 chats = [];
 CURRENT_CHAT_USER_ID = '';
+const ICON_SRC = "img/Animal Icons Small.png";
+
+/**************************** INITIALIZE ****************************/
 
 function initialize() {
     // Can be used for testing:
@@ -74,7 +77,8 @@ function initialize() {
     generateAdminHeader();
 }
 
-const ICON_SRC = "img/Animal Icons Small.png";
+/**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
+
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
@@ -82,8 +86,14 @@ function updateUserOverview() {
     tab.innerHTML = '';
 
     for (chat of chats) {
-        tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
+        selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
+        tab.innerHTML = tab.innerHTML + "<button " + selectedChat + "onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
     }
+}
+
+function clearView() {
+    $('.chatAction').html("");
+    $('.messages').html("");
 }
 
 function toggleChat(userId) {
@@ -113,7 +123,11 @@ function toggleChat(userId) {
             sendMessage();
         }
     });
+    updateUserOverview();
 }
+
+
+/**************************** SINGLE CHAT FUNCTIONS ****************************/
 
 /*
     Given a user identifier, creates a new chat for that user if the identifier is unique
@@ -133,51 +147,6 @@ function newChat(userId, icon) {
     }
 }
 
-/*
-    To create a message object, we use the function createMessage. Given a role and a message string, 
-    this function appends creates a new messageObject that can be sent to addMessage.
-*/
-function createMessage(role, messageString) {
-    return { role: role, message: messageString, timestamp: new Date() };
-}
-
-function sendMessage() {
-    message = $('#messageBox').val();
-    if (message != '') {
-        console.log("sending message")
-        message = $('#messageBox').val();
-        send_message(CURRENT_CHAT_USER_ID, message);
-        messageObject = createMessage("admin", message);
-
-        addMessage(CURRENT_CHAT_USER_ID, messageObject);
-                
-        message = $('#messageBox').val('');
-    }
-
-}
-
-
-/*
-    Given a user identifier and a messageObject, appends the message object to that user's
-    chat if it exists, logs an error if that user chat doesn't exist 
-*/
-function addMessage(userId, messageObject) {
-    foundUser = false;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.messages.push(messageObject);
-            foundUser = true;
-            if (userId == CURRENT_CHAT_USER_ID) {
-                currentChat = document.getElementsByClassName("messages")[0];
-                messageSide = messageObject.role == 'admin' ? 'right' : 'left';
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
-            }
-        }
-    }
-    if (!foundUser) {
-        console.log(Error('User with given identifier could not be found'));
-    }
-}
 
 function deactivateChat(userId) {
     foundUser = false;
@@ -230,11 +199,59 @@ function removeChat(userId) {
     }
 }
 
-function clearView() {
-    $('.chatAction').html("");
-    $('.messages').html("");
+
+/**************************** SINGLE MESSAGE FUNCTIONS ****************************/
+
+
+/*
+    To create a message object, we use the function createMessage. Given a role and a message string, 
+    this function appends creates a new messageObject that can be sent to addMessage.
+*/
+function createMessage(role, messageString) {
+    return { role: role, message: messageString, timestamp: new Date() };
+}
+
+function sendMessage() {
+    message = $('#messageBox').val();
+    if (message != '') {
+        console.log("sending message")
+        message = $('#messageBox').val();
+        send_message(CURRENT_CHAT_USER_ID, message);
+        messageObject = createMessage("admin", message);
+
+        addMessage(CURRENT_CHAT_USER_ID, messageObject);
+                
+        message = $('#messageBox').val('');
+    }
 
 }
+
+
+/*
+    Given a user identifier and a messageObject, appends the message object to that user's
+    chat if it exists, logs an error if that user chat doesn't exist 
+*/
+function addMessage(userId, messageObject) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.messages.push(messageObject);
+            foundUser = true;
+            if (userId == CURRENT_CHAT_USER_ID) {
+                currentChat = document.getElementsByClassName("messages")[0];
+                messageSide = messageObject.role == 'admin' ? 'right' : 'left';
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
+            }
+        }
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+}
+
+
+
+/**************************** TESTING FUNCTIONS ****************************/
 
 function mockChats() {
 
