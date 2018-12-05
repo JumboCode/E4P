@@ -15,29 +15,31 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-        <body onload="generateUserHeader()">
-        <div class="topnav"></div>
-            
-        <div class="flex-container" id = "open">
-            <div class="row"> Need to talk to an Ear?</div>
-            <div class="row">
-                <button type="button" class="btn btn-outline-secondary" onclick="openChat()"> Connect </button>
-            </div>
-        </div>
+        
+    <body onload="generateUserHeader()">
+    <div class="topnav"></div>
 
-        <div class="d-flex align-items-center justify-content-center flex-column" id="chat">
-            <div class="flex-container content" id="chatbox">
-                <div class="d-flex align-items-start flex-column" id="chathistory">
-                    <div class="mt-auto p-2" id ="chat_admin"> </div>
-                </div>
-            </div>
-     
-            <div class="d-flex justify-content-center" id="chatbar">
-                <div class="input-group" id = "type_msg">
-                    <textarea class="form-control" id="msg" type="text" placeholder="Type message..."></textarea>
-                    <button class="btn" type="button" onclick="getMessage()">Send</button>
-                </div>
-            </div>
-        </div>
+    		<h2 class="flex-container" id = "open">
+    			<div class="row"> Ears for Peers</div>
+    			<img src="img/elephant.jpg">
+    			<div class="row">
+    				<button type="button" onclick="openChat()"> NEED TO TALK?</button>
+    			</div>
+    		</h2> 
+    		<div id="e_space"></div>
+    		<div class="d-flex align-items-center justify-content-center flex-column" id="chat">
+    			<div class="flex-container content" id="chatbox">
+    				<div class="d-flex align-items-start flex-column" id="chathistory">
+    					<div class="mt-auto p-2" id ="chat_admin"> </div>
+    				</div>
+    			</div>
+    	 
+    			<div class="d-flex justify-content-center" id="chatbar">
+    				<div class="input-group" id = "type_msg">
+    				  	<textarea id="msg" type="text" placeholder="Type message..."></textarea>
+    				    <button type="button" onclick="getMessage()">Send</button>
+    				</div>
+       			</div>
+    		</div>
     </body>
 </html>

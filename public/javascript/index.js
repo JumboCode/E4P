@@ -68,14 +68,7 @@ function startChat() {
 
 
 function getMessage() {
-  var box = document.getElementById("chatbox");
-  box.scrollTop = box.scrollHeight;
-  var message = document.getElementById("msg").value;
-  var messageObj = createMessage('user', message);
-  chat.messages.push(messageObj);
-  document.getElementById("msg").value="";
-  updateChat(messageObj);
-  send_message(message);
+  sendMessage();
   window.onbeforeunload = warning;
 }
 
@@ -102,6 +95,23 @@ function createMessage(role, messageString) {
   return { role: role, message: messageString, timestamp: new Date() };
 }
 
+function sendMessage() {
+  $("#msg").on('keyup', function (e) {
+    if (e.keyCode == 13) {
+    message = document.getElementById("msg").value;
+    // message = encodeURI(uri);
+    //var new_message = message.split(/[^>]/, '');
+    //console.log(message);
+    //console.log(decodeURI(message));
+    if (message != '') {
+        messageObject = createMessage('user', message);
+        chat.messages.push(messageObject);
+        send_message(message);
+        updateChat(messageObject);     
+        message = document.getElementById("msg").value="";
+    }
+}});
+}
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
 
