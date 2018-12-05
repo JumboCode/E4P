@@ -96,8 +96,7 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-  $("#msg").on('keyup', function (e) {
-    if (e.keyCode == 13) {
+  
     message = document.getElementById("msg").value;
     // message = encodeURI(uri);
     //var new_message = message.split(/[^>]/, '');
@@ -110,7 +109,6 @@ function sendMessage() {
         updateChat(messageObject);     
         message = document.getElementById("msg").value="";
     }
-}});
 }
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
