@@ -9,11 +9,6 @@ body {font-family: "Lato", sans-serif;}
     overflow-x: scroll;
 }
 
-/*.topnav {
-    background-color: #248F89;
-    height: 85px;
-    width: 940px;
-}*/
 .main-content {
     height: 80vh;
 }
