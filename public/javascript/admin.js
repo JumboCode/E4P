@@ -1,5 +1,10 @@
 const socket = io();
 
+socket.on('connect', () => {
+  // send as POST request
+  $.post("/admin", { admin: socket.id });
+});
+
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
@@ -26,15 +31,18 @@ socket.on('user disconnect', end_chat);
 // ends a chat with given user
 function end_chat(user) {
   console.log('user disconnected ' + user);
-  // TODO - Frontend: close chat
+  deactivateChat(user);
+
+  // reload the current window:
+  toggleChat(CURRENT_CHAT_USER_ID);
 }
 
 socket.on('user waiting', user_waiting);
 
-function user_waiting(user) {
+function user_waiting(user, icon) {
   console.log('user waiting ' + user);
   console.log('creating new chat for user waiting');
-  newChat(user);
+  newChat(user, icon);
   updateUserOverview();
 }
 
@@ -65,19 +73,34 @@ function initialize() {
     generateAdminHeader();
 }
 
+const ICON_SRC = "img/Animal Icons Small.png";
+
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
     tab = document.getElementsByClassName("tab")[0];
     tab.innerHTML = '';
 
     for (chat of chats) {
-        tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
+        let iconTag = "";
+        if (isNaN(parseInt(chat.icon))) {
+            iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
+        } else {
+            iconTag = "<div class='icon'>" + chat.icon + "</div>";
+        }
+      
+        userTypingHidden = chat.typing ? '' : 'hidden';
+        tab.innerHTML = tab.innerHTML 
+                      + "<button class='username' onclick='toggleChat(`" + chat.userId + "`)'>"
+                      + iconTag
+                      + "<div class='buttonId'>" + chat.userId + "</div>"
+                      + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
+                      + "<img class='buttonTypingIcon' src='img/typing_icon.png'></div></button>";
     }
-    clearView();
 }
 
 function toggleChat(userId) {
     CURRENT_CHAT_USER_ID = userId
+    tabId = 0;
     for (chat of chats) {
         if (chat.userId == userId) {
             currentChat = document.getElementsByClassName("messages")[0];
@@ -86,6 +109,10 @@ function toggleChat(userId) {
                 messageSide = message.role == 'admin' ? 'right' : 'left';
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
             }
+
+            currentUserTyping = chat.typing ? 'block' : 'none';
+            $('#typingIcon').css('display', currentUserTyping);
+
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
                 actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
@@ -97,19 +124,28 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
+        tabId++;
     }
     $("#messageBox").on('keyup', function (e) {
         if (e.keyCode == 13) {
             sendMessage();
         }
     });
+    scrollDown()
+
+
+}
+
+function scrollDown() {
+    messageBox = document.getElementsByClassName("messagesBox")[0];
+    messageBox.scrollTop = messageBox.scrollHeight;
 }
 
 /*
     Given a user identifier, creates a new chat for that user if the identifier is unique
     and logs an error if it is a duplicate
 */
-function newChat(userId) {
+function newChat(userId, icon) {
     console.log("new chat");
     validUser = true;
     for (chat of chats) {
@@ -119,7 +155,7 @@ function newChat(userId) {
         }
     }
     if (validUser) {
-        chats.push({ userId: userId, messages: [], accepted: false, active: true });
+        chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon });
     }
 }
 
@@ -163,6 +199,7 @@ function addMessage(userId, messageObject) {
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
+        scrollDown();
     }
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
@@ -214,7 +251,10 @@ function removeChat(userId) {
         console.log(Error('User with given identifier could not be found'));
     }
     updateUserOverview();
-    clearView(); 
+    clearView();
+    if (chats.length > 0) {
+        toggleChat(chats[0].userId)
+    }
 }
 
 function clearView() {
@@ -223,11 +263,37 @@ function clearView() {
 
 }
 
+
+function userIsTyping(userId) {
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.typing = true;
+        }
+    }
+    updateUserOverview();
+    if (userId == CURRENT_CHAT_USER_ID) {
+        toggleChat(CURRENT_CHAT_USER_ID);
+    }
+}
+
+function userNotTyping(userId) {
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.typing = false;
+        }
+    }
+    updateUserOverview();
+    if (userId == CURRENT_CHAT_USER_ID) {
+        toggleChat(CURRENT_CHAT_USER_ID);
+    }
+}
+
 function mockChats() {
 
     newChat('user1');
     newChat('user2');
     newChat('user3');
+    newChat('this_is_a_really_long_username')
 
     message = createMessage('user', 'hi');
     addMessage('user1', message);
@@ -245,10 +311,13 @@ function mockChats() {
     message = createMessage('admin', 'hi user3');
     addMessage('user3', message);
 
-    acceptChat('user2');
-    acceptChat('user3');
+    // acceptChat('user2');
+    // acceptChat('user3');
     deactivateChat('user3');
+}
 
+function getImageURL() {
+    return 'img/cow.jpg';
 }
 
 function populateChat() {
