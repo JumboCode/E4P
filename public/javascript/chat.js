@@ -26,7 +26,7 @@ function escapeMessage(message) {
 
 function chatElements() {
   return '<textarea id="messageBox" type="text" autocomplete="off" placeholder="Type a message..."></textarea>'
-       + '<div id="sendButton" onclick="sendMessage()""><div id="sendButtonText">Send</div></div>';
+       + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
 }
 
 function chatSetup(sendMessage) {
@@ -35,5 +35,9 @@ function chatSetup(sendMessage) {
       e.preventDefault();
       sendMessage();
     }
+  });
+
+  $("#sendButton").click(function(e) {
+    sendMessage();
   });
 }
