@@ -1,5 +1,10 @@
 const socket = io();
 
+socket.on('connect', () => {
+  // send as POST request
+  $.post("/admin", { admin: socket.id });
+});
+
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
@@ -26,15 +31,18 @@ socket.on('user disconnect', end_chat);
 // ends a chat with given user
 function end_chat(user) {
   console.log('user disconnected ' + user);
-  // TODO - Frontend: close chat
+  deactivateChat(user);
+
+  // reload the current window:
+  toggleChat(CURRENT_CHAT_USER_ID);
 }
 
 socket.on('user waiting', user_waiting);
 
-function user_waiting(user) {
+function user_waiting(user, icon) {
   console.log('user waiting ' + user);
   console.log('creating new chat for user waiting');
-  newChat(user);
+  newChat(user, icon);
   updateUserOverview();
 }
 
@@ -59,11 +67,14 @@ CURRENT_CHAT_USER_ID = '';
 
 function initialize() {
     // Can be used for testing:
-    mockChats();
-    populateChat();
+    // mockChats();
+    // populateChat();
+  
     updateUserOverview();
     generateAdminHeader();
 }
+
+const ICON_SRC = "img/Animal Icons Small.png";
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
@@ -71,9 +82,8 @@ function updateUserOverview() {
     tab.innerHTML = '';
 
     for (chat of chats) {
-        tab.innerHTML = tab.innerHTML + "<button class='username' onclick='toggleChat(`" + chat.userId+ "`)'>" + chat.userId + "</button>";
+        tab.innerHTML = tab.innerHTML + "<button onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
     }
-    clearView();
 }
 
 function toggleChat(userId) {
@@ -83,7 +93,8 @@ function toggleChat(userId) {
             currentChat = document.getElementsByClassName("messages")[0];
             currentChat.innerHTML = "";
             for (message of chat.messages) {
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(message.role, message.message)
+                messageSide = message.role == 'admin' ? 'right' : 'left';
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
             }
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
@@ -108,7 +119,7 @@ function toggleChat(userId) {
     Given a user identifier, creates a new chat for that user if the identifier is unique
     and logs an error if it is a duplicate
 */
-function newChat(userId) {
+function newChat(userId, icon) {
     console.log("new chat");
     validUser = true;
     for (chat of chats) {
@@ -118,7 +129,7 @@ function newChat(userId) {
         }
     }
     if (validUser) {
-        chats.push({ userId: userId, messages: [], accepted: false, active: true });
+        chats.push({ userId: userId, messages: [], accepted: false, active: true , icon: icon});
     }
 }
 
@@ -158,12 +169,7 @@ function addMessage(userId, messageObject) {
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
                 currentChat = document.getElementsByClassName("messages")[0];
-                if (messageObject.role == 'admin') {
-                    messageSide = 'right';
-                }
-                else {
-                    messageSide = 'left';
-                }    
+                messageSide = messageObject.role == 'admin' ? 'right' : 'left';
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
@@ -218,7 +224,10 @@ function removeChat(userId) {
         console.log(Error('User with given identifier could not be found'));
     }
     updateUserOverview();
-    clearView(); 
+    clearView();
+    if (chats.length > 0) {
+        toggleChat(chats[0].userId)
+    }
 }
 
 function clearView() {
@@ -286,17 +295,13 @@ function populateChat() {
 }
 
 function sendTypingMessage(user_id, is_typing) {
-  if (is_typing == true) {
-      socket.emit('typing', {
-      user_id: socket.id 
-    });
-  } else {
-      socket.emit('stop typing', {
-      user_id: socket.id
-    }); 
-  }
+   if (is_typing == true) {
+       socket.emit('typing', {
+       user_id: socket.id 
+     });
+   } else {
+       socket.emit('stop typing', {
+       user_id: socket.id
+     }); 
+   }
 }
-
-
-
-

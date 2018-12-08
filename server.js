@@ -2,17 +2,48 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 const path = require('path');
-
-const bodyParser = require('body-parser');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+const passport = require('passport');
+const mongoose = require('mongoose');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+
+const adminRoutes = require('./routes/adminRoutes');
+
+///////////////////////////////////////////////////////////////////////
+//        Passport Config
+///////////////////////////////////////////////////////////////////////
+
+if (process.env.NODB) {
+  console.log('NODB flag set, running without database and no authentication!');
+} else {
+  var db = mongoose.connection;
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useNewUrlParser: true });
+
+  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+  app.use(cookieParser());
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  var Admin = require('./models/adminModel');
+  passport.use(new LocalStrategy(Admin.authenticate));
+  passport.serializeUser(Admin.serializeUser);
+  passport.deserializeUser(Admin.deserializeUser);
+}
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // parse application/json
 app.use(bodyParser.json());
 
+// initialize admin id array
+let admins = [];
 
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
@@ -33,47 +64,47 @@ if (app.get('env') == 'production') {
 //        Routes
 ///////////////////////////////////////////////////////////////////////
 
+app.use('/admin', adminRoutes);
+
 app.get('/', function(req, res) {
-	res.sendFile('index.html', {root: path.join(__dirname, 'public')});
-});
-
-app.get('/admin', function(req, res) {
-	res.sendFile('admin.html', {root: path.join(__dirname, 'public')});
-});
-
-app.get('/login', function(req, res) {
-  res.sendFile('login_page.html', {root: path.join(__dirname, 'public')});
-});
-
-app.post('/login', function(req, res) {
-  // TODO add authentication to this route and remove the following print statements:
-  console.log(req.body.username)
-  console.log(req.body.password)
-
-  res.send('success');
+  res.sendFile('index.html', {root: path.join(__dirname, 'public')});
 });
 
 app.get('/help', function(req, res) {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
 });
 
-// TODO THIS IS NOT SECURE, PROTECT ALL ADMIN ROUTES BEHIND AUTH
-app.get('/:folder/:file', function(req, res) {
-  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', req.params.folder)});
+app.get('/css/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'css')});
+});
+
+app.get('/javascript/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'javascript')});
+});
+
+app.get('/img/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'img')});
+});
+
+app.post('/admin', function(req, res) {
+  admins.push(req.body.admin);
 });
 
 ///////////////////////////////////////////////////////////////////////
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
+var icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
+             "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
+             "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
+             "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
 
-io.on('connection', (socket) => {
-  // console.log('CONNECT ' + socket.id);
-  
+io.on('connection', (socket) => {  
   // PHASE I
-  // socket.broadcast.to(all_admins).emit('user waiting', socket.id);
   socket.on('user connect', () => {
-    // console.log('user connect: ' + socket.id)
-  	socket.broadcast.emit('user waiting', socket.id);
+    socket.icon = icons.splice(Math.floor(Math.random() * icons.length), 1)[0];
+    for (let admin of admins) {
+      socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
+    }
   }); 
 
   // PHASE II
@@ -85,8 +116,9 @@ io.on('connection', (socket) => {
     // TODO what if user_room_id no longer exists
     socket.join(user_room_id);
     socket.broadcast.to(user_room_id).emit('admin matched');
-    // socket.broadcast.to(all_admins).emit('user matched', user_room_id);
-    socket.broadcast.emit('user matched', user_room_id);
+    for (let admin of admins) {
+      socket.broadcast.to(admin).emit('user matched', user_room_id);
+    }
   });
 
   // PHASE III
@@ -103,8 +135,9 @@ io.on('connection', (socket) => {
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
-    // console.log('DISCONNECT ' + socket.id)
+    // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
+    icons.push(socket.icon);
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {
       // room exists, either admin or user left in room, send disconnect
@@ -112,23 +145,30 @@ io.on('connection', (socket) => {
     } else {
       // room DNE, no one else connected, user was pending
       // TODO what if admin disconnected first, dont need to send 'accept user'
-      // TODO socket.broadcast.to(all_admins).emit('user matched', user_room_id);
-      socket.broadcast.emit('user matched', user_room_id);
+      for (let admin of admins) {
+        socket.broadcast.to(admin).emit('user matched', user_room_id);
+      }
+    }
+    // Removes admin ID from admins array when an admin disconnects
+    for (let i = 0; i < admins.length; i++) {
+      if (admins[i] == user_room_id) {
+        admins.splice(i, 1);
+      }
     }
   });
 
   //User Typing Event:
-  socket.on('typing', function(data) => {
-    let reciever = data['room']; 
-    socket.broadcast.to(receiver).emit('typing', {room: reciever});
-    console.log("User is typing"); 
-  }); 
+   socket.on('typing', function(data) {
+     let reciever = data['room']; 
+     socket.broadcast.to(receiver).emit('typing', {room: reciever});
+     console.log("User is typing"); 
+   }); 
 
-  socket.on('stop typing', function(data) => {
-    let reciever = data['room']; 
-    socket.broadcast.to(receiver).emit('stop typing', {room: reciever}); 
-    console.log("User is not typing"); 
-  }); 
+   socket.on('stop typing', function(data) {
+     let reciever = data['room']; 
+     socket.broadcast.to(receiver).emit('stop typing', {room: reciever}); 
+     console.log("User is not typing"); 
+   }); 
 
 });
 
@@ -136,4 +176,5 @@ server.listen(process.env.PORT || 3000, function() {
   	console.log('Node app is running on port 3000');
 });
 
-module.exports = app
+module.exports = app;
+module.exports.admins = admins;
