@@ -129,8 +129,10 @@ div.icon {
 }
 
 .chatAction #messageBox {
-    height: 100%;
-    width: 85%;
+  border: var(--light-blue);
+  height: 100%;
+  width: 85%;
+  resize: none;
 }
 
 .chatAction #sendButton {

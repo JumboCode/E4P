@@ -118,22 +118,15 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
             }
             else if (chat.active) {
-                actionDiv.innerHTML = "<input id='messageBox' type='text' name='messageInput' placeholder='Message' autocomplete='off'>"
-                                    + "<div id='sendButton' onclick='sendMessage()'><div id='sendButtonText'>Send</div></div>";
+                actionDiv.innerHTML = chatElements();
+                chatSetup(sendMessage);
+                scrollDown()
             } else {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
         tabId++;
     }
-    $("#messageBox").on('keyup', function (e) {
-        if (e.keyCode == 13) {
-            sendMessage();
-        }
-    });
-    scrollDown()
-
-
 }
 
 function scrollDown() {
@@ -171,17 +164,12 @@ function sendMessage() {
     message = $('#messageBox').val();
     if (message != '') {
         console.log("sending message")
-        message = $('#messageBox').val();
         send_message(CURRENT_CHAT_USER_ID, message);
         messageObject = createMessage("admin", message);
-
         addMessage(CURRENT_CHAT_USER_ID, messageObject);
-                
         message = $('#messageBox').val('');
     }
-
 }
-
 
 /*
     Given a user identifier and a messageObject, appends the message object to that user's
