@@ -129,14 +129,14 @@ io.on('connection', (socket) => {
   });
 
   // PHASE III
-  // recieve chat message from admin or user, and send it to a specific user's room
+  // receive chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', function(data) {
     // console.log(data.message);
 
     let message = data['message'];
-    let reciever = data['room'];
-    // console.log('reciever: ' + reciever);
-    socket.broadcast.to(reciever).emit('chat message', {message: message, room: reciever});
+    let receiver = data['room'];
+    // console.log('receiver: ' + receiver);
+    socket.broadcast.to(receiver).emit('chat message', {message: message, room: receiver});
   });
 
   // PHASE IV
