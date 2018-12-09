@@ -8,7 +8,8 @@ socket.on('connect', () => {
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
-  console.log('recieved chat message on admin: ' + data);
+  console.log('recieved chat message on admin: ')
+  console.log(data);
 
   addMessage(data.room, createMessage('user', data.message))
 });
@@ -46,6 +47,19 @@ function user_waiting(user, icon) {
   updateUserOverview();
 }
 
+
+socket.on('typing', user_typing);
+
+function user_typing(data) {
+  userIsTyping(data.room);
+}
+
+socket.on('stop typing', user_stop_typing);
+
+function user_stop_typing(data) {
+  userNotTyping(data.room);
+}
+
 // RECEIVE ^^^
 ///////////////////////////////////////
 // SEND    vvv
@@ -65,11 +79,11 @@ function accept_user(user) {
 function send_typing_message(user_id, is_typing) {
   if (is_typing == true) {
     socket.emit('typing', {
-      user_id: socket.id 
+      room: socket.id 
     });
   } else {
     socket.emit('stop typing', {
-      user_id: socket.id
+      room: socket.id
     }); 
    }
 }
@@ -212,7 +226,9 @@ function deactivateChat(userId) {
     for (chat of chats) {
         if (userId == chat.userId) {
             chat.active = false;
+            chat.typing = false;
             foundUser = true;
+            updateUserOverview();
         }
     }
     if (!foundUser) {

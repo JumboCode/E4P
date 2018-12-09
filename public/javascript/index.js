@@ -28,14 +28,14 @@ function user_connect() {
   socket.emit('user connect');
 };
 
-function send_typing_message(user_id, is_typing) {
+function send_typing_message(is_typing) {
   if (is_typing == true) {
     socket.emit('typing', {
-      user_id: socket.id 
+      room: socket.id 
     });
   } else {
     socket.emit('stop typing', {
-      user_id: socket.id
+      room: socket.id
     }); 
   }
 }

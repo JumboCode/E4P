@@ -35,6 +35,20 @@ function chatSetup(sendMessage) {
       e.preventDefault();
       sendMessage();
     }
+    
+    // Check if on user side
+    if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.userId) != "undefined") {
+      send_typing_message(true);
+
+      // clear timout that would send message "stop typing" message
+      if (typeof(userTypingTimeout) != "undefined") {
+        clearTimeout(userTypingTimeout);
+      }
+
+      userTypingTimeout = setTimeout(function(){ 
+        send_typing_message(false);
+      }, 5000);
+    }
   });
 
   $("#sendButton").click(function(e) {
