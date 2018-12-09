@@ -1,4 +1,8 @@
 # E4P
+
+
+[![Build Status](https://travis-ci.org/JumboCode/E4P.svg?branch=master)](https://travis-ci.org/JumboCode/E4P)
+
 JumboCode 2018-2019 project for Ears 4 Peers. This site is currently under construction and not actively used by Tufts Ears 4 Peers. If you'd like to reach out to Ears 4 Peers, go to their website: [Ears 4 Peers](http://sites.tufts.edu/ears4peers/ "Ears 4 Peers Site").
 
 * [Design](https://github.com/JumboCode/E4P/wiki/Design "E4P Design")
@@ -15,9 +19,25 @@ git clone https://github.com/JumboCode/E4P.git
 npm install
 ```
 ### Run
+#### Run the Database (in a Separate Tab)
 ```sh
-npm start
+mongod
 ```
+#### Run the Server
+- Run normally with the authentication module:
+  ```sh
+  npm start
+  ```
+
+- Run without the authentication module (to register the initial user)
+  ```sh
+  NOAUTH=true npm start
+  ```
+  
+  Run without the database module (you don't need the mongod tab and disables database and authentication)
+  ```sh
+  NODB=true npm start
+  ```
 ## Team Members
 - Anika Agarwal
 - Jasmine Falk

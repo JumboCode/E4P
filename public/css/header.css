@@ -1,16 +1,25 @@
+:root{
+  --light-blue: #DEF3F3;
+  --dark-green: #248F89;
+  --medium-green: #51D2CA;
+  --light-green: #B2FEF8;
+}
+
 .topnav {
-    background-color: #B1C6C4;
+    background-color: var(--dark-green);
     overflow: hidden;
+    width: 100%;
 }
 
 .topnav a {
+  font-family: "Roboto";
   float: left;
-  color: #B1C6C4;
+  color: var(--light-blue);
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
-  font-size: 17px;
-  background: white;
+  font-size: 25px;
+  background: var(--dark-green);
 }
 
 .topnav-right {
@@ -18,11 +27,11 @@
 }
 
 .topnav a:hover {
-  background-color: #B1C6C4;
-  color: grey;
+  background-color: var(--light-blue);
+  color: var(--dark-green);
 }
 
 .topnav a.active {
-  background-color: #B1C6C4;
+  background-color: var(--dark-green);
   color: white;
 }
