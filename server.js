@@ -148,7 +148,6 @@ io.on('connection', (socket) => {
     if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
       icons.push(socket.icon);
     }
-    
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {
       // room exists, either admin or user left in room, send disconnect
@@ -169,17 +168,15 @@ io.on('connection', (socket) => {
   });
 
   //User Typing Event:
-   socket.on('typing', function(data) {
-     let reciever = data['room']; 
-     socket.broadcast.to(receiver).emit('typing', {room: reciever});
-     console.log("User is typing"); 
-   }); 
+  socket.on('typing', function(data) {
+    let receiver = data['room']; 
+    socket.broadcast.to(receiver).emit('typing', {room: receiver});
+  }); 
 
-   socket.on('stop typing', function(data) {
-     let reciever = data['room']; 
-     socket.broadcast.to(receiver).emit('stop typing', {room: reciever}); 
-     console.log("User is not typing"); 
-   }); 
+  socket.on('stop typing', function(data) {
+    let receiver = data['room']; 
+    socket.broadcast.to(receiver).emit('stop typing', {room: receiver}); 
+  }); 
 
 });
 
