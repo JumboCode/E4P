@@ -28,6 +28,18 @@ function user_connect() {
   socket.emit('user connect');
 };
 
+function send_typing_message(user_id, is_typing) {
+  if (is_typing == true) {
+    socket.emit('typing', {
+      user_id: socket.id 
+    });
+  } else {
+    socket.emit('stop typing', {
+      user_id: socket.id
+    }); 
+  }
+}
+
 function warning() {
   return "Are you sure you want to leave?";
 }

@@ -62,6 +62,19 @@ function accept_user(user) {
   socket.emit('accept user', user);
 }
 
+function send_typing_message(user_id, is_typing) {
+  if (is_typing == true) {
+    socket.emit('typing', {
+      user_id: socket.id 
+    });
+  } else {
+    socket.emit('stop typing', {
+      user_id: socket.id
+    }); 
+   }
+}
+
+
 chats = [];
 CURRENT_CHAT_USER_ID = '';
 
