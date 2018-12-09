@@ -24,3 +24,20 @@ function escapeMessage(message) {
 	return message
 }
 
+function chatElements() {
+  return '<textarea id="messageBox" type="text" autocomplete="off" placeholder="Type a message..."></textarea>'
+       + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
+}
+
+function chatSetup(sendMessage) {
+  $("#messageBox").keydown(function(e) {
+    if (e.which == 13 && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  $("#sendButton").click(function(e) {
+    sendMessage();
+  });
+}

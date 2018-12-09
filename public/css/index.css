@@ -209,25 +209,39 @@ img {
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.50);
 }
 
-#chatbar button{
-  background: var(--dark-green);
-  color: white;
-  height: 55px;
-  width: 10%;
-}
 #e_space {
   background: white;
   height: 10vh;
 }
-#type_msg {
 
+#type_msg {
   width: 100%;
 }
 
-#msg {
+#messageBox {
   border: var(--light-blue);
   min-height: 10px;
   width: 90%;
   resize: none;
+}
 
+#sendButton {
+  background: var(--dark-green);
+  color: white;
+  height: 55px;
+  width: 10%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: solid rgb(200, 200, 200) 1px;
+  cursor: pointer;
+}
+
+#sendButton:hover {
+  background-color: rgb(200, 200, 200);
+}
+
+#sendButtonText {
+    text-align: center;
 }
