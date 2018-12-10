@@ -72,7 +72,6 @@ function initialize() {
     // Can be used for testing:
     // mockChats();
     // populateChat();
-  
     updateUserOverview();
     generateAdminHeader();
 }
@@ -87,7 +86,16 @@ function updateUserOverview() {
 
     for (chat of chats) {
         selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
-        tab.innerHTML = tab.innerHTML + "<button " + selectedChat + "onclick='toggleChat(`" + chat.userId+ "`)'><img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'><div class='username'>" + chat.icon + "</div></button>";
+        userTypingHidden = chat.typing ? '' : 'hidden';
+        messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
+        tab.innerHTML = tab.innerHTML 
+                      + "<button class='username' " + selectedChat
+                      + " onclick='toggleChat(`" + chat.userId + "`)'>"
+                      + "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>" 
+                      + "<div class='buttonText'><div class='buttonId'>" + chat.userId + "</div>"
+                      + "<div class='messagePreview'>" + messagePreview + "</div></div>"
+                      + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
+                      + "<img class='buttonTypingIcon' src='img/typing_icon.png'></div></button>";
     }
 }
 
@@ -98,6 +106,7 @@ function clearView() {
 
 function toggleChat(userId) {
     CURRENT_CHAT_USER_ID = userId
+    tabId = 0;
     for (chat of chats) {
         if (chat.userId == userId) {
             currentChat = document.getElementsByClassName("messages")[0];
@@ -106,6 +115,10 @@ function toggleChat(userId) {
                 messageSide = message.role == 'admin' ? 'right' : 'left';
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
             }
+
+            currentUserTyping = chat.typing ? 'block' : 'none';
+            $('#typingIcon').css('display', currentUserTyping);
+
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
                 actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
@@ -117,13 +130,20 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
+        tabId++;
     }
     $("#messageBox").on('keyup', function (e) {
         if (e.keyCode == 13) {
             sendMessage();
         }
     });
+    scrollDown()
     updateUserOverview();
+}
+
+function scrollDown() {
+    messageBox = document.getElementsByClassName("messagesBox")[0];
+    messageBox.scrollTop = messageBox.scrollHeight;
 }
 
 
@@ -143,10 +163,9 @@ function newChat(userId, icon) {
         }
     }
     if (validUser) {
-        chats.push({ userId: userId, messages: [], accepted: false, active: true , icon: icon});
+        chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon });
     }
 }
-
 
 function deactivateChat(userId) {
     foundUser = false;
@@ -199,6 +218,30 @@ function removeChat(userId) {
     }
 }
 
+function userIsTyping(userId) {
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.typing = true;
+        }
+    }
+    updateUserOverview();
+    if (userId == CURRENT_CHAT_USER_ID) {
+        toggleChat(CURRENT_CHAT_USER_ID);
+    }
+}
+
+function userNotTyping(userId) {
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.typing = false;
+        }
+    }
+    updateUserOverview();
+    if (userId == CURRENT_CHAT_USER_ID) {
+        toggleChat(CURRENT_CHAT_USER_ID);
+    }
+}
+
 
 /**************************** SINGLE MESSAGE FUNCTIONS ****************************/
 
@@ -226,7 +269,6 @@ function sendMessage() {
 
 }
 
-
 /*
     Given a user identifier and a messageObject, appends the message object to that user's
     chat if it exists, logs an error if that user chat doesn't exist 
@@ -243,10 +285,12 @@ function addMessage(userId, messageObject) {
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
+        scrollDown();
     }
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
+    updateUserOverview();
 }
 
 
@@ -258,6 +302,7 @@ function mockChats() {
     newChat('user1');
     newChat('user2');
     newChat('user3');
+    newChat('this_is_a_really_long_username')
 
     message = createMessage('user', 'hi');
     addMessage('user1', message);
@@ -275,10 +320,9 @@ function mockChats() {
     message = createMessage('admin', 'hi user3');
     addMessage('user3', message);
 
-    acceptChat('user2');
-    acceptChat('user3');
+    // acceptChat('user2');
+    // acceptChat('user3');
     deactivateChat('user3');
-
 }
 
 function populateChat() {

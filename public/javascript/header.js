@@ -8,14 +8,15 @@ function generateUserHeader() {
 
 function generateHeader(role) {
 	href = role === 'user' ? '/' : '/admin';
-
+	login = '/admin/login';
+	logout = '/admin/logout';
 	buttons = role === 'user' ? 
-		"<a href='/help'>Help</a><a href='/help'>Feedback</a>" :
-		"<a href='/admin/logout'>Logout</a>";
+		"<a href='/help'>Help</a><a href='http://sites.tufts.edu/ears4peers/contact-us/'>Feedback</a><a href="+login+">Login</a>" :
+		"<a href=" + logout + ">Logout</a>";
 
 	document.getElementsByClassName("topnav")[0].innerHTML = 
 		"<a class='active' href='" + href + "'>E4P</a>"
 		+ "<div class='topnav-right'>"
-		+ buttons
+		+ 	buttons
 		+ "</div>";
 }

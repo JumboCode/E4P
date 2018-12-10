@@ -19,12 +19,15 @@ body {font-family: "Lato", sans-serif;}
     width: 30%;
     height: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 /* Style the buttons that are used to open the tab content */
 .tab button {
     display: block;
     background-color: #96D7D2;
+    display: flex;
+    flex-direction: row;
     color: black;
     padding: 0px 0px;
     width: 100%;
@@ -33,6 +36,8 @@ body {font-family: "Lato", sans-serif;}
     text-align: left;
     cursor: pointer;
     transition: 0.3s;
+    align-items: center;
+    overflow-x: auto;
 }
 
 /* Change background color of buttons on hover */
@@ -52,7 +57,7 @@ body {font-family: "Lato", sans-serif;}
 .icon {
     object-fit: none;
     object-position: 0 0;
-    width: 60px;
+    min-width: 60px;
     height: 60px;
 }
 
@@ -60,6 +65,37 @@ body {font-family: "Lato", sans-serif;}
     display: inline-block;
     vertical-align: top;
     padding: 22px 16px;
+}
+
+.buttonId {
+    padding-left: 5%;
+    max-width: 80%;
+    min-width: 60%;
+    font-size: 15px;
+    overflow: auto;
+}
+
+.buttonText {
+    display: flex;
+    flex-direction: column;
+    width: 100%
+}
+
+.messagePreview {
+    padding-left: 5%;
+    max-width: 80%;
+    min-width: 60%;
+    overflow: hidden;
+    max-height: 50%;
+}
+
+.buttonTypingDiv {
+    width: 20%;
+    /*visibility: hidden;*/
+}
+
+.buttonTypingIcon {
+    width: 100%;
 }
 
 /* Style the tab content */
@@ -73,12 +109,14 @@ body {font-family: "Lato", sans-serif;}
 
 }
 
-.messages {
+/* Style the box that shows all the messages */
+.messagesBox {
     padding: 0px 12px;
     max-height: 90%;
     overflow-y: scroll;
 }
 
+/* Styles the */
 .chatAction {
     position: absolute;
     margin: 0;
@@ -86,6 +124,8 @@ body {font-family: "Lato", sans-serif;}
     width: 100%;
     top: auto;
     bottom: 0px;
+    display: flex;
+    flex-direction: row;
 }
 
 .chatAction #delete, #accept {
@@ -95,9 +135,7 @@ body {font-family: "Lato", sans-serif;}
 }
 
 .chatAction {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
+
 }
 
 .chatAction #messageBox {
@@ -254,3 +292,15 @@ body {font-family: "Lato", sans-serif;}
 #hippo {
     object-position: -60px -300px;
 }
+
+#typingIcon {
+    display: none;
+    width: 15%;
+    height: auto;
+}
+
+#typingIcon img {
+    width: 100%;
+    height: 100%;
+}
+
