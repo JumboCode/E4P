@@ -119,13 +119,15 @@ function updateUserOverview() {
         } else {
             iconTag = "<div class='icon'>" + chat.icon + "</div>";
         }
+        iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
+        iconText[0] = iconText[0].toUp
         userTypingHidden = chat.typing ? '' : 'hidden';
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
         tab.innerHTML = tab.innerHTML 
                       + "<button class='username' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
                       + iconTag
-                      + "<div class='buttonText'><div class='buttonId'>" + chat.userId + "</div>"
+                      + "<div class='buttonText'><div class='buttonId'>" + iconText + "</div>"
                       + "<div class='messagePreview'>" + messagePreview + "</div></div>"
                       + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
                       + "<img class='buttonTypingIcon' src='img/typing_icon.png'></div></button>";
