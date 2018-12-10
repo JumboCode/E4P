@@ -16,6 +16,7 @@ body {font-family: "Lato", sans-serif;}
 .tab {
     float: left;
     border: 1px solid #ccc;
+    background-color: #ffffff;
     width: 30%;
     height: 100%;
     overflow-y: auto;
@@ -31,7 +32,6 @@ body {font-family: "Lato", sans-serif;}
     color: black;
     padding: 0px 0px;
     width: 100%;
-    border: none;
     outline: none;
     text-align: left;
     cursor: pointer;
@@ -54,11 +54,20 @@ body {font-family: "Lato", sans-serif;}
     background-color: #DEF3F3;
 }
 
-.icon {
+img.icon {
     object-fit: none;
     object-position: 0 0;
     min-width: 60px;
     height: 60px;
+}
+
+div.icon {
+    display: inline-block;
+    vertical-align: top;
+    width: 60px;
+    height: 60px;
+    margin: 0;
+    padding: 22px 16px;
 }
 
 .username {
@@ -106,6 +115,7 @@ body {font-family: "Lato", sans-serif;}
     width: 70%;
     border-left: none;
     height: 100%;
+    background-color: #DEF3F3;
 
 }
 
@@ -139,8 +149,10 @@ body {font-family: "Lato", sans-serif;}
 }
 
 .chatAction #messageBox {
-    height: 100%;
-    width: 85%;
+  border: var(--light-blue);
+  height: 100%;
+  width: 85%;
+  resize: none;
 }
 
 .chatAction #sendButton {
@@ -149,8 +161,7 @@ body {font-family: "Lato", sans-serif;}
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background-color: rgb(241, 241, 241);
-    border-radius: 4%;
+    background-color: #96D7D2;
     border: solid rgb(200, 200, 200) 1px;
     cursor: pointer;
 }

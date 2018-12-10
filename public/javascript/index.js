@@ -28,6 +28,18 @@ function user_connect() {
   socket.emit('user connect');
 };
 
+function send_typing_message(is_typing) {
+  if (is_typing == true) {
+    socket.emit('typing', {
+      room: socket.id 
+    });
+  } else {
+    socket.emit('stop typing', {
+      room: socket.id
+    }); 
+  }
+}
+
 function warning() {
   return "Are you sure you want to leave?";
 }
@@ -96,20 +108,21 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-  
-    message = document.getElementById("msg").value;
-    // message = encodeURI(uri);
-    //var new_message = message.split(/[^>]/, '');
-    //console.log(message);
-    //console.log(decodeURI(message));
+    message = $('#messageBox').val();
     if (message != '') {
+        send_message(message);
         messageObject = createMessage('user', message);
         chat.messages.push(messageObject);
-        send_message(message);
         updateChat(messageObject);     
-        message = document.getElementById("msg").value="";
+        message = $('#messageBox').val('');
     }
 }
+
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
+
+$(function() {
+  $("#type_msg").html(chatElements());
+  chatSetup(sendMessage);
+});
 

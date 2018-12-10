@@ -8,7 +8,8 @@ socket.on('connect', () => {
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
-  console.log('recieved chat message on admin: ' + data);
+  console.log('recieved chat message on admin: ')
+  console.log(data);
 
   addMessage(data.room, createMessage('user', data.message))
 });
@@ -46,6 +47,19 @@ function user_waiting(user, icon) {
   updateUserOverview();
 }
 
+
+socket.on('typing', user_typing);
+
+function user_typing(data) {
+  userIsTyping(data.room);
+}
+
+socket.on('stop typing', user_stop_typing);
+
+function user_stop_typing(data) {
+  userNotTyping(data.room);
+}
+
 // RECEIVE ^^^
 ///////////////////////////////////////
 // SEND    vvv
@@ -61,6 +75,19 @@ function send_message(user, msg) {
 function accept_user(user) {
   socket.emit('accept user', user);
 }
+
+function send_typing_message(user_id, is_typing) {
+  if (is_typing == true) {
+    socket.emit('typing', {
+      room: socket.id 
+    });
+  } else {
+    socket.emit('stop typing', {
+      room: socket.id
+    }); 
+   }
+}
+
 
 chats = [];
 CURRENT_CHAT_USER_ID = '';
@@ -86,12 +113,18 @@ function updateUserOverview() {
 
     for (chat of chats) {
         selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
+        let iconTag = "";
+        if (isNaN(parseInt(chat.icon))) {
+            iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
+        } else {
+            iconTag = "<div class='icon'>" + chat.icon + "</div>";
+        }
         userTypingHidden = chat.typing ? '' : 'hidden';
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
         tab.innerHTML = tab.innerHTML 
                       + "<button class='username' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                      + "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>" 
+                      + iconTag
                       + "<div class='buttonText'><div class='buttonId'>" + chat.userId + "</div>"
                       + "<div class='messagePreview'>" + messagePreview + "</div></div>"
                       + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
@@ -124,8 +157,9 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
             }
             else if (chat.active) {
-                actionDiv.innerHTML = "<input id='messageBox' type='text' name='messageInput' placeholder='Message' autocomplete='off'>"
-                                    + "<div id='sendButton' onclick='sendMessage()'><div id='sendButtonText'>Send</div></div>";
+                actionDiv.innerHTML = chatElements();
+                chatSetup(sendMessage);
+                scrollDown()
             } else {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
@@ -167,12 +201,15 @@ function newChat(userId, icon) {
     }
 }
 
+
 function deactivateChat(userId) {
     foundUser = false;
     for (chat of chats) {
         if (userId == chat.userId) {
             chat.active = false;
+            chat.typing = false;
             foundUser = true;
+            updateUserOverview();
         }
     }
     if (!foundUser) {

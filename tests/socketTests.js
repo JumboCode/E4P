@@ -143,4 +143,57 @@ describe('socket tests', () => {
       setTimeout(() => { user1.emit('user connect'); }, 50);
     });
   });
+
+  describe('User Typing Messages', () => {
+    it('should send typing notices back and forth between admin and user', (done) => {
+      // setup connections
+      admin1.on('user waiting', (id1) => {
+        admin1.emit('accept user', id1);
+      });
+
+      user1.on('admin matched', () => {
+        user1.emit('typing', { room: user1.id });
+      });
+
+      // chat messages
+      admin1.on('typing', (msg) => {
+        expect(msg.room).to.equal(user1.id);
+        admin1.emit('typing', { room: msg.room });
+      });
+
+      user1.on('typing', (msg) => {
+        expect(msg.room).to.equal(user1.id);
+        done();
+      });
+
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+    });
+  });
+  
+  describe('User Typing Messages', () => {
+    it('should send stop typing notices back and forth between admin and user', (done) => {
+      // setup connections
+      admin1.on('user waiting', (id1) => {
+        admin1.emit('accept user', id1);
+      });
+
+      user1.on('admin matched', () => {
+        user1.emit('stop typing', { room: user1.id });
+      });
+
+      // chat messages
+      admin1.on('stop typing', (msg) => {
+        expect(msg.room).to.equal(user1.id);
+        admin1.emit('stop typing', { room: msg.room });
+      });
+
+      user1.on('stop typing', (msg) => {
+        expect(msg.room).to.equal(user1.id);
+        done();
+      });
+
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+    });
+  });
+
 });
