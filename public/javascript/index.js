@@ -37,7 +37,8 @@ socket.on('wait for admin reconnect', () => {
 
 socket.on('ping user', () => {
     console.log('pinged admin back');
-    socket.emit('ping admin back');
+    // console.log('SOCKET ID: ' + socket.id)
+    socket.emit('ping admin back', socket.id);
 });
 
 

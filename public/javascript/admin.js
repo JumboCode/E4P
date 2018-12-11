@@ -3,25 +3,27 @@ const socket = io();
 let chats = [];
 let CURRENT_CHAT_USER_ID = '';
 
+// responseIdFromUserPing = "";
+// if responseID in chats
+    // user is still there, do something
+// else
+    // responseID is still "", so (responseID in chats) returns false
+
 function retrieveLocalStorage() {
     if (window.localStorage.getItem('chats')) {
         // retrieve local storage if it exists
         console.log('RECONNECT');
         chats = JSON.parse(localStorage.getItem('chats'));  // --------------------------------------
-        //socket.emit('room', window.localStorage.getItem('user_id'));
         for (chat of chats) {
             chat.accepted = true;
         }
         updateUserOverview();
-
         console.log('pinged user');
-        socket.emit('ping user');
-        setTimeout(function(){
-            socket.on('ping admin back', () => {
-                console.log('USER IS STILL HERE');
-            });
-        }, 2000);
 
+        for (chat of chats) {
+            socket.emit('check user active', chat.userId);
+            socket.emit('accept user' , chat.userId);
+        }
     }
     else {
         // no local storage found
@@ -29,19 +31,14 @@ function retrieveLocalStorage() {
     }
 }
 
-
-
-function resetStorage() {
-    window.localStorage.clear();
-}
-
-// chats.push({ userId: userId, messages: [], accepted: false, active: true });
+socket.on('user still active', (user_id) => {
+    console.log('USER IS STILL ACTIVE: ' + user_id);
+});
 
 socket.on('connect', () => {
   // send as POST request
   $.post("/admin", { admin: socket.id });
 });
-
 
 socket.on('user matched', user_matched);
 
@@ -52,8 +49,6 @@ socket.on('chat message', function(data) {
 
   addMessage(data.room, createMessage('user', data.message))
 });
-
-
 
 socket.on('user waiting reconnect', (socket_id) => {
     console.log('USER WAITING: ' + socket_id);
@@ -71,8 +66,6 @@ socket.on('user waiting reconnect', (socket_id) => {
           to reconnect!
       </li>`));
 });
-
-let rejoinButton = document.querySelector('#rejoin');
 
 // $('#rejoin').click(function() {
 //   // join_room(this.user_socket_id);
@@ -135,6 +128,10 @@ function initialize() {
     retrieveLocalStorage();
     updateUserOverview();
     generateAdminHeader();
+}
+
+function resetStorage() {
+    window.localStorage.clear();
 }
 
 // updates the left chat menu to catch newly added users

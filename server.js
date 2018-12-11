@@ -186,6 +186,17 @@ io.on('connection', (socket) => {
 	socket.role = 'admin';
   });
 
+  socket.on('check user active', (user_id) => {
+      socket.broadcast.to(user_id).emit('ping user', user_id);
+      // socket.broadcast.emit('ping user', user_id);
+  });
+
+  socket.on('ping admin back', (user_id) => {
+       // socket.broadcast.emit('user still active', user_id);
+       console.log('USER ID: ' + user_id);
+       socket.broadcast.to(user_id).emit('user still active', user_id);
+  });
+
   socket.on('user waiting for admin reconnect', (socket_id) => {
 	//Object.keys(io.sockets.sockets).
 	// var nsp = io.of('/admin');
