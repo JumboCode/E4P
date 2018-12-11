@@ -8,10 +8,10 @@ socket.on('connect', () => {
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
-  console.log('recieved chat message on admin: ')
-  console.log(data);
+  addMessage(data.room, createMessage('user', data.message));
 
-  addMessage(data.room, createMessage('user', data.message))
+  // Chat message received, so user is not typing anymore
+  userNotTyping(data.room);
 });
 
 // removes a user from the waiting list
