@@ -1,3 +1,7 @@
+textarea {
+    font-family: "Roboto";
+}
+
 .left-chat-bubble {
     background-color: #96D7D2;
     border: none;
