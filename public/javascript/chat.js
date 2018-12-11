@@ -31,11 +31,6 @@ function chatElements() {
 
 function chatSetup(sendMessage) {
   $("#messageBox").keydown(function(e) {
-    if (e.which == 13 && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-    
     // Check if on user side
     if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.userId) != "undefined") {
       send_typing_message(true);
@@ -48,6 +43,12 @@ function chatSetup(sendMessage) {
       userTypingTimeout = setTimeout(function(){ 
         send_typing_message(false);
       }, 5000);
+    }
+
+    // Send text message after userTyping message
+    if (e.which == 13 && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
     }
   });
 
