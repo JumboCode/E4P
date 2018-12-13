@@ -57,6 +57,10 @@ function openChat() {
   open.innerHTML = '';
   open.innerHTML = " <div class='row'>Waiting to connect to an ear!</div><div class='row'><div class='loader' id='load'></div></div>";
   console.log("attempting to connect");
+  window.onbeforeunload = () => {
+    return "Are you sure you want to leave? Your chat connection will be lost.";
+  }
+
   user_connect();
 }
 
