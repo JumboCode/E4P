@@ -112,13 +112,13 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-    message = $('#messageBox').val();
+    message = $('#inputBox').val();
     if (message != '') {
         send_message(message);
         messageObject = createMessage('user', message);
         chat.messages.push(messageObject);
         updateChat(messageObject);     
-        message = $('#messageBox').val('');
+        message = $('#inputBox').val('');
     }
 }
 

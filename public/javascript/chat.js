@@ -25,12 +25,12 @@ function escapeMessage(message) {
 }
 
 function chatElements() {
-  return '<textarea id="messageBox" type="text" autocomplete="off" placeholder="Type a message..."></textarea>'
+  return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message..."></textarea>'
        + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
 }
 
 function chatSetup(sendMessage) {
-  $("#messageBox").keydown(function(e) {
+  $("#inputBox").keydown(function(e) {
     // Check if on user side
     if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.userId) != "undefined") {
       send_typing_message(true);
