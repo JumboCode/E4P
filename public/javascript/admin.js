@@ -272,16 +272,10 @@ function userIsTyping(userId) {
         }
     }
     updateUserOverview();
-    /* Code below is commented out since if the user is typing, the following
-     * clears the input field.
-     * TODO: find a way to update the messages and show the typing notice
-     * without clearing the admin input field.
-     */
-    /* 
     if (userId == CURRENT_CHAT_USER_ID) {
-        toggleChat(CURRENT_CHAT_USER_ID);
+        showCurrentTyping(true);
     }
-    */
+
 }
 
 function userNotTyping(userId) {
@@ -291,16 +285,16 @@ function userNotTyping(userId) {
         }
     }
     updateUserOverview();
-    /* Code below is commented out since if the user is typing, the following
-     * clears the input field.
-     * TODO: find a way to update the messages and show the typing notice
-     * without clearing the admin input field.
-     */
-    /* 
+
     if (userId == CURRENT_CHAT_USER_ID) {
-        toggleChat(CURRENT_CHAT_USER_ID);
+        showCurrentTyping(false);
     }
-    */
+
+}
+
+function showCurrentTyping(userIsTyping) {
+    currentUserTyping = userIsTyping ? 'block' : 'none';
+    $('#typingIcon').css('display', currentUserTyping);
 }
 
 
