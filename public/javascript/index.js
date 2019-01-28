@@ -31,12 +31,12 @@ function user_connect() {
 function send_typing_message(is_typing) {
   if (is_typing == true) {
     socket.emit('typing', {
-      room: socket.id 
+      room: socket.id
     });
   } else {
     socket.emit('stop typing', {
       room: socket.id
-    }); 
+    });
   }
 }
 
@@ -72,11 +72,11 @@ function startChat() {
 
 
   //add input bar to page
-  a_chat = document.getElementById("chat");
-  a_chat.style.display = "block";
+  $("#e_space").css('height', '10vh');
+  $("#chat").attr('style', 'display: flex !important');
   chatbox = document.getElementById("chatbox");
   chatbox.style.display = "block";
-  
+
   chatbar = document.getElementById("chatbar");
   chatbar.style.visibility= "visible";
   chat.accepted = true;
@@ -117,7 +117,7 @@ function sendMessage() {
         send_message(message);
         messageObject = createMessage('user', message);
         chat.messages.push(messageObject);
-        updateChat(messageObject);     
+        updateChat(messageObject);
         message = $('#messageBox').val('');
     }
 }
@@ -129,4 +129,3 @@ $(function() {
   $("#type_msg").html(chatElements());
   chatSetup(sendMessage);
 });
-

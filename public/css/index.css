@@ -56,6 +56,10 @@ img {
     width: 100%;
 }
 
+#open {
+  margin-bottom: 0;
+}
+
 #open button {
   background: var(--light-blue);
   font-family: "Roboto";
@@ -90,7 +94,7 @@ img {
 
 #chat {
   color: grey;
-  display: none;
+  display: none!important;
 }
 
 @media screen and (max-height: 600px) {
@@ -119,7 +123,7 @@ img {
     margin-top: 50px;
     height: 60vh;
     overflow-y: scroll;
-    
+
 }
 }
 
@@ -151,7 +155,7 @@ img {
     margin-top: 50px;
     height: 500px;
     overflow-y: scroll;
-    
+
 }
 }
 
@@ -179,7 +183,7 @@ img {
 }
 
 
-#chat_user { 
+#chat_user {
   position: inline-block;
   width: 100%;
   background: grey;
@@ -211,7 +215,7 @@ img {
 
 #e_space {
   background: white;
-  height: 10vh;
+  height: 0;
 }
 
 #type_msg {
