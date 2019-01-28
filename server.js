@@ -23,7 +23,7 @@ if (process.env.NODB) {
   console.log('NODB flag set, running without database and no authentication!');
 } else {
   var db = mongoose.connection;
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useNewUrlParser: true });
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useCreateIndex: true, useNewUrlParser: true });
 
   app.use(bodyParser.urlencoded({extended: true}));
   app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
