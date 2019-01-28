@@ -94,15 +94,11 @@ function updateChat(messageObj) {
   chatbox = document.getElementById("chatbox");
   if (messageObj.role == 'admin') {
       messageSide = 'left';
-      //newMessage = "<div class='chat_admin'><div class='received_msg'><p>"+messageObj.message+"</p></div></div>"
   }
   else {
-      console.log(messageObj.message);
       messageSide = 'right';
-      //newMessage = "<div class='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
   }
   newMessage = createMessageDiv(messageSide, messageObj.message);
-  console.log(messages.innerHTML);
   messages.innerHTML = messages.innerHTML + newMessage;
   messages.scrollTop = messages.scrollHeight - messages.clientHeight;
 }
