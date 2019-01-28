@@ -125,16 +125,22 @@ function updateUserOverview() {
         }
         iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
         iconText[0] = iconText[0].toUp
-        userTypingHidden = chat.typing ? '' : 'hidden';
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
+        typing = chat.typing ? ' id=typing' : '';
+        alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML 
                       + "<button class='username' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                      + iconTag
-                      + "<div class='buttonText'><div class='buttonId'>" + iconText + "</div>"
-                      + "<div class='messagePreview'>" + messagePreview + "</div></div>"
-                      + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
-                      + "<img class='buttonTypingIcon' src='img/typing_icon.png'></div></button>";
+                        + iconTag
+                        + "<div class='buttonText'>"
+                            + "<div class='buttonId'>" + iconText + "</div>"
+                            + "<div class='messagePreview'>" + messagePreview + "</div>"
+                        + "</div>"
+                        + "<div class='buttonTypingDiv'" + typing + ">"
+                            + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
+                        + "</div>"
+                        + "<div class='alertBar'" + alert + "></div>"
+                      + "</button>";
     }
 }
 
@@ -172,18 +178,14 @@ function toggleChat(userId) {
         }
         tabId++;
     }
-    $("#messageBox").on('keyup', function (e) {
-        if (e.keyCode == 13) {
-            sendMessage();
-        }
-    });
+
     scrollDown()
     updateUserOverview();
 }
 
 function scrollDown() {
-    messageBox = document.getElementsByClassName("messagesBox")[0];
-    messageBox.scrollTop = messageBox.scrollHeight;
+    messagesBox = document.getElementsByClassName("messagesBox")[0];
+    messagesBox.scrollTop = messagesBox.scrollHeight;
 }
 
 
@@ -203,7 +205,7 @@ function newChat(userId, icon) {
         }
     }
     if (validUser) {
-        chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon });
+        chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon, alert: true });
     }
 }
 
@@ -214,6 +216,7 @@ function deactivateChat(userId) {
         if (userId == chat.userId) {
             chat.active = false;
             chat.typing = false;
+            chat.alert = true;
             foundUser = true;
             updateUserOverview();
         }
@@ -228,6 +231,7 @@ function acceptChat(userId) {
     for (chat of chats) {
         if (userId == chat.userId) {
             chat.accepted = true;
+            chat.alert = false;
             foundUser = true;
         }
     }
@@ -306,16 +310,16 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-    message = $('#messageBox').val();
+    message = $('#inputBox').val();
     if (message != '') {
         console.log("sending message")
-        message = $('#messageBox').val();
+        message = $('#inputBox').val();
         send_message(CURRENT_CHAT_USER_ID, message);
         messageObject = createMessage("admin", message);
 
         addMessage(CURRENT_CHAT_USER_ID, messageObject);
                 
-        message = $('#messageBox').val('');
+        message = $('#inputBox').val('');
     }
 
 }
@@ -329,10 +333,15 @@ function addMessage(userId, messageObject) {
     for (chat of chats) {
         if (userId == chat.userId) {
             chat.messages.push(messageObject);
+            chat.alert = true;
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
                 currentChat = document.getElementsByClassName("messages")[0];
-                messageSide = messageObject.role == 'admin' ? 'right' : 'left';
+                messageSide = 'left';
+                if (messageObject.role == 'admin') {
+                    chat.alert = false;
+                    messageSide = 'right';
+                }
                 currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }

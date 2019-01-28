@@ -218,7 +218,7 @@ img {
   width: 100%;
 }
 
-#messageBox {
+#inputBox {
   border: var(--light-blue);
   min-height: 10px;
   width: 90%;
