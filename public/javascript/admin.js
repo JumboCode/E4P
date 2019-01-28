@@ -170,7 +170,7 @@ function toggleChat(userId) {
             }
             else if (chat.active) {
                 actionDiv.innerHTML = chatElements();
-                chatSetup(sendMessage, chat);
+                chatSetup(sendMessage);
                 scrollDown()
             } else {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
@@ -178,13 +178,6 @@ function toggleChat(userId) {
         }
         tabId++;
     }
-
-    // TODO duplicate code? see chat.js 'chatSetup()'
-    // $("#inputBox").on('keyup', function (e) {
-    //     if (e.keyCode == 13) {
-    //         sendMessage();
-    //     }
-    // });
 
     scrollDown()
     updateUserOverview();
