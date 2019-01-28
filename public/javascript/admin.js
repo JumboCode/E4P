@@ -125,9 +125,9 @@ function updateUserOverview() {
         }
         iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
         iconText[0] = iconText[0].toUp
-        userTypingHidden = chat.typing ? '' : 'hidden';
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
-        alert = chat.alert ? " id=alert" : '';
+        typing = chat.typing ? ' id=typing' : '';
+        alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML 
                       + "<button class='username' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
@@ -136,7 +136,7 @@ function updateUserOverview() {
                             + "<div class='buttonId'>" + iconText + "</div>"
                             + "<div class='messagePreview'>" + messagePreview + "</div>"
                         + "</div>"
-                        + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
+                        + "<div class='buttonTypingDiv'" + typing + ">"
                             + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
                         + "</div>"
                         + "<div class='alertBar'" + alert + "></div>"

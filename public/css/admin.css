@@ -87,7 +87,7 @@ div.icon {
 .buttonText {
     display: flex;
     flex-direction: column;
-    width: 90%
+    width: 70%
 }
 
 .messagePreview {
@@ -100,7 +100,11 @@ div.icon {
 
 .buttonTypingDiv {
     width: 20%;
-    /*visibility: hidden;*/
+    visibility: hidden;
+}
+
+.buttonTypingDiv#typing {
+    visibility: visible;
 }
 
 .buttonTypingIcon {
