@@ -87,7 +87,7 @@ div.icon {
 .buttonText {
     display: flex;
     flex-direction: column;
-    width: 100%
+    width: 70%
 }
 
 .messagePreview {
@@ -100,11 +100,24 @@ div.icon {
 
 .buttonTypingDiv {
     width: 20%;
-    /*visibility: hidden;*/
+    visibility: hidden;
+}
+
+.buttonTypingDiv#typing {
+    visibility: visible;
 }
 
 .buttonTypingIcon {
     width: 100%;
+}
+
+.alertBar {
+    width: 10%;
+    min-height: 60px;
+}
+
+.alertBar#alert {
+    background-color: var(--dark-green);
 }
 
 /* Style the tab content */
@@ -144,11 +157,7 @@ div.icon {
     cursor: pointer;
 }
 
-.chatAction {
-
-}
-
-.chatAction #messageBox {
+.chatAction #inputBox {
   border: var(--light-blue);
   height: 100%;
   width: 85%;
