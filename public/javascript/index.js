@@ -72,8 +72,8 @@ function startChat() {
 
 
   //add input bar to page
-  a_chat = document.getElementById("chat");
-  a_chat.style.display = "block";
+  $("#e_space").css('height', '10vh');
+  $("#chat").attr('style', 'display: flex !important');
   chatbox = document.getElementById("chatbox");
   chatbox.style.display = "block";
 
@@ -114,7 +114,7 @@ function sendMessage() {
         send_message(message);
         messageObject = createMessage('user', message);
         chat.messages.push(messageObject);
-        updateChat(messageObject);     
+        updateChat(messageObject);
         message = $('#inputBox').val('');
     }
 }
