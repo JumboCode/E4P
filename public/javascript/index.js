@@ -31,12 +31,12 @@ function user_connect() {
 function send_typing_message(is_typing) {
   if (is_typing == true) {
     socket.emit('typing', {
-      room: socket.id 
+      room: socket.id
     });
   } else {
     socket.emit('stop typing', {
       room: socket.id
-    }); 
+    });
   }
 }
 
@@ -72,11 +72,11 @@ function startChat() {
 
 
   //add input bar to page
-  a_chat = document.getElementById("chat");
-  a_chat.style.display = "block";
+  $("#e_space").css('height', '10vh');
+  $("#chat").attr('style', 'display: flex !important');
   chatbox = document.getElementById("chatbox");
   chatbox.style.display = "block";
-  
+
   chatbar = document.getElementById("chatbar");
   chatbar.style.visibility= "visible";
   chat.accepted = true;
@@ -94,16 +94,13 @@ function updateChat(messageObj) {
   chatbox = document.getElementById("chatbox");
   if (messageObj.role == 'admin') {
       messageSide = 'left';
-      //newMessage = "<div class='chat_admin'><div class='received_msg'><p>"+messageObj.message+"</p></div></div>"
   }
   else {
-      console.log(messageObj.message);
       messageSide = 'right';
-      //newMessage = "<div class='chat_user'><div class='sent_msg'><p>"+messageObj.message+"</p></div></div>"
   }
   newMessage = createMessageDiv(messageSide, messageObj.message);
-  console.log(messages.innerHTML);
   messages.innerHTML = messages.innerHTML + newMessage;
+  messages.scrollTop = messages.scrollHeight - messages.clientHeight;
 }
 
 
@@ -112,13 +109,13 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-    message = $('#messageBox').val();
+    message = $('#inputBox').val();
     if (message != '') {
         send_message(message);
         messageObject = createMessage('user', message);
         chat.messages.push(messageObject);
-        updateChat(messageObject);     
-        message = $('#messageBox').val('');
+        updateChat(messageObject);
+        message = $('#inputBox').val('');
     }
 }
 
@@ -129,4 +126,3 @@ $(function() {
   $("#type_msg").html(chatElements(""));
   chatSetup(sendMessage);
 });
-
