@@ -126,7 +126,7 @@ function sendMessage() {
 /* function to change active to false when user exits out */
 
 $(function() {
-  $("#type_msg").html(chatElements());
+  $("#type_msg").html(chatElements(""));
   chatSetup(sendMessage);
 });
 
