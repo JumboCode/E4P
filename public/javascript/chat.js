@@ -24,8 +24,10 @@ function escapeMessage(message) {
 	return message
 }
 
-function chatElements() {
-  return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message..."></textarea>'
+function chatElements(currentMessage) {
+  currentText = currentMessage ? currentMessage : "";
+  return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message...">' 
+       + currentText + '</textarea>'
        + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
 }
 

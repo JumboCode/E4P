@@ -150,6 +150,7 @@ function clearView() {
 }
 
 function toggleChat(userId) {
+    updateCurrentInput(CURRENT_CHAT_USER_ID);
     CURRENT_CHAT_USER_ID = userId
     tabId = 0;
     for (chat of chats) {
@@ -169,7 +170,7 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
             }
             else if (chat.active) {
-                actionDiv.innerHTML = chatElements();
+                actionDiv.innerHTML = chatElements(chat.currentMessage);
                 chatSetup(sendMessage);
                 scrollDown()
             } else {
@@ -188,6 +189,14 @@ function scrollDown() {
     messagesBox.scrollTop = messagesBox.scrollHeight;
 }
 
+function updateCurrentInput(userId) {
+    for (chat of chats) {
+        if (chat.userId == userId && chat.accepted && chat.active) {
+            currentMessage = $('#inputBox').val();
+            chat.currentMessage = currentMessage;
+        }
+    }
+}
 
 /**************************** SINGLE CHAT FUNCTIONS ****************************/
 
@@ -205,7 +214,16 @@ function newChat(userId, icon) {
         }
     }
     if (validUser) {
-        chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon, alert: true });
+        chats.push(
+            { userId: userId, 
+              messages: [], 
+              accepted: false, 
+              active: true,
+              typing: false,
+              icon: icon, 
+              alert: true, 
+              currentMessage: "" }
+        );
     }
 }
 
@@ -285,7 +303,6 @@ function userNotTyping(userId) {
         }
     }
     updateUserOverview();
-
     if (userId == CURRENT_CHAT_USER_ID) {
         showCurrentTyping(false);
     }
