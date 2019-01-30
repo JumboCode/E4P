@@ -22,13 +22,6 @@ const adminRoutes = require('./routes/adminRoutes');
 
 var db = new sqlite3.Database('db.sqlite3');
 
-/*
-  var password_salt = bcrypt.genSaltSync(10);
-  var password_hash = bcrypt.hashSync(password, password_salt);
-*/
-
-// TODO sanitize input!!!!
-
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
 app.use(cookieParser());
@@ -36,6 +29,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new LocalStrategy((username, password, done) => {
+  console.log('SELECT salt FROM users WHERE username = ' + username)
   db.get('SELECT salt FROM users WHERE username = ?', username, (err, row) => {
     if (!row) return done(null, false);
     var hash = bcrypt.hashSync(password, row.salt);
