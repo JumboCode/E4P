@@ -314,13 +314,13 @@ div.icon {
 
 #typingIcon {
     display: none;
-    width: 6em;
+    width: 3em;
     height: auto;
     margin-left: .6em;
     margin-bottom: .25em;
 }
 
 #typingIcon img {
-    width: 50%;
-    height: 50%;
+    width: 100%;
+    height: 100%;
 }
