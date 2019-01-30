@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
-  }); 
+  });
 
   // PHASE II
   // Admin Accepts User:
@@ -142,7 +142,6 @@ io.on('connection', (socket) => {
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
-    // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
 
     if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
@@ -169,14 +168,14 @@ io.on('connection', (socket) => {
 
   //User Typing Event:
   socket.on('typing', function(data) {
-    let receiver = data['room']; 
+    let receiver = data['room'];
     socket.broadcast.to(receiver).emit('typing', {room: receiver});
-  }); 
+  });
 
   socket.on('stop typing', function(data) {
-    let receiver = data['room']; 
-    socket.broadcast.to(receiver).emit('stop typing', {room: receiver}); 
-  }); 
+    let receiver = data['room'];
+    socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
+  });
 
 });
 

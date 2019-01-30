@@ -314,14 +314,6 @@ function showCurrentTyping(userIsTyping) {
     $('#typingIcon').css('display', currentUserTyping);
 }
 
-// function send_typing_message(is_typing) {
-//   if (is_typing) {
-//     socket.emit('typing');
-//   } else {
-//     socket.emit('stop typing');
-//   }
-// }
-
 
 /**************************** SINGLE MESSAGE FUNCTIONS ****************************/
 
@@ -368,7 +360,6 @@ function addMessage(userId, messageObject) {
                     messageSide = 'right';
                 }
                 $("#typingIcon").before(createMessageDiv(messageSide, messageObject.message));
-                //currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
         scrollDown();
