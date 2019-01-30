@@ -32,7 +32,7 @@ passport.use(new LocalStrategy((username, password, done) => {
   db.get('SELECT salt FROM users WHERE username = ?', username, (err, row) => {
     if (!row) return done(null, false);
     var hash = bcrypt.hashSync(password, row.salt);
-    db.get('SELECT username, id FROM users WHERE username = ? AND password = ?', username, hash, (err, row) => {
+    db.get('SELECT username FROM users WHERE username = ? AND password = ?', username, hash, (err, row) => {
       if (!row) return done(null, false);
       return done(null, row);
     });
@@ -40,11 +40,11 @@ passport.use(new LocalStrategy((username, password, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-  return done(null, user.id);
+  return done(null, user.username);
 });
 
-passport.deserializeUser((id, done) => {
-  db.get('SELECT username, id FROM users WHERE id = ?', id, (err, row) => {
+passport.deserializeUser((username, done) => {
+  db.get('SELECT username FROM users WHERE username = ?', username, (err, row) => {
     if (!row) return done(null, false);
     return done(null, row);
   });
