@@ -23,14 +23,13 @@
     "cookie-parser": "*",
     "express": "^4.16.3",
     "express-session": "*",
-    "mongodb": "*",
-    "mongoose": "^5.3.11",
     "nodemailer": "^4.6.8",
     "passport": "^0.4.0",
     "passport-http": "*",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
-    "socket.io": "^2.1.1"
+    "socket.io": "^2.1.1",
+    "sqlite3": "^4.0.6"
   },
   "devDependencies": {
     "chai": "^3.5.0",

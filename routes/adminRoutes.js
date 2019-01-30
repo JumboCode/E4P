@@ -3,7 +3,6 @@ const passport = require('passport');
 const path = require('path');
 
 let router = express.Router();
-let Admin = require('../models/adminModel');
 
 function ensureAuthenticated(req, res, next) {
   if (process.env.NOAUTH || process.env.NODB) { return next(); }
@@ -40,23 +39,6 @@ router.get('/logout', ensureAuthenticated, (req, res) => {
   // console.log("GET /admin/logout")
   req.logout();
   res.redirect('/admin/login');
-});
-
-router.get('/register', ensureAuthenticated, (req, res) => {
-  // console.log("GET /admin/register")
-  res.sendFile('register_page.html', {root: path.join(__dirname, '../public')});
-});
-
-router.post('/register', ensureAuthenticated, (req, res) => {
-  // console.log("POST /admin/register")
-  Admin.register(new Admin({username : req.body.username }), req.body.password, function(err, admin) {
-    if (err) {
-      console.log(err);
-      res.redirect('/admin/register');
-    } else {
-      res.redirect('/admin/login');
-    }
-  });
 });
 
 module.exports = router;

@@ -6,8 +6,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+const bcrypt = require("bcryptjs");
+const sqlite3 = require('sqlite3');
 const passport = require('passport');
-const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
@@ -19,23 +20,43 @@ const adminRoutes = require('./routes/adminRoutes');
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
 
-if (process.env.NODB) {
-  console.log('NODB flag set, running without database and no authentication!');
-} else {
-  var db = mongoose.connection;
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useCreateIndex: true, useNewUrlParser: true });
+var db = new sqlite3.Database('db.sqlite3');
 
-  app.use(bodyParser.urlencoded({extended: true}));
-  app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
-  app.use(cookieParser());
-  app.use(passport.initialize());
-  app.use(passport.session());
+/*
+  var password_salt = bcrypt.genSaltSync(10);
+  var password_hash = bcrypt.hashSync(password, password_salt);
+*/
 
-  var Admin = require('./models/adminModel');
-  passport.use(new LocalStrategy(Admin.authenticate));
-  passport.serializeUser(Admin.serializeUser);
-  passport.deserializeUser(Admin.deserializeUser);
-}
+// TODO sanitize input!!!!
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy((username, password, done) => {
+  db.get('SELECT salt FROM users WHERE username = ?', username, (err, row) => {
+    if (!row) return done(null, false);
+    var hash = bcrypt.hashSync(password, row.salt);
+    db.get('SELECT username, id FROM users WHERE username = ? AND password = ?', username, hash, (err, row) => {
+      if (!row) return done(null, false);
+      return done(null, row);
+    });
+  });
+}));
+
+passport.serializeUser((user, done) => {
+  return done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  db.get('SELECT username, id FROM users WHERE id = ?', id, (err, row) => {
+    if (!row) return done(null, false);
+    return done(null, row);
+  });
+});
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
