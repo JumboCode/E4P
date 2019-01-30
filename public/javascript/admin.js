@@ -367,7 +367,8 @@ function addMessage(userId, messageObject) {
                     chat.alert = false;
                     messageSide = 'right';
                 }
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
+                $("#typingIcon").before(createMessageDiv(messageSide, messageObject.message));
+                //currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
         scrollDown();

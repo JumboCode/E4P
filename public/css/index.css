@@ -252,11 +252,13 @@ img {
 
 #typingIcon {
     display: none;
-    width: 15%;
+    width: 6em;
     height: auto;
+    margin-left: .6em;
+    margin-bottom: .25em;
 }
 
 #typingIcon img {
-    width: 100%;
-    height: 100%;
+    width: 50%;
+    height: 50%;
 }
