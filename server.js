@@ -29,7 +29,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new LocalStrategy((username, password, done) => {
-  console.log('SELECT salt FROM users WHERE username = ' + username)
   db.get('SELECT salt FROM users WHERE username = ?', username, (err, row) => {
     if (!row) return done(null, false);
     var hash = bcrypt.hashSync(password, row.salt);
