@@ -47,7 +47,7 @@ router.post('/change/request', ensureAuthenticated, (req, res) => {
   res.redirect('/admin/logout');
 });
 
-/*TODO figure out how to redirect to login then back to confirm*/
+// TODO figure out how to redirect to login then back to confirm
 router.get('/change', /*ensureAuthenticated,*/ (req, res) => {
   let request = req.query.request;
 

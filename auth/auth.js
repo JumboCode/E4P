@@ -18,6 +18,7 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     type: 'OAuth2',
+    // TODO remove hard coded elements in dev
     user: process.env.email || 'steven.dev.email@gmail.com',
     clientId: process.env.emailId || '345888905186-junsh1mfvrurcd5t2m5kapkdggi2e6tf.apps.googleusercontent.com',
     clientSecret: process.env.emailSecret || 'OGbdzRpdmF-edJk1U4N6dSw4',
