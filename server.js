@@ -6,21 +6,18 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const bcrypt = require("bcryptjs");
-const sqlite3 = require('sqlite3');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const auth = require('./auth/auth');
 const adminRoutes = require('./routes/adminRoutes');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
-
-var db = new sqlite3.Database('db.sqlite3');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
@@ -28,27 +25,9 @@ app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy((username, password, done) => {
-  db.get('SELECT salt FROM users WHERE username = ?', username, (err, row) => {
-    if (!row) return done(null, false);
-    var hash = bcrypt.hashSync(password, row.salt);
-    db.get('SELECT username FROM users WHERE username = ? AND password = ?', username, hash, (err, row) => {
-      if (!row) return done(null, false);
-      return done(null, row);
-    });
-  });
-}));
-
-passport.serializeUser((user, done) => {
-  return done(null, user.username);
-});
-
-passport.deserializeUser((username, done) => {
-  db.get('SELECT username FROM users WHERE username = ?', username, (err, row) => {
-    if (!row) return done(null, false);
-    return done(null, row);
-  });
-});
+passport.use(new LocalStrategy(auth.strategy));
+passport.serializeUser(auth.serialize);
+passport.deserializeUser(auth.deserialize);
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -23,7 +23,7 @@
     "cookie-parser": "*",
     "express": "^4.16.3",
     "express-session": "*",
-    "nodemailer": "^4.6.8",
+    "nodemailer": "^4.7.0",
     "passport": "^0.4.0",
     "passport-http": "*",
     "passport-local": "^1.0.0",

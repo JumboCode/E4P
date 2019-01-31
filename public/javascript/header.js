@@ -9,7 +9,7 @@ function generateUserHeader() {
 function generateHeader(role) {
 	href = role === 'user' ? '/' : '/admin';
 	login = '/admin/login';
-	reset = '/admin/change_request';
+	reset = '/admin/change/request';
 	logout = '/admin/logout';
 	buttons = role === 'user' ? 
 		"<a href='/help' target='_blank'>Help</a>" +
@@ -24,4 +24,3 @@ function generateHeader(role) {
 		+ 	buttons
 		+ "</div>";
 }
-

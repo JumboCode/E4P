@@ -1,8 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const path = require('path');
-const bcrypt = require("bcryptjs");
-const sqlite3 = require('sqlite3');
+const auth = require('../auth/auth');
 
 let router = express.Router();
 
@@ -39,37 +38,41 @@ router.get('/logout', ensureAuthenticated, (req, res) => {
   res.redirect('/admin/login');
 });
 
-/********************************************/
-/*              Password Change             */
-/********************************************/
-
-const TIMEOUT = 5; //minutes
-var db = new sqlite3.Database('db.sqlite3');
-
-router.get('/change_request', ensureAuthenticated, (req, res) => {
+router.get('/change/request', ensureAuthenticated, (req, res) => {
   res.sendFile('change_request.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/change_request', ensureAuthenticated, (req, res) => {
-  let username = req.user.username;
-  let request = bcrypt.genSaltSync();
-  let timestamp = new Date();
-  let invalid = timestamp.setMinutes(timestamp.getMinutes() + TIMEOUT);
-
-  db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, invalid, username, (err) => {
-    if (err) console.log(err);
-  });
-
+router.post('/change/request', ensureAuthenticated, (req, res) => {
+  auth.start_password_change(req.user.username);
   res.redirect('/admin/logout');
 });
 
 /*TODO figure out how to redirect to login then back to confirm*/
-router.get('/change_confirm', /*ensureAuthenticated,*/ (req, res) => {
+router.get('/change', /*ensureAuthenticated,*/ (req, res) => {
+  let request = req.query.request;
 
+  // check request still valid and redirect as necessary
+  auth.valid_password_change(request, (valid) => {
+    if (valid) {
+      res.sendFile('change_password.html', {root: path.join(__dirname, '../public')});
+    } else {
+      res.sendFile('change_invalid.html', {root: path.join(__dirname, '../public')});
+    }
+  });
 });
 
-router.get('/change_password', (req, res) => {
+router.post('/change', (req, res) => {
+  let request = req.query.request;
+  let password = req.body.new_pwd;
 
+  auth.valid_password_change(request, (username) => {
+    if (username) {
+      auth.change_password(username, password);
+      res.redirect('/admin/login');
+    } else {
+      res.sendFile('change_invalid.html', {root: path.join(__dirname, '../public')});
+    }
+  });
 });
 
 module.exports = router;
