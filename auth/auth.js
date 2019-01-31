@@ -38,10 +38,10 @@ function sendMail(username, email, request) {
 
 function start_password_change(username) {
   let date = new Date();
-  let invalid = date.setMinutes(date.getMinutes() + TIMEOUT);
+  let expires = date.setMinutes(date.getMinutes() + TIMEOUT);
   let request = crypto.randomBytes(16).toString('hex');
 
-  db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, invalid, username, (err) => {
+  db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, expires, username, (err) => {
     if (err) throw err;
     
     db.get('SELECT email FROM users WHERE username = ?', username, (err, row) => {
@@ -61,12 +61,11 @@ function start_password_change(username) {
 //    calls the callback with no arguments
 //    (any attempt to resolve param in cb will result in 'undefined')
 function valid_password_change(request, cb) {
-  let timestamp = Date.now()
-  db.get('SELECT username, invalid FROM change_requests WHERE request = ?', request, (err, row) => {
+  db.get('SELECT username, expires FROM change_requests WHERE request = ?', request, (err, row) => {
     if (err) throw err;
 
     if (row) {
-      if (timestamp < row.invalid) {
+      if (Date.now() < row.expires) {
         return cb(row.username);
       }
 
@@ -95,6 +94,41 @@ function change_password(username, password) {
 module.exports.start_password_change = start_password_change;
 module.exports.valid_password_change = valid_password_change;
 module.exports.change_password = change_password;
+
+///////////////////////////////////////////////////////////////////////
+//        IP Address Limiting
+///////////////////////////////////////////////////////////////////////
+
+const MAX_ATTEMPTS = 2;
+
+function can_attempt_login(ip, cb) {
+  db.get('SELECT attempts, next_attempt FROM login_attempts WHERE ip = ?', ip, (err, row) => {
+    if (err) throw err;
+
+    if (row) {
+      if (row.attempts > MAX_ATTEMPTS) {
+        // more than allowed attempts, wait until timeout
+        cb(false);
+      }
+
+      if (Date.now() < row.next_attempt) {
+        // before next allowable attempt
+        cb(false);
+      }
+      // previous login attempt
+      console.log(ip + ' rejected attempt')
+      return cb(false);
+    }
+
+    console.log(ip + ' allowed attempt')
+
+    // log the attempt
+
+    return cb(true);
+  });
+}
+
+module.exports.can_attempt_login = can_attempt_login;
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Functions

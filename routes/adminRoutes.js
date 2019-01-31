@@ -5,6 +5,10 @@ const auth = require('../auth/auth');
 
 let router = express.Router();
 
+///////////////////////////////////////////////////////////////////////
+//        Helper Functions
+///////////////////////////////////////////////////////////////////////
+
 function ensureAuthenticated(req, res, next) {
   if (/*process.env.NOAUTH || process.env.NODB*/ false) { return next(); }
   if (req.isAuthenticated()) { return next(); }
@@ -16,6 +20,25 @@ function loggedIn(req, res, next) {
   next();
 }
 
+function flagCheck(req, res, next) {
+  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return res.redirect('/admin'); }
+  next();
+}
+
+function limitCheck(req, res, next) {
+  auth.can_attempt_login(req.ip, (valid) => {
+    if (valid) {
+      next();
+    } else {
+      res.sendStatus(429);
+    }
+  });
+}
+
+///////////////////////////////////////////////////////////////////////
+//        Admin Routes
+///////////////////////////////////////////////////////////////////////
+
 router.get('/', ensureAuthenticated, (req, res) => {
   res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
 });
@@ -24,12 +47,7 @@ router.get('/login', loggedIn, (req, res) => {
   res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
 });
 
-function flagCheck(req, res, next) {
-  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return res.redirect('/admin'); }
-  next();
-}
-
-router.post('/login', flagCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), (req, res) => {
+router.post('/login', flagCheck, limitCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), (req, res) => {
   res.redirect('/admin');
 });
 
