@@ -12,11 +12,16 @@ var db = new sqlite3.Database('db.sqlite3');
 const TIMEOUT = 5; //minutes
 const URL = 'http://localhost:3000/admin/change?request='
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
+const transporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
-    user: 'steven.dev.email@gmail.com',
-    pass: '***REMOVED***'
+    type: 'OAuth2',
+    user: process.env.email || 'steven.dev.email@gmail.com',
+    clientId: process.env.emailId || '345888905186-junsh1mfvrurcd5t2m5kapkdggi2e6tf.apps.googleusercontent.com',
+    clientSecret: process.env.emailSecret || 'OGbdzRpdmF-edJk1U4N6dSw4',
+    refreshToken: process.env.emailRefresh || '1/TIEIoYkYQoHoaDEsc3dE3J90n8wiHPbc6Xx2kKHPPRY',
   }
 });
 
@@ -24,8 +29,8 @@ function sendMail(username, email, request) {
   transporter.sendMail({
     to: email,
     subject: 'Ears for Peers Password Change',
-    html: 'Hi ' + username + ',<br><br>Someone has requested a password change for your account.<br>If this was you, <a href="' + URL + request + '">click here to change your password</a>.'
-  }, (err, info) => {
+    html: 'Hi ' + username + ',<br><br>Someone has requested a password change for your account.<br>If this was you, <a href="' + URL + request + '">click here to change your password</a>.',
+  }, (err, res) => {
     if (err) throw err;
   });
 }
@@ -59,8 +64,14 @@ function valid_password_change(request, cb) {
   db.get('SELECT username, invalid FROM change_requests WHERE request = ?', request, (err, row) => {
     if (err) throw err;
 
-    if (row && timestamp < row.invalid) {
-      return cb(row.username);
+    if (row) {
+      if (timestamp < row.invalid) {
+        return cb(row.username);
+      }
+
+      db.run('DELETE FROM change_requests WHERE request = ?', request, (err) => {
+        if (err) throw err;
+      });
     }
 
     return cb();
