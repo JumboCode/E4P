@@ -16,7 +16,7 @@ textarea {
 
 .right-chat-bubble {
     background-color: #B2FEF8;
-    border: none;  
+    border: none;
     border-radius: 1px;
     width: auto;
     max-width: 62%;
@@ -27,7 +27,9 @@ textarea {
 }
 
 .container {
-    display: inline-block; 
+    display: inline-block;
     position: relative;
     width: 100%;
+    margin-top: .25em;
+    margin-bottom: .25em;
 }
