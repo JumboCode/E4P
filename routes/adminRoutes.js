@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const path = require('path');
 const auth = require('../auth/auth');
+const querystring = require('querystring');
 
 let router = express.Router();
 
@@ -26,13 +27,19 @@ function flagCheck(req, res, next) {
 }
 
 function limitCheck(req, res, next) {
-  auth.can_attempt_login(req.ip, (valid) => {
+  auth.can_attempt_login(req.ip, (valid, time) => {
     if (valid) {
       next();
     } else {
-      res.redirect('/admin/wait?');
+      let query = querystring.stringify({ time: time });
+      res.redirect('/admin/wait?' + query);
     }
   });
+}
+
+function limitReset(req, res, next) {
+  auth.delete_login_attempt(req.ip);
+  next();
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -47,13 +54,17 @@ router.get('/login', loggedIn, (req, res) => {
   res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/login', flagCheck, limitCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), (req, res) => {
+router.post('/login', flagCheck, limitCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), limitReset, (req, res) => {
   res.redirect('/admin');
 });
 
 router.get('/logout', ensureAuthenticated, (req, res) => {
   req.logout();
   res.redirect('/admin/login');
+});
+
+router.get('/wait', (req, res) => {
+  res.sendFile('login_wait.html', {root: path.join(__dirname, '../public')});
 });
 
 router.get('/change/request', ensureAuthenticated, (req, res) => {

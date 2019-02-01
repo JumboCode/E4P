@@ -10,8 +10,9 @@ var db = new sqlite3.Database('db.sqlite3');
 //        Password Change
 ///////////////////////////////////////////////////////////////////////
 
-const TIMEOUT = 5; //minutes
-const URL = 'http://localhost:3000/admin/change?'
+// TODO make these configurable (document configurability)
+const VALID_DURATION = process.env.validDuration || 5; //minutes
+const URL = (process.env.host || 'http://localhost:3000') + '/admin/change?'
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -29,7 +30,7 @@ const transporter = nodemailer.createTransport({
 
 function sendMail(username, email, request) {
   let query = querystring.stringify({ request: request });
-  
+
   transporter.sendMail({
     to: email,
     subject: 'Ears for Peers Password Change',
@@ -41,7 +42,7 @@ function sendMail(username, email, request) {
 
 function start_password_change(username) {
   let date = new Date();
-  let expires = date.setMinutes(date.getMinutes() + TIMEOUT);
+  let expires = date.setMinutes(date.getMinutes() + VALID_DURATION);
   let request = crypto.randomBytes(16).toString('hex');
 
   db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, expires, username, (err) => {
@@ -102,36 +103,69 @@ module.exports.change_password = change_password;
 //        IP Address Limiting
 ///////////////////////////////////////////////////////////////////////
 
-const MAX_ATTEMPTS = 2;
+// TODO make these configurable (document configurability)
+const MAX_ATTEMPTS = process.env.maxAttempts || 2;
+const RETRY_WAIT_DURATION = process.env.retryWait || 5; // minutes
+const ATTEMPT_SCRUBBER_INTERVAL = process.env.scrubInt || 5; // hours
+
+let attempt_scrubber = setInterval(() => {
+  let timestamp = Date.now();
+  db.run('DELETE FROM login_attempts WHERE next_attempt < ?', timestamp, (err) => {
+    if (err) throw err;
+  });
+}, ATTEMPT_SCRUBBER_INTERVAL * 3600000);
+
+function delete_login_attempt(ip) {
+  db.run('DELETE FROM login_attempts WHERE ip = ?', ip, (err) => {
+    if (err) throw err;
+  });
+}
+
+function increment_attempt(ip, prev_attempts) {
+  let date = new Date();
+  let attempts = prev_attempts + 1;
+  let next_attempt = date.setMinutes(date.getMinutes() + RETRY_WAIT_DURATION);
+
+  db.run('REPLACE INTO login_attempts (ip, attempts, next_attempt) VALUES (?, ?, ?)', ip, attempts, next_attempt, (err) => {
+    if (err) throw err;
+  });
+}
 
 function can_attempt_login(ip, cb) {
   db.get('SELECT attempts, next_attempt FROM login_attempts WHERE ip = ?', ip, (err, row) => {
+    let timestamp = Date.now();
+
     if (err) throw err;
 
-    if (row) {
-      if (row.attempts > MAX_ATTEMPTS) {
-        // more than allowed attempts, wait until timeout
-        cb(false);
-      }
-
-      if (Date.now() < row.next_attempt) {
-        // before next allowable attempt
-        cb(false);
-      }
-      // previous login attempt
-      console.log(ip + ' rejected attempt')
-      return cb(false);
+    // no previous attempt, log and allow
+    if (!row) {
+      // console.log(ip + ' allowed attempt, no previous attempt made');
+      increment_attempt(ip, /*this is attempt number*/0);
+      return cb(true);
     }
 
-    console.log(ip + ' allowed attempt')
+    // still under the maximum allowed attempts, increment, update time and allow
+    if (row.attempts < MAX_ATTEMPTS) {
+      // console.log(ip + ' allowed attempt, this is attempt ' + (row.attempts + 1));
+      increment_attempt(ip, row.attempts);
+      return cb(true);
+    }
 
-    // log the attempt
+    // made too many attempts but waited alloted time, reset attempt count and allow
+    if (row.next_attempt < timestamp) {
+      // console.log(ip + ' allowed attempt, waited enough time');
+      increment_attempt(ip, 0);
+      return cb(true);
+    }
 
-    return cb(true);
+    // can't log in yet, wait time milliseconds
+    let wait_time = row.next_attempt - timestamp;
+    return cb(false, wait_time);
   });
 }
 
 module.exports.can_attempt_login = can_attempt_login;
+module.exports.delete_login_attempt = delete_login_attempt;
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Functions
