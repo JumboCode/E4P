@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const bcrypt = require("bcryptjs");
 const sqlite3 = require('sqlite3');
 const nodemailer = require('nodemailer');
+const querystring = require('querystring');
 
 var db = new sqlite3.Database('db.sqlite3');
 
@@ -10,7 +11,7 @@ var db = new sqlite3.Database('db.sqlite3');
 ///////////////////////////////////////////////////////////////////////
 
 const TIMEOUT = 5; //minutes
-const URL = 'http://localhost:3000/admin/change?request='
+const URL = 'http://localhost:3000/admin/change?'
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -27,10 +28,11 @@ const transporter = nodemailer.createTransport({
 });
 
 function sendMail(username, email, request) {
+  const query = querystring.stringify({ request: request });
   transporter.sendMail({
     to: email,
     subject: 'Ears for Peers Password Change',
-    html: 'Hi ' + username + ',<br><br>Someone has requested a password change for your account.<br>If this was you, <a href="' + URL + request + '">click here to change your password</a>.',
+    html: 'Hi ' + username + ',<br><br>Someone has requested a password change for your account.<br>If this was you, <a href="' + URL + query + '">click here to change your password</a>.',
   }, (err, res) => {
     if (err) throw err;
   });

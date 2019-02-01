@@ -30,7 +30,7 @@ function limitCheck(req, res, next) {
     if (valid) {
       next();
     } else {
-      res.sendStatus(429);
+      res.redirect('/admin/wait?');
     }
   });
 }
