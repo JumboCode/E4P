@@ -28,7 +28,8 @@ const transporter = nodemailer.createTransport({
 });
 
 function sendMail(username, email, request) {
-  const query = querystring.stringify({ request: request });
+  let query = querystring.stringify({ request: request });
+  
   transporter.sendMail({
     to: email,
     subject: 'Ears for Peers Password Change',

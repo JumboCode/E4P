@@ -80,7 +80,7 @@ router.get('/change', /*ensureAuthenticated,*/ (req, res) => {
 });
 
 router.post('/change', (req, res) => {
-  let request = req.query.request;
+  let request = req.body.request;
   let password = req.body.new_pwd;
 
   auth.valid_password_change(request, (username) => {
