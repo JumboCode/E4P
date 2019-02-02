@@ -1,0 +1,10 @@
+{
+  "presets": [
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    ["@babel/transform-react-jsx", {
+      "pragma": "jsxElem",
+    }]
+  ]
+}

@@ -1,67 +1,76 @@
+import $ from 'jquery';
+/*eslint-disable-next-line*/
+import {jsxElem} from './jsxElem';
+
 /*
  * Return a message div based on the role and message string.
  */
-function createMessageDiv(side, message) {
-    return "<div class= 'container'><div class='" + side + "-chat-bubble'> " + escapeMessage(message) + "</div></div>";
+export function createMessageDiv(side, message) {
+  return (
+    <div class='container'>
+      <div class={`${side}-chat-bubble`}>{escapeMessage(message)}</div>
+    </div>
+  );
 }
 
 /*
  * Returns the formatted time stamp.
  */
-function getTimeString(time) {
+export function getTimeString(time) {
   return time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
 }
 
-function escapeMessage(message) {
-	// Escape "<"
-	let lt_re = new RegExp("<", "g");
-	message = message.replace(lt_re, "&lt");
+export function escapeMessage(message) {
+  // Escape "<"
+  let lt_re = new RegExp('<', 'g');
+  message = message.replace(lt_re, '&lt');
 
-	// Escape ">"
-	let gt_re = new RegExp(">", "g");
-	message = message.replace(gt_re, "&gt");
+  // Escape ">"
+  let gt_re = new RegExp('>', 'g');
+  message = message.replace(gt_re, '&gt');
 
-	return message
+  return message;
 }
 
-function chatElements(currentMessage) {
-  currentText = currentMessage ? currentMessage : "";
-  return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message...">'
-       + currentText + '</textarea>'
-       + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
+export function chatElements(currentMessage) {
+  let currentText = currentMessage ? currentMessage : '';
+  return ([
+    <textarea id='inputBox' type='text' autocomplete='off' placeholder='Type a message...'>
+      {currentText}
+    </textarea>,
+    <div id='sendButton'>
+      <div id='sendButtonText'>Send</div>
+    </div>
+  ]);
 }
 
-function chatSetup(sendMessage) {
-  $("#inputBox").keydown(function(e) {
-    // Check if on user side
-    if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.userId) != "undefined") {
+export function chatSetup(sendMessage, isAdmin, userId, send_typing_message) {
+  $('#inputBox').keydown((e) => {
+    if (!isAdmin) {
       send_typing_message(true);
-      // clear timout that would send message "stop typing" message
-      if (typeof(userTypingTimeout) != "undefined") {
+      if (typeof(userTypingTimeout) != 'undefined') {
         clearTimeout(userTypingTimeout);
       }
-
-      userTypingTimeout = setTimeout(function(){
+      let userTypingTimeout = setTimeout(() => {
         send_typing_message(false);
-      }, 5000);
+      });
     } else {
-      send_typing_message(CURRENT_CHAT_USER_ID, true);
-      if (typeof(adminTypingTimeout) != "undefined") {
+      send_typing_message(userId, true);
+      if (typeof(adminTypingTimeout) != 'undefined') {
         clearTimeout(adminTypingTimeout);
       }
-      adminTypingTimeout = setTimeout(() => {
-        send_typing_message(CURRENT_CHAT_USER_ID, false);
+      let adminTypingTimeout = setTimeout(() => {
+        send_typing_message(userId, false);
       }, 5000);
     }
-
-    // Send text message after userTyping message
-    if (e.which == 13 && !e.shiftKey) {
+    const ENTER = 13;
+    if (e.which == ENTER && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
 
-  $("#sendButton").click(function(e) {
+  $('#sendButton').click(() => {
     sendMessage();
   });
 }

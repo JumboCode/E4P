@@ -1,4 +1,15 @@
-const socket = io();
+import io from 'socket.io-client';
+import $ from 'jquery';
+import {generateUserHeader} from './header';
+import {chatSetup, chatElements, createMessageDiv} from './chat';
+/*eslint-disable-next-line*/
+import {jsxElem} from './jsxElem';
+const socket = io('http://localhost:3000');
+
+window.onload = () => {
+  generateUserHeader();
+  $('#openchat').click(openChat);
+};
 
 socket.on('connect', () => {
   console.log('connected to socket with');
@@ -9,19 +20,17 @@ socket.on('admin matched', () => {
   console.log('admin matched');
 });
 
-socket.on('chat message', function(data) {
+socket.on('chat message', (data) => {
   console.log('recieved chat message on index: ' + data);
   updateChat(createMessage('admin', data.message));
   $('#typingIcon').css('display', 'none');
 });
 
 socket.on('typing', () => {
-  console.log('admin is typing');
   $('#typingIcon').css('display', 'block');
 });
 
 socket.on('stop typing', () => {
-  console.log('admin stopped typing');
   $('#typingIcon').css('display', 'none');
 });
 
@@ -34,7 +43,7 @@ function send_message(msg) {
 
 function user_connect() {
   socket.emit('user connect');
-};
+}
 
 function send_typing_message(is_typing) {
   if (is_typing) {
@@ -49,7 +58,7 @@ function send_typing_message(is_typing) {
 }
 
 function warning() {
-  return "Are you sure you want to leave?";
+  return 'Are you sure you want to leave?';
 }
 
 var chat = {
@@ -61,32 +70,33 @@ var chat = {
 
 
 function openChat() {
-  open = document.getElementById("open");
-  open.innerHTML = '';
-  open.innerHTML = " <div class='row'>Waiting to connect to an ear!</div><div class='row'><div class='loader' id='load'></div></div>";
-  console.log("attempting to connect");
+  let open = $('#open');
+  open.empty();
+  open.html([
+    <div class='row'>Waiting to connect to an ear!</div>,
+    <div class='row'>
+      <div class='loader' id='load'/>
+    </div>
+  ]);
+  console.log('attempting to connect');
   window.onbeforeunload = () => {
-    return "Are you sure you want to leave? Your chat connection will be lost.";
-  }
+    return 'Are you sure you want to leave? Your chat connection will be lost.';
+  };
 
   user_connect();
 }
 
 function startChat() {
   // get rid of open buttons
-  open = document.getElementById("open");
-  open.innerHTML = '';
-  open.style.display = "none";
-
+  let open = $('#open');
+  open.empty();
+  open.attr('style', 'display: none');
 
   //add input bar to page
-  $("#e_space").css('height', '10vh');
-  $("#chat").attr('style', 'display: flex !important');
-  chatbox = document.getElementById("chatbox");
-  chatbox.style.display = "block";
-
-  chatbar = document.getElementById("chatbar");
-  chatbar.style.visibility= "visible";
+  $('#e_space').css('height', '10vh');
+  $('#chat').attr('style', 'display: flex !important');
+  $('#chatbox').attr('style', 'display: block');
+  $('#chatbar').attr('style', 'visibility: visible');
   chat.accepted = true;
 }
 
@@ -98,17 +108,11 @@ function getMessage() {
 
 
 function updateChat(messageObj) {
-  messages = document.getElementById("chathistory");
-  chatbox = document.getElementById("chatbox");
-  if (messageObj.role == 'admin') {
-      messageSide = 'left';
-  }
-  else {
-      messageSide = 'right';
-  }
-  newMessage = createMessageDiv(messageSide, messageObj.message);
-  $("#typingIcon").before(newMessage);
-  messages.scrollTop = messages.scrollHeight - messages.clientHeight;
+  let messages = $('#chathistory');
+  let messageSide = messageObj.role == 'admin' ? 'left' : 'right';
+  let newMessage = createMessageDiv(messageSide, messageObj.message);
+  $('#typingIcon').before(newMessage);
+  messages.scrollTop(messages.prop('scrollHeight') - messages.prop('clientHeight'));
 }
 
 
@@ -117,20 +121,20 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-    message = $('#inputBox').val();
-    if (message != '') {
-        send_message(message);
-        messageObject = createMessage('user', message);
-        chat.messages.push(messageObject);
-        updateChat(messageObject);
-        message = $('#inputBox').val('');
-    }
+  let message = $('#inputBox').val();
+  if (message != '') {
+    send_message(message);
+    let messageObject = createMessage('user', message);
+    chat.messages.push(messageObject);
+    updateChat(messageObject);
+    message = $('#inputBox').val('');
+  }
 }
 
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
 
-$(function() {
-  $("#type_msg").html(chatElements(""));
-  chatSetup(sendMessage);
+$(() => {
+  $('#type_msg').html(chatElements(''));
+  chatSetup(sendMessage, false, chat.userId, send_typing_message);
 });

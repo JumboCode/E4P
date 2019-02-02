@@ -18,12 +18,12 @@ function loggedIn(req, res, next) {
 
 router.get('/', ensureAuthenticated, (req, res) => {
   // console.log("GET /admin")
-  res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
+  res.sendFile('admin.html', {root: path.join(__dirname, '../dist')});
 });
 
 router.get('/login', loggedIn, (req, res) => {
   // console.log("GET /admin/login")
-  res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
+  res.sendFile('login_page.html', {root: path.join(__dirname, '../dist')});
 });
 
 function flagCheck(req, res, next) {
@@ -44,7 +44,7 @@ router.get('/logout', ensureAuthenticated, (req, res) => {
 
 router.get('/register', ensureAuthenticated, (req, res) => {
   // console.log("GET /admin/register")
-  res.sendFile('register_page.html', {root: path.join(__dirname, '../public')});
+  res.sendFile('register_page.html', {root: path.join(__dirname, '../dist')});
 });
 
 router.post('/register', ensureAuthenticated, (req, res) => {
