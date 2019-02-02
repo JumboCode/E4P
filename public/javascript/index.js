@@ -27,6 +27,7 @@ socket.on('chat message', (data) => {
 });
 
 socket.on('typing', () => {
+  console.log('istyping');
   $('#typingIcon').css('display', 'block');
 });
 

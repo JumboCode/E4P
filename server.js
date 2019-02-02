@@ -11,13 +11,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const execSync = require('child_process').execSync;
 const adminRoutes = require('./routes/adminRoutes');
-
-// Build Distribution of Static Assets
-execSync('npm run build');
-execSync('mkdir -p dist-html');
-execSync('mv ./dist/*.html ./dist-html');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
@@ -73,17 +67,14 @@ app.use('/admin', adminRoutes);
 //app.use(express.static('dist'));
 
 app.get('/', (req, res) => {
-  console.log('GET "/"');
   res.sendFile('index.html', {root: path.join(__dirname, 'dist-html')});
 });
 
 app.get('/help', (req, res) => {
-  console.log('GET "/help');
   res.sendFile('help_page.html', {root: path.join(__dirname, 'dist-html')});
 });
 
 app.get('/:file', (req, res) => {
-  console.log('GET ":file"');
   res.sendFile(req.params.file, {root: path.join(__dirname, 'dist')}, (err) => {
     if (err) {
       if (err.status === 404) {
@@ -96,7 +87,6 @@ app.get('/:file', (req, res) => {
 });
 
 app.post('/admin', (req, res) => {
-  console.log('POST "/admin"');
   admins.push(req.body.admin);
 });
 

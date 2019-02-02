@@ -1,7 +1,5 @@
-branches: 
-  only: master
 language: node_js
-node_js: "7"
+node_js: "10.15.1"
 services: mongodb
 branches:
   only:
