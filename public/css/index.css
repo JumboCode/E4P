@@ -91,66 +91,6 @@ img {
   display: none !important;
 }
 
-@media screen and (max-height: 600px) {
-  #chatbox {
-    display: none;
-    height: 80%;
-    width: 80%;
-    background-color: var(--light-blue);
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-  }
-
-  #open.flex-container {
-    font-family: "Roboto", sans-serif;
-    font-weight: 500;
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-    background-color: #96d7d2;
-    color: var(--light-blue);
-    text-decoration: bold;
-    flex-direction: column;
-  }
-
-  #chathistory {
-    background-color: var(--light-blue);
-    margin-top: 50px;
-    height: 60vh;
-    overflow-y: scroll;
-  }
-}
-
-@media screen and (min-height: 600px) {
-  #chatbox {
-    display: none;
-    height: 80%;
-    width: 80%;
-    background-color: var(--light-blue);
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-  }
-
-  #open.flex-container {
-    font-family: "Roboto", sans-serif;
-    font-weight: 500;
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--medium-green);
-    color: var(--light-blue);
-    text-decoration: bold;
-    flex-direction: column;
-  }
-
-  #chathistory {
-    background-color: var(--light-blue);
-    margin-top: 50px;
-    height: 500px;
-    overflow-y: scroll;
-  }
-}
-
 #chat_admin {
   position: inline-block;
   width: 100%;
@@ -249,4 +189,66 @@ img {
 #typingIcon img {
   width: 100%;
   height: 100%;
+}
+
+/* MEDIA QUERIES */
+
+@media screen and (max-height: 600px) {
+  #chatbox {
+    display: none;
+    height: 80%;
+    width: 80%;
+    background-color: var(--light-blue);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  #open.flex-container {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: #96d7d2;
+    color: var(--light-blue);
+    text-decoration: bold;
+    flex-direction: column;
+  }
+
+  #chathistory {
+    background-color: var(--light-blue);
+    margin-top: 50px;
+    height: 60vh;
+    overflow-y: scroll;
+  }
+}
+
+@media screen and (min-height: 600px) {
+  #chatbox {
+    display: none;
+    height: 80%;
+    width: 80%;
+    background-color: var(--light-blue);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  }
+
+  #open.flex-container {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--medium-green);
+    color: var(--light-blue);
+    text-decoration: bold;
+    flex-direction: column;
+  }
+
+  #chathistory {
+    background-color: var(--light-blue);
+    margin-top: 50px;
+    height: 500px;
+    overflow-y: scroll;
+  }
 }

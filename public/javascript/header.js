@@ -27,8 +27,3 @@ function generateHeader(role) {
     </div>
   ]);
 }
-
-// {role === 'user' ? <a href='/help' target='_blank'>Help</a> : ''}
-// {role === 'user' ? <a href='http://sites.tufts.edu/ears4peers/contact-us/' target='_blank'>Feedback</a> : ''}
-// {role === 'user' ? <a href={login}>Login</a> : ''}
-// {role !== 'user' ? <a href={logout}>Logout</a> : ''}}

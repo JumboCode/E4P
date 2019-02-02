@@ -26,10 +26,11 @@ textarea {
   float: right;
 }
 
-.container {
+.message-container {
   display: inline-block;
   position: relative;
   width: 100%;
-  margin-top: 0.25em;
-  margin-bottom: 0.25em;
+  margin: 0.25em auto;
+  padding-left: 1em;
+  padding-right: 1em;
 }

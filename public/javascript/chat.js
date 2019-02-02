@@ -7,7 +7,7 @@ import {jsxElem} from './jsxElem';
  */
 export function createMessageDiv(side, message) {
   return (
-    <div class='container'>
+    <div class='message-container'>
       <div class={`${side}-chat-bubble`}>{escapeMessage(message)}</div>
     </div>
   );
@@ -53,7 +53,7 @@ export function chatSetup(sendMessage, isAdmin, userId, send_typing_message) {
       }
       let userTypingTimeout = setTimeout(() => {
         send_typing_message(false);
-      });
+      }, 5000);
     } else {
       send_typing_message(userId, true);
       if (typeof(adminTypingTimeout) != 'undefined') {

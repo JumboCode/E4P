@@ -13,67 +13,48 @@ window.onload = () => {
 };
 
 window.onbeforeunload = () => {
-  return ('Are you sure you want to leave? Your chat connections will be lost.');
+  return('Are you sure you want to leave? Your chat connections will be lost.');
 };
 
 socket.on('connect', () => {
-  // send as POST request
   $.post('/admin', { admin: socket.id });
 });
 
-socket.on('user matched', user_matched);
-
-socket.on('chat message', (data) => {
-  addMessage(data.room, createMessage('user', data.message));
-  // Chat message received, so user is not typing anymore
-  userNotTyping(data.room);
-});
-
-// removes a user from the waiting list
-function user_matched(user) {
+socket.on('user matched', (user) => {
   console.log('user matched ' + user);
-
-  // remove user from chat list if it exists
   for (let messageStream of chats) {
     if (messageStream.userId == user) {
       removeChat(user);
       break;
     }
   }
-}
+});
 
-socket.on('user disconnect', end_chat);
+socket.on('chat message', (data) => {
+  addMessage(data.room, createMessage('user', data.message));
+  userNotTyping(data.room);
+});
 
-// ends a chat with given user
-function end_chat(user) {
+socket.on('user disconnect', (user) => {
   console.log('user disconnected ' + user);
   deactivateChat(user);
-
-  // reload the current window:
   toggleChat(CURRENT_CHAT_USER_ID);
-}
+});
 
-socket.on('user waiting', user_waiting);
-
-function user_waiting(user, icon) {
+socket.on('user waiting', (user, icon) => {
   console.log('user waiting ' + user);
   console.log('creating new chat for user waiting');
   newChat(user, icon);
   updateUserOverview();
-}
+});
 
-
-socket.on('typing', user_typing);
-
-function user_typing(data) {
+socket.on('typing', (data) => {
   userIsTyping(data.room);
-}
+});
 
-socket.on('stop typing', user_stop_typing);
-
-function user_stop_typing(data) {
+socket.on('stop typing', (data) => {
   userNotTyping(data.room);
-}
+});
 
 // RECEIVE ^^^
 ///////////////////////////////////////
@@ -155,31 +136,24 @@ function toggleChat(userId) {
     if (chat.userId == userId) {
       let currentChat = $('.messages').first();
       currentChat.empty();
-      //let currentChat = document.getElementsByClassName('messages')[0];
-      //currentChat.innerHTML = '';
       for (let message of chat.messages) {
         let messageSide = message.role == 'admin' ? 'right' : 'left';
         currentChat.append(createMessageDiv(messageSide, message.message));
-        //currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message);
       }
       let currentUserTyping = chat.typing ? 'block' : 'none';
       $('#typingIcon').css('display', currentUserTyping);
       let actionDiv = $('.chatAction').first();
-      //let actionDiv = document.getElementsByClassName('chatAction')[0];
       if (!chat.accepted) {
         actionDiv.html(<button id='accept'>Accept Thread</button>);
         actionDiv.children('#accept').click(() => {acceptChat(CURRENT_CHAT_USER_ID);});
-        //actionDiv.innerHTML = '<button id="accept" onclick="acceptChat(CURRENT_CHAT_USER_ID)">Accept Thread</button>';
       }
       else if (chat.active) {
         actionDiv.html(chatElements(chat.currentMessage));
-        //actionDiv.innerHTML = chatElements(chat.currentMessage);
         chatSetup(sendMessage, true, CURRENT_CHAT_USER_ID, send_typing_message);
         scrollDown();
       } else {
         actionDiv.html(<button id='delete'>Delete Thread</button>);
         actionDiv.children('#delete').click(() => {removeChat(CURRENT_CHAT_USER_ID);});
-        //actionDiv.innerHTML = '<button id="delete" onclick="removeChat(CURRENT_CHAT_USER_ID)">Delete Thread</button>';
       }
     }
     tabId++;
@@ -192,8 +166,6 @@ function toggleChat(userId) {
 function scrollDown() {
   let messagesBox = $('.messagesBox').first();
   messagesBox.scrollTop(messagesBox.prop('scrollHeight'));
-  //let messagesBox = document.getElementsByClassName('messagesBox')[0];
-  //messagesBox.scrollTop = messagesBox.scrollHeight;
 }
 
 function updateCurrentInput(userId) {
@@ -376,60 +348,58 @@ function addMessage(userId, messageObject) {
 
 /**************************** TESTING FUNCTIONS ****************************/
 
-// function mockChats() {
-//
-//     newChat('user1');
-//     newChat('user2');
-//     newChat('user3');
-//     newChat('this_is_a_really_long_username')
-//
-//     message = createMessage('user', 'hi');
-//     addMessage('user1', message);
-//     addMessage('user2', message);
-//     addMessage('user3', message);
-//
-//     message = createMessage('admin', 'hi user1');
-//     addMessage('user1', message);
-//
-//     message = createMessage('admin', 'hi user2');
-//     addMessage('user2', message);
-//     message = createMessage('user', 'blah blah');
-//     addMessage('user2', message);
-//
-//     message = createMessage('admin', 'hi user3');
-//     addMessage('user3', message);
-//
-//     // acceptChat('user2');
-//     // acceptChat('user3');
-//     deactivateChat('user3');
-// }
-//
-// function populateChat() {
-//     for (i = 0; i < 10; i++) {
-//         message = createMessage('user', 'short test');
-//         addMessage('user1', message);
-//         message = createMessage('admin', 'short test');
-//         addMessage('user1', message);
-//     }
-//     for (i = 0; i < 10; i++) {
-//         message = createMessage('user', 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test ');
-//         addMessage('user1', message);
-//         message = createMessage('admin', 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test '
-//             + 'this is a long test ');
-//         addMessage('user1', message);
-//     }
-//
-// }
+function mockChats() {
+  newChat('user1');
+  newChat('user2');
+  newChat('user3');
+  newChat('this_is_a_really_long_username');
+
+  let message = createMessage('user', 'hi');
+  addMessage('user1', message);
+  addMessage('user2', message);
+  addMessage('user3', message);
+
+  message = createMessage('admin', 'hi user1');
+  addMessage('user1', message);
+
+  message = createMessage('admin', 'hi user2');
+  addMessage('user2', message);
+  message = createMessage('user', 'blah blah');
+  addMessage('user2', message);
+
+  message = createMessage('admin', 'hi user3');
+  addMessage('user3', message);
+
+  // acceptChat('user2');
+  // acceptChat('user3');
+  deactivateChat('user3');
+}
+
+function populateChat() {
+  for (let i = 0; i < 10; i++) {
+    let message = createMessage('user', 'short test');
+    addMessage('user1', message);
+    message = createMessage('admin', 'short test');
+    addMessage('user1', message);
+  }
+  for (let i = 0; i < 10; i++) {
+    let message = createMessage('user', 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test ');
+    addMessage('user1', message);
+    message = createMessage('admin', 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test '
+          + 'this is a long test ');
+    addMessage('user1', message);
+  }
+}

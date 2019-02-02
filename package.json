@@ -11,7 +11,8 @@
     "lint-client": "eslint ./public/**/*.js",
     "slint": "stylelint",
     "slint-client": "stylelint ./public/**/*.css",
-    "parcel": "parcel"
+    "parcel": "parcel",
+    "build": "parcel build public/*.html"
   },
   "repository": {
     "type": "git",
