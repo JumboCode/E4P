@@ -11,11 +11,13 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const exec = require('child_process').exec;
+const execSync = require('child_process').execSync;
 const adminRoutes = require('./routes/adminRoutes');
 
 // Build Distribution of Static Assets
-exec('npm run build');
+execSync('npm run build');
+execSync('mkdir -p dist-html');
+execSync('mv ./dist/*.html ./dist-html');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
@@ -67,34 +69,34 @@ if (app.get('env') == 'production') {
 ///////////////////////////////////////////////////////////////////////
 
 app.use('/admin', adminRoutes);
-app.use(express.static('dist'));
+
+//app.use(express.static('dist'));
 
 app.get('/', (req, res) => {
-  res.sendFile('index.html', {root: path.join(__dirname, 'dist')});
+  console.log('GET "/"');
+  res.sendFile('index.html', {root: path.join(__dirname, 'dist-html')});
 });
 
-// app.get('/help', function(req, res) {
-//   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
-// });
+app.get('/help', (req, res) => {
+  console.log('GET "/help');
+  res.sendFile('help_page.html', {root: path.join(__dirname, 'dist-html')});
+});
 
-// app.get(':file', (req, res) => {
-//   res.sendFile(req.params.file, {root: path.join(__dirname, 'dist')});
-// })
-//
-// app.get('/css/:file', (req, res) => {
-//   res.set('Content-Type', 'text/css');
-//   res.sendFile(req.params.file, {root: path.join(__dirname, 'dist')});
-// });
-//
-// app.get('/javascript/:file', (req, res) => {
-//   res.sendFile(req.params.file, {root: path.join(__dirname, 'dist')});
-// });
-//
-// app.get('/img/:file', (req, res) => {
-//   res.sendFile(req.params.file, {root: path.join(__dirname, 'dist')});
-// });
+app.get('/:file', (req, res) => {
+  console.log('GET ":file"');
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'dist')}, (err) => {
+    if (err) {
+      if (err.status === 404) {
+        res.status(err.status).send(`${req.params.file} doesnt exist.`);
+      } else {
+        res.status(err.status).end();
+      }
+    }
+  });
+});
 
 app.post('/admin', (req, res) => {
+  console.log('POST "/admin"');
   admins.push(req.body.admin);
 });
 

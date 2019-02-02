@@ -9,10 +9,17 @@
     "lint": "eslint",
     "lint-server": "eslint server.js",
     "lint-client": "eslint ./public/**/*.js",
+    "lint-tests": "eslint ./tests/**/*.js",
     "slint": "stylelint",
     "slint-client": "stylelint ./public/**/*.css",
     "parcel": "parcel",
-    "build": "parcel build public/*.html"
+    "build": "parcel build public/*.html",
+    "watch": "parcel public/*.html"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-client"
+    }
   },
   "repository": {
     "type": "git",
@@ -50,6 +57,7 @@
     "chai-http": "^4.2",
     "eslint": "^5.13.0",
     "eslint-plugin-react": "^7.12.4",
+    "husky": "^1.3.1",
     "jquery": "^3.3.1",
     "mocha": "^5.2",
     "parcel-bundler": "^1.11.0",

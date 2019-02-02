@@ -2,4 +2,5 @@ node_modules
 .DS_STORE
 *.psd
 dist
+dist-html
 .cache

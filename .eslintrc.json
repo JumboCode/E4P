@@ -21,7 +21,8 @@
     "semi": ["error", "always"],
     "react/jsx-filename-extension": [0],
     "no-console": [0],
-    "prefer-arrow-callback": ["error"]
+    "prefer-arrow-callback": ["error"],
+    "no-unused-vars": [1]
   },
   "settings": {
     "react": {

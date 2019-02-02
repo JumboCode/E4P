@@ -18,12 +18,12 @@ function loggedIn(req, res, next) {
 
 router.get('/', ensureAuthenticated, (req, res) => {
   // console.log("GET /admin")
-  res.sendFile('admin.html', {root: path.join(__dirname, '../dist')});
+  res.sendFile('admin.html', {root: path.join(__dirname, '../dist-html')});
 });
 
 router.get('/login', loggedIn, (req, res) => {
   // console.log("GET /admin/login")
-  res.sendFile('login_page.html', {root: path.join(__dirname, '../dist')});
+  res.sendFile('login_page.html', {root: path.join(__dirname, '../dist-html')});
 });
 
 function flagCheck(req, res, next) {
@@ -44,12 +44,12 @@ router.get('/logout', ensureAuthenticated, (req, res) => {
 
 router.get('/register', ensureAuthenticated, (req, res) => {
   // console.log("GET /admin/register")
-  res.sendFile('register_page.html', {root: path.join(__dirname, '../dist')});
+  res.sendFile('register_page.html', {root: path.join(__dirname, '../dist-html')});
 });
 
 router.post('/register', ensureAuthenticated, (req, res) => {
   // console.log("POST /admin/register")
-  Admin.register(new Admin({username : req.body.username }), req.body.password, function(err, admin) {
+  Admin.register(new Admin({username : req.body.username }), req.body.password, (err, admin) => {
     if (err) {
       console.log(err);
       res.redirect('/admin/register');
