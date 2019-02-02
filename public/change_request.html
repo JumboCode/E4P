@@ -9,14 +9,20 @@
 <body>
   <div class="wrapper center">
     <h1 class="banner">Password Change</h1>
-    <p class="justify">Requesting a password change will send a confirmation link to the registered email address. Keep in mind this will change the password for everyone using the account.</p>
+    <p class="justify">Type in the email you used to sign up for your account. Requesting a password change will send a confirmation link to the registered email address. Keep in mind this will change the password for everyone using the account.</p>
     <form id="change_request" method="post" action="/admin/change/request">
+      <input class="text_input" type="email" id="email" name="email" placeholder="Email"><br>
       <input class="action_button" type="submit" value="Request">
     </form>
   </div>
 
   <script>
     $('#change_request').on('submit', (e) => {
+      if ($('#email').val() === '') {
+        alert("Email can't be blank!");
+        return false;
+      }
+
       alert('Password change request submitted. Check for confirmation email sent to your registered email.');
     });
   </script>

@@ -38,17 +38,16 @@ router.get('/logout', ensureAuthenticated, (req, res) => {
   res.redirect('/admin/login');
 });
 
-router.get('/change/request', ensureAuthenticated, (req, res) => {
+router.get('/change/request', (req, res) => {
   res.sendFile('change_request.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/change/request', ensureAuthenticated, (req, res) => {
-  auth.start_password_change(req.user.username);
+router.post('/change/request', (req, res) => {
+  auth.start_password_change(req.body.email);
   res.redirect('/admin/logout');
 });
 
-// TODO figure out how to redirect to login then back to confirm
-router.get('/change', /*ensureAuthenticated,*/ (req, res) => {
+router.get('/change', (req, res) => {
   let request = req.query.request;
 
   // check request still valid and redirect as necessary

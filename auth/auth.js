@@ -38,21 +38,23 @@ function sendMail(username, email, request) {
   });
 }
 
-function start_password_change(username) {
+function start_password_change(email) {
   let date = new Date();
   let invalid = date.setMinutes(date.getMinutes() + TIMEOUT);
   let request = crypto.randomBytes(16).toString('hex');
 
-  db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, invalid, username, (err) => {
+  db.get('SELECT username FROM users WHERE email = ?', email, (err, row) => {
     if (err) throw err;
-    
-    db.get('SELECT email FROM users WHERE username = ?', username, (err, row) => {
+
+    // TODO maybe alert user attempt was bad?
+    if (!row) {
+      return;
+    }
+
+    db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, invalid, row.username, (err) => {
       if (err) throw err;
 
-      /*TODO maybe implement a better error for if we can't find username of someonet trying to initiate password change*/
-      if (!row) console.log('user who initiated password change not found');
-
-      sendMail(username, row.email, request);
+      sendMail(row.username, email, request);
     });
   });
 }
@@ -64,6 +66,7 @@ function start_password_change(username) {
 //    (any attempt to resolve param in cb will result in 'undefined')
 function valid_password_change(request, cb) {
   let timestamp = Date.now()
+
   db.get('SELECT username, invalid FROM change_requests WHERE request = ?', request, (err, row) => {
     if (err) throw err;
 
