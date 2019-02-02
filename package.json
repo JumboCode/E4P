@@ -4,8 +4,8 @@
   "description": "E4P JumboCode Project",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --exit --recursive tests",
-    "start": "node server.js",
+    "test": "npm run build && mocha --exit --recursive tests",
+    "start": "npm run build && node server.js",
     "lint": "eslint",
     "lint-server": "eslint server.js",
     "lint-client": "eslint ./public/**/*.js",
@@ -13,7 +13,7 @@
     "slint": "stylelint",
     "slint-client": "stylelint ./public/**/*.css",
     "parcel": "parcel",
-    "build": "parcel build public/*.html",
+    "build": "parcel build public/*.html && mkdir -p dist-html && mv ./dist/*.html ./dist-html",
     "watch": "parcel public/*.html"
   },
   "husky": {

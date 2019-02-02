@@ -11,13 +11,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const execSync = require('child_process').execSync;
 const adminRoutes = require('./routes/adminRoutes');
-
-// Build Distribution of Static Assets
-execSync('npm run build');
-execSync('mkdir -p dist-html');
-execSync('mv ./dist/*.html ./dist-html');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
