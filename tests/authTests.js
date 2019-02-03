@@ -2,7 +2,7 @@
  *  GET:
  *    x /admin
  *    x /admin/login
- *    - /admin/logout
+ *    x /admin/logout
  *    - /admin/wait
  *    - /admin/change/request
  *    - /admin/change
@@ -117,4 +117,36 @@ describe('AUTH TESTS', () => {
           done();
     });
   });
+
+  it('should get /admin/logout and redirect to /admin/login if logged in', (done) => {
+    let agent = chai.request.agent(server);
+    
+    agent.post('/admin/login')
+        .set('content-type', 'application/json')
+        .send({
+          username: process.env.TEST_USER || 'jumbocode',
+          password: process.env.TEST_PASS || 'mattlangan'
+      }).end((err, res) => {
+          return agent.get('/admin/logout')
+                      .redirects(0)
+                      .end((err, res) => {
+                        res.should.have.status(302);
+                        res.should.have.header('location', '/admin/login');
+                        agent.close();
+                        done();
+          });
+    });
+  });
+
+  it('should get /admin/logout and redirect to /admin/login if not logged in', (done) => {
+    chai.request(server)
+        .get('/admin/logout')
+        .redirects(0)
+        .end((err, res) => {
+          res.should.have.status(302);
+          res.should.have.header('location', '/admin/login');
+          done();
+    });
+  });
+
 });
