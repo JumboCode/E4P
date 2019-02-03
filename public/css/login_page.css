@@ -4,24 +4,22 @@ body {
 }
 
 .login_button {
-	width: 10%;
-	border: none;
-	background-color: #C4BAB8;
-    color: black;
-    font-size: 16px;
-    border-radius: 3px;
-
-
+  width: 10%;
+  border: none;
+  background-color: #c4bab8;
+  color: black;
+  font-size: 16px;
+  border-radius: 3px;
 }
 
 .input_box {
-	border-radius: 3px;
-	border: none;
+  border-radius: 3px;
+  border: none;
 }
 
 .center {
-	line-height: 300px;
-    height: 200px;
-	display: inline-block;
-	text-align: center;
+  line-height: 300px;
+  height: 200px;
+  display: inline-block;
+  text-align: center;
 }

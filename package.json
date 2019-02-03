@@ -10,7 +10,7 @@
     "slint-client": "stylelint ./public/**/*.css"
   },
   "husky": {
-    "hooks-dontuse": {
+    "hooks": {
       "pre-commit": "npm run slint-client"
     }
   },
