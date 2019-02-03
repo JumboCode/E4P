@@ -22,4 +22,3 @@ function generateHeader(role) {
 		+ 	buttons
 		+ "</div>";
 }
-
