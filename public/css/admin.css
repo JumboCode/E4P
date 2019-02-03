@@ -129,7 +129,8 @@ div.icon {
   border-left: none;
   height: 100%;
   background-color: #def3f3;
-
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
 }
 
 /* Style the box that shows all the messages */
@@ -185,7 +186,6 @@ div.icon {
   text-align: center;
 }
 
-}
 #typingIcon {
   display: none;
   width: 3em;
