@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const sqlite3 = require('sqlite3');
 const nodemailer = require('nodemailer');
 const querystring = require('querystring');
+const assert = require('assert');
 
 var db = new sqlite3.Database('db.sqlite3');
 
@@ -39,6 +40,7 @@ function sendMail(username, email, request) {
 }
 
 function start_password_change(email) {
+  assert(typeof email === 'string');
   let date = new Date();
   let invalid = date.setMinutes(date.getMinutes() + TIMEOUT);
   let request = crypto.randomBytes(16).toString('hex');
@@ -65,6 +67,7 @@ function start_password_change(email) {
 //    calls the callback with no arguments
 //    (any attempt to resolve param in cb will result in 'undefined')
 function valid_password_change(request, cb) {
+  assert(typeof request === 'string');
   let timestamp = Date.now()
 
   db.get('SELECT username, invalid FROM change_requests WHERE request = ?', request, (err, row) => {
@@ -85,6 +88,9 @@ function valid_password_change(request, cb) {
 }
 
 function change_password(username, password) {
+  assert(typeof username === 'string');
+  assert(typeof password === 'string');
+
   // autogenerates salt with default of 10 rounds
   let hash = bcrypt.hashSync(password);
 
@@ -106,6 +112,9 @@ module.exports.change_password = change_password;
 ///////////////////////////////////////////////////////////////////////
 
 function strategy(username, password, done) {
+  assert(typeof username === 'string');
+  assert(typeof password === 'string');
+
   db.get('SELECT username, password FROM users WHERE username = ?', username, (err, row) => {
     if (err) throw err;
 
@@ -126,6 +135,8 @@ function serialize(user, done) {
 }
 
 function deserialize(username, done) {
+  assert(typeof username === 'string');
+
   db.get('SELECT username FROM users WHERE username = ?', username, (err, row) => {
     if (!row) return done(null, false);
     return done(null, row);
