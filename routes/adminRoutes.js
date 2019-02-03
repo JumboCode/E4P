@@ -27,7 +27,7 @@ function flagCheck(req, res, next) {
 }
 
 function limitCheck(req, res, next) {
-  auth.can_attempt_login(req.ip, (valid, time) => {
+  auth.can_attempt_login(String(req.ip), (valid, time) => {
     if (valid) {
       next();
     } else {
@@ -38,7 +38,7 @@ function limitCheck(req, res, next) {
 }
 
 function limitReset(req, res, next) {
-  auth.delete_login_attempt(req.ip);
+  auth.delete_login_attempt(String(req.ip));
   next();
 }
 
@@ -72,12 +72,12 @@ router.get('/change/request', (req, res) => {
 });
 
 router.post('/change/request', (req, res) => {
-  auth.start_password_change(req.body.email);
+  auth.start_password_change(String(req.body.email));
   res.redirect('/admin/logout');
 });
 
 router.get('/change', (req, res) => {
-  let request = req.query.request;
+  let request = String(req.query.request);
 
   // check request still valid and redirect as necessary
   auth.valid_password_change(request, (valid) => {
@@ -90,8 +90,8 @@ router.get('/change', (req, res) => {
 });
 
 router.post('/change', (req, res) => {
-  let request = req.body.request;
-  let password = req.body.new_pwd;
+  let request = String(req.body.request);
+  let password = String(req.body.new_pwd);
 
   auth.valid_password_change(request, (username) => {
     if (username) {

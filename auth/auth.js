@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const sqlite3 = require('sqlite3');
 const nodemailer = require('nodemailer');
 const querystring = require('querystring');
+const assert = require('assert');
 
 var db = new sqlite3.Database('db.sqlite3');
 
@@ -41,6 +42,7 @@ function sendMail(username, email, request) {
 }
 
 function start_password_change(email) {
+  assert(typeof email === 'string');
   let date = new Date();
   let expires = date.setMinutes(date.getMinutes() + VALID_DURATION);
   let request = crypto.randomBytes(16).toString('hex');
@@ -67,6 +69,7 @@ function start_password_change(email) {
 //    calls the callback with no arguments
 //    (any attempt to resolve param in cb will result in 'undefined')
 function valid_password_change(request, cb) {
+  assert(typeof request === 'string');
   let timestamp = Date.now()
 
   db.get('SELECT username, invalid FROM change_requests WHERE request = ?', request, (err, row) => {
@@ -87,6 +90,9 @@ function valid_password_change(request, cb) {
 }
 
 function change_password(username, password) {
+  assert(typeof username === 'string');
+  assert(typeof password === 'string');
+
   // autogenerates salt with default of 10 rounds
   let hash = bcrypt.hashSync(password);
 
@@ -120,12 +126,17 @@ let attempt_scrubber = setInterval(() => {
 }, ATTEMPT_SCRUBBER_INTERVAL * 3600000);
 
 function delete_login_attempt(ip) {
+  assert(typeof ip === 'string');
+
   db.run('DELETE FROM login_attempts WHERE ip = ?', ip, (err) => {
     if (err) throw err;
   });
 }
 
 function increment_attempt(ip, prev_attempts) {
+  assert(typeof ip === 'string');
+  assert(typeof prev_attempts === 'number');
+
   let date = new Date();
   let attempts = prev_attempts + 1;
   let next_attempt = date.setMinutes(date.getMinutes() + RETRY_WAIT_DURATION);
@@ -136,6 +147,8 @@ function increment_attempt(ip, prev_attempts) {
 }
 
 function can_attempt_login(ip, cb) {
+  assert(typeof ip === 'string');
+
   db.get('SELECT attempts, next_attempt FROM login_attempts WHERE ip = ?', ip, (err, row) => {
     let timestamp = Date.now();
 
@@ -176,6 +189,9 @@ module.exports.delete_login_attempt = delete_login_attempt;
 ///////////////////////////////////////////////////////////////////////
 
 function strategy(username, password, done) {
+  assert(typeof username === 'string');
+  assert(typeof password === 'string');
+
   db.get('SELECT username, password FROM users WHERE username = ?', username, (err, row) => {
     if (err) throw err;
 
@@ -196,6 +212,8 @@ function serialize(user, done) {
 }
 
 function deserialize(username, done) {
+  assert(typeof username === 'string');
+
   db.get('SELECT username FROM users WHERE username = ?', username, (err, row) => {
     if (!row) return done(null, false);
     return done(null, row);
