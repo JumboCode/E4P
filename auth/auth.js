@@ -11,8 +11,9 @@ var db = new sqlite3.Database('db.sqlite3');
 //        Password Change
 ///////////////////////////////////////////////////////////////////////
 
-const TIMEOUT = 5; //minutes
-const URL = 'http://localhost:3000/admin/change?'
+// TODO make these configurable (document configurability)
+const VALID_DURATION = process.env.validDuration || 5; //minutes
+const URL = (process.env.host || 'http://localhost:3000') + '/admin/change?'
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -30,6 +31,7 @@ const transporter = nodemailer.createTransport({
 
 function sendMail(username, email, request) {
   let query = querystring.stringify({ request: request });
+
   transporter.sendMail({
     to: email,
     subject: 'Ears for Peers Password Change',
@@ -42,7 +44,7 @@ function sendMail(username, email, request) {
 function start_password_change(email) {
   assert(typeof email === 'string');
   let date = new Date();
-  let invalid = date.setMinutes(date.getMinutes() + TIMEOUT);
+  let expires = date.setMinutes(date.getMinutes() + VALID_DURATION);
   let request = crypto.randomBytes(16).toString('hex');
 
   db.get('SELECT username FROM users WHERE email = ?', email, (err, row) => {
@@ -74,7 +76,7 @@ function valid_password_change(request, cb) {
     if (err) throw err;
 
     if (row) {
-      if (timestamp < row.invalid) {
+      if (timestamp < row.expires) {
         return cb(row.username);
       }
 
