@@ -3,9 +3,9 @@
  *    x /admin
  *    x /admin/login
  *    x /admin/logout
- *    - /admin/wait
  *    - /admin/change/request
  *    - /admin/change
+ *    - /admin/wait
  *
  *  POST:
  *    x /admin/login
@@ -43,8 +43,8 @@ describe('AUTH TESTS', () => {
         .redirects(0)
         .set('content-type', 'application/json')
         .send({
-          username: process.env.TEST_USER || 'jumbocode',
-          password: process.env.TEST_PASS || 'mattlangan'
+          username: process.env.DEV_USER || 'jumbocode',
+          password: process.env.DEV_PASS || 'mattlangan'
       }).end((err, res) => {
           res.should.have.status(302);
           res.should.have.header('location', '/admin');
@@ -73,8 +73,8 @@ describe('AUTH TESTS', () => {
     agent.post('/admin/login')
         .set('content-type', 'application/json')
         .send({
-          username: process.env.TEST_USER || 'jumbocode',
-          password: process.env.TEST_PASS || 'mattlangan'
+          username: process.env.DEV_USER || 'jumbocode',
+          password: process.env.DEV_PASS || 'mattlangan'
       }).end((err, res) => {
           return agent.get('/admin/login')
                       .redirects(0)
@@ -93,8 +93,8 @@ describe('AUTH TESTS', () => {
     agent.post('/admin/login')
         .set('content-type', 'application/json')
         .send({
-          username: process.env.TEST_USER || 'jumbocode',
-          password: process.env.TEST_PASS || 'mattlangan'
+          username: process.env.DEV_USER || 'jumbocode',
+          password: process.env.DEV_PASS || 'mattlangan'
       }).end((err, res) => {
           return agent.get('/admin')
                       .redirects(0)
@@ -124,8 +124,8 @@ describe('AUTH TESTS', () => {
     agent.post('/admin/login')
         .set('content-type', 'application/json')
         .send({
-          username: process.env.TEST_USER || 'jumbocode',
-          password: process.env.TEST_PASS || 'mattlangan'
+          username: process.env.DEV_USER || 'jumbocode',
+          password: process.env.DEV_PASS || 'mattlangan'
       }).end((err, res) => {
           return agent.get('/admin/logout')
                       .redirects(0)
@@ -148,5 +148,44 @@ describe('AUTH TESTS', () => {
           done();
     });
   });
+
+  it('should get /admin/change/request', (done) => {
+    chai.request(server)
+        .get('/admin/change/request')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
+    });
+  });
+
+  it('should post /admin/change/request and redirect to logout if good email', (done) => {
+    chai.request(server)
+        .post('/admin/change/request')
+        .redirects(0)
+        .set('content-type', 'application/json')
+        .send({
+          email: process.env.DEV_EMAIL || 'steven.dev.email@gmail.com',
+      }).end((err, res) => {
+          res.should.have.status(302);
+          res.should.have.header('location', '/admin/logout');
+          done();
+    });
+  });
+
+  it('should post /admin/change/request and redirect to logout if bad email', (done) => {
+    chai.request(server)
+        .post('/admin/change/request')
+        .redirects(0)
+        .set('content-type', 'application/json')
+        .send({
+          email: 'DNE',
+      }).end((err, res) => {
+          res.should.have.status(302);
+          res.should.have.header('location', '/admin/logout');
+          done();
+    });
+  });
+
 
 });
