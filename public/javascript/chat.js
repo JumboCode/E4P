@@ -26,7 +26,7 @@ function escapeMessage(message) {
 
 function chatElements(currentMessage) {
   currentText = currentMessage ? currentMessage : "";
-  return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message...">' 
+  return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message...">'
        + currentText + '</textarea>'
        + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
 }
@@ -36,14 +36,21 @@ function chatSetup(sendMessage) {
     // Check if on user side
     if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.userId) != "undefined") {
       send_typing_message(true);
-
       // clear timout that would send message "stop typing" message
       if (typeof(userTypingTimeout) != "undefined") {
         clearTimeout(userTypingTimeout);
       }
 
-      userTypingTimeout = setTimeout(function(){ 
+      userTypingTimeout = setTimeout(function(){
         send_typing_message(false);
+      }, 5000);
+    } else {
+      send_typing_message(CURRENT_CHAT_USER_ID, true);
+      if (typeof(adminTypingTimeout) != "undefined") {
+        clearTimeout(adminTypingTimeout);
+      }
+      adminTypingTimeout = setTimeout(() => {
+        send_typing_message(CURRENT_CHAT_USER_ID, false);
       }, 5000);
     }
 

@@ -55,7 +55,7 @@ function start_password_change(email) {
       return;
     }
 
-    db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, invalid, row.username, (err) => {
+    db.run('REPLACE INTO change_requests VALUES (?, ?, ?)', request, expires, row.username, (err) => {
       if (err) throw err;
 
       sendMail(row.username, email, request);
@@ -72,11 +72,11 @@ function valid_password_change(request, cb) {
   assert(typeof request === 'string');
   let timestamp = Date.now()
 
-  db.get('SELECT username, invalid FROM change_requests WHERE request = ?', request, (err, row) => {
+  db.get('SELECT username, expires FROM change_requests WHERE request = ?', request, (err, row) => {
     if (err) throw err;
 
     if (row) {
-      if (Date.now() < row.expires) {
+      if (timestamp < row.expires) {
         return cb(row.username);
       }
 

@@ -249,3 +249,16 @@ img {
 #sendButtonText {
     text-align: center;
 }
+
+#typingIcon {
+    display: none;
+    width: 3em;
+    height: auto;
+    margin-left: .6em;
+    margin-bottom: .25em;
+}
+
+#typingIcon img {
+    width: 100%;
+    height: 100%;
+}

@@ -4,18 +4,26 @@ socket.on('connect', () => {
   console.log('connected to socket with');
 });
 
-socket.on('admin matched', admin_matched);
+socket.on('admin matched', () => {
+  startChat();
+  console.log('admin matched');
+});
 
 socket.on('chat message', function(data) {
   console.log('recieved chat message on index: ' + data);
   updateChat(createMessage('admin', data.message));
+  $('#typingIcon').css('display', 'none');
 });
 
-// callback once admin connects to user
-function admin_matched() {
-  startChat();
-  console.log('admin matched');
-}
+socket.on('typing', () => {
+  console.log('admin is typing');
+  $('#typingIcon').css('display', 'block');
+});
+
+socket.on('stop typing', () => {
+  console.log('admin stopped typing');
+  $('#typingIcon').css('display', 'none');
+});
 
 function send_message(msg) {
   socket.emit('chat message', {
@@ -29,7 +37,7 @@ function user_connect() {
 };
 
 function send_typing_message(is_typing) {
-  if (is_typing == true) {
+  if (is_typing) {
     socket.emit('typing', {
       room: socket.id
     });
@@ -99,7 +107,7 @@ function updateChat(messageObj) {
       messageSide = 'right';
   }
   newMessage = createMessageDiv(messageSide, messageObj.message);
-  messages.innerHTML = messages.innerHTML + newMessage;
+  $("#typingIcon").before(newMessage);
   messages.scrollTop = messages.scrollHeight - messages.clientHeight;
 }
 
