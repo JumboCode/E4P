@@ -8,6 +8,23 @@ const assert = require('assert');
 var db = new sqlite3.Database('db.sqlite3');
 
 ///////////////////////////////////////////////////////////////////////
+//        DB Scrubber
+///////////////////////////////////////////////////////////////////////
+
+const SCRUBBER_INTERVAL = process.env.scrubInt || 5; // hours
+
+let db_scrubber = setInterval(() => {
+  let timestamp = Date.now();
+  db.run('DELETE FROM login_attempts WHERE next_attempt < ?', timestamp, (err) => {
+    if (err) throw err;
+  });
+
+  db.run('DELETE FROM change_requests WHERE expires < ?', timestamp, (err) => {
+    if (err) throw err;
+  });
+}, SCRUBBER_INTERVAL * 3600000);
+
+///////////////////////////////////////////////////////////////////////
 //        Password Change
 ///////////////////////////////////////////////////////////////////////
 
@@ -116,14 +133,6 @@ module.exports.change_password = change_password;
 // TODO make these configurable (document configurability)
 const MAX_ATTEMPTS = process.env.maxAttempts || 2;
 const RETRY_WAIT_DURATION = process.env.retryWait || 5; // minutes
-const ATTEMPT_SCRUBBER_INTERVAL = process.env.scrubInt || 5; // hours
-
-let attempt_scrubber = setInterval(() => {
-  let timestamp = Date.now();
-  db.run('DELETE FROM login_attempts WHERE next_attempt < ?', timestamp, (err) => {
-    if (err) throw err;
-  });
-}, ATTEMPT_SCRUBBER_INTERVAL * 3600000);
 
 function delete_login_attempt(ip) {
   assert(typeof ip === 'string');
