@@ -27,3 +27,17 @@
     position: relative;
     width: 100%;
 }
+
+.left-time {
+    position: relative;
+    top: 20px;
+    left: 10px;
+    float: left;   
+}
+
+.right-time{
+    position: relative;
+    top: 20px;
+    right: 10px;
+    float: right;
+}
