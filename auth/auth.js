@@ -5,7 +5,13 @@ const nodemailer = require('nodemailer');
 const querystring = require('querystring');
 const assert = require('assert');
 
-var db = new sqlite3.Database('db.sqlite3');
+const DB_NAME = 'db.sqlite3'
+
+let db = new sqlite3.Database(DB_NAME);
+
+// TODO add schema version check
+// TODO add register routes
+// TODO add testing
 
 ///////////////////////////////////////////////////////////////////////
 //        DB Scrubber

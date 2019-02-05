@@ -4,7 +4,7 @@
   "description": "E4P JumboCode Project",
   "main": "server.js",
   "scripts": {
-    "test": "mocha --exit --recursive tests",
+    "test": "cp db.sqlite3 backup.sqlite3 && mocha --exit --recursive tests && mv backup.sqlite3 db.sqlite3",
     "start": "node server.js"
   },
   "repository": {
