@@ -165,8 +165,16 @@ function increment_attempt(ip, prev_attempts, cb) {
 
 function can_attempt_login(ip, cb) {
   assert(typeof ip === 'string');
+  db.serialize(() => {
+    db.run('UPDATE login_attempts SET attempts = attempts + 1 WHERE ip = ?', ip, (err) => {
+      if (err) throw err;      
+    });
 
-  db.get('SELECT attempts, next_attempt FROM login_attempts WHERE ip = ?', ip, (err, row) => {
+    db.get('SELECT attempts, next_attempt FROM login_attempts WHERE ip = ?', ip, (err, row) => {
+      
+    });
+  });
+
     let timestamp = Date.now();
 
     if (err) throw err;
