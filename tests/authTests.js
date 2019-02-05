@@ -37,21 +37,6 @@ describe('AUTH TESTS', () => {
     });
   });
 
-  it('should post /admin/login and redirect to /admin if successful', (done) => {
-    chai.request(server)
-        .post('/admin/login')
-        .redirects(0)
-        .set('content-type', 'application/json')
-        .send({
-          username: process.env.DEV_USER || 'jumbocode',
-          password: process.env.DEV_PASS || 'mattlangan'
-      }).end((err, res) => {
-          res.should.have.status(302);
-          res.should.have.header('location', '/admin');
-          done();
-    });
-  });
-
   it('should post /admin/login and redirect to /admin/login if unsucessful', (done) => {
     chai.request(server)
         .post('/admin/login')
@@ -67,8 +52,19 @@ describe('AUTH TESTS', () => {
     });
   });
 
-  it('should not post /admin/login and redirect to /admin/wait with time query if too many unsucessful attempts are made, regardless of correct login info', (done) => {
-    done();
+  it('should post /admin/login and redirect to /admin if successful', (done) => {
+    chai.request(server)
+        .post('/admin/login')
+        .redirects(0)
+        .set('content-type', 'application/json')
+        .send({
+          username: process.env.DEV_USER || 'jumbocode',
+          password: process.env.DEV_PASS || 'mattlangan'
+      }).end((err, res) => {
+          res.should.have.status(302);
+          res.should.have.header('location', '/admin');
+          done();
+    });
   });
   
   it('should not get /admin/login and redirect to /admin if logged in', (done) => {
@@ -191,5 +187,34 @@ describe('AUTH TESTS', () => {
     });
   });
 
+  // execute this after other tests to prevent triggering speed limit unintentionally
+  it('should not post /admin/login and redirect to /admin/wait with time query if too many unsucessful attempts are made, regardless of correct login info', (done) => {
+    const MAX_ATTEMPTS = process.env.maxAttempts || 2;
+    let requester = chai.request(server).keepOpen();
+    let attempts = [];
 
+    // clear any bad login attempts
+    requester.post('/admin/login')
+        .send({ username: process.env.DEV_USER || 'jumbocode', password: process.env.DEV_PASS || 'mattlangan' })
+        .then((res) => { requester.get('/admin/logout')
+        .then((res) => {
+          // trigger limiter
+          for (let i = 0; i < MAX_ATTEMPTS; i++) {
+            attempts.push(requester.post('/admin/login').send({ username: 'DNE', password: 'DNE' }));
+          }
+
+          Promise.all(attempts).then((responses) => {
+            // try after limited
+            requester.post('/admin/login')
+                .redirects(0)
+                .send({ username: process.env.DEV_USER || 'jumbocode', password: process.env.DEV_PASS || 'mattlangan' })
+                .end((err, res) => {
+                  res.should.have.status(302);
+                  res.should.have.header('location', '/admin/wait');
+                  done();
+                  requester.close();
+            });
+          });
+    })});
+  });
 });

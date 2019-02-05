@@ -26,15 +26,23 @@ function flagCheck(req, res, next) {
   next();
 }
 
+let pending_attempts = [];
 function limitCheck(req, res, next) {
-  auth.can_attempt_login(String(req.ip), (valid, time) => {
-    if (valid) {
-      next();
-    } else {
-      let query = querystring.stringify({ time: time });
-      res.redirect('/admin/wait?' + query);
-    }
-  });
+  pending_attempts.push(new Promise((resolve, reject) => {
+    Promise.all(pending_attempts).then(() => {
+      pending_attempts = pending_attempts.filter((x) => { return x != 'allowed'; });
+      auth.can_attempt_login(String(req.ip), (valid, time) => {
+        if (valid) {
+          resolve('allowed');
+          next();
+        } else {
+          resolve('denied');
+          let query = querystring.stringify({ time: time });
+          res.redirect('/admin/wait?' + query);
+        }
+      });
+    });
+  }));
 }
 
 function limitReset(req, res, next) {

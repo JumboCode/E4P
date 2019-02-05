@@ -148,7 +148,7 @@ function delete_login_attempt(ip) {
   });
 }
 
-function increment_attempt(ip, prev_attempts) {
+function increment_attempt(ip, prev_attempts, cb) {
   assert(typeof ip === 'string');
   assert(typeof prev_attempts === 'number');
 
@@ -158,6 +158,8 @@ function increment_attempt(ip, prev_attempts) {
 
   db.run('REPLACE INTO login_attempts (ip, attempts, next_attempt) VALUES (?, ?, ?)', ip, attempts, next_attempt, (err) => {
     if (err) throw err;
+
+    return cb();
   });
 }
 
@@ -172,25 +174,26 @@ function can_attempt_login(ip, cb) {
     // no previous attempt, log and allow
     if (!row) {
       // console.log(ip + ' allowed attempt, no previous attempt made');
-      increment_attempt(ip, /*this is attempt number*/0);
-      return cb(true);
+      increment_attempt(ip, /*this is attempt number*/0, () => { cb(true); });
+      return;// cb(true);
     }
 
     // still under the maximum allowed attempts, increment, update time and allow
     if (row.attempts < MAX_ATTEMPTS) {
       // console.log(ip + ' allowed attempt, this is attempt ' + (row.attempts + 1));
-      increment_attempt(ip, row.attempts);
-      return cb(true);
+      increment_attempt(ip, row.attempts, () => { cb(true); });
+      return;// cb(true);
     }
 
     // made too many attempts but waited alloted time, reset attempt count and allow
     if (row.next_attempt < timestamp) {
       // console.log(ip + ' allowed attempt, waited enough time');
-      increment_attempt(ip, 0);
-      return cb(true);
+      increment_attempt(ip, 0, () => { cb(true); });
+      return;// cb(true);
     }
 
     // can't log in yet, wait time milliseconds
+    // console.log(ip + ' denied attempt');
     let wait_time = row.next_attempt - timestamp;
     return cb(false, wait_time);
   });
