@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*
  * Return a message div based on the role and message string.
  */
@@ -19,19 +20,19 @@ function getTimeString(time) {
 }
 
 function escapeMessage(message) {
-	// Escape "<"
-	let lt_re = new RegExp("<", "g");
-	message = message.replace(lt_re, "&lt");
+  // Escape "<"
+  let lt_re = new RegExp('<', 'g');
+  message = message.replace(lt_re, '&lt');
 
-	// Escape ">"
-	let gt_re = new RegExp(">", "g");
-	message = message.replace(gt_re, "&gt");
+  // Escape ">"
+  let gt_re = new RegExp('>', 'g');
+  message = message.replace(gt_re, '&gt');
 
-	return message;
+  return message;
 }
 
 function chatElements(currentMessage) {
-  let currentText = currentMessage ? currentMessage : "";
+  let currentText = currentMessage ? currentMessage : '';
   return(`
     <textarea id='inputBox' type='text' autocomplete='off' placeholder="Type a message...">
       ${currentText}
@@ -43,12 +44,12 @@ function chatElements(currentMessage) {
 }
 
 function chatSetup(sendMessage) {
-  $("#inputBox").keydown(function(e) {
+  $('#inputBox').keydown((e) => {
     // Check if on user side
-    if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.userId) != "undefined") {
+    if (typeof(CURRENT_CHAT_USER_ID) == 'undefined' && typeof(chat.userId) != 'undefined') {
       send_typing_message(true);
       // clear timout that would send message "stop typing" message
-      if (typeof(userTypingTimeout) != "undefined") {
+      if (typeof(userTypingTimeout) != 'undefined') {
         clearTimeout(userTypingTimeout);
       }
 
@@ -57,7 +58,7 @@ function chatSetup(sendMessage) {
       }, 5000);
     } else {
       send_typing_message(CURRENT_CHAT_USER_ID, true);
-      if (typeof(adminTypingTimeout) != "undefined") {
+      if (typeof(adminTypingTimeout) != 'undefined') {
         clearTimeout(adminTypingTimeout);
       }
       var adminTypingTimeout = setTimeout(() => {
@@ -73,5 +74,5 @@ function chatSetup(sendMessage) {
     }
   });
 
-  $("#sendButton").click(() => {sendMessage();});
+  $('#sendButton').click(() => {sendMessage();});
 }

@@ -1,9 +1,10 @@
+/* eslint-disable no-undef */
 const socket = io();
 
 window.onload = () => {
   generateUserHeader();
   $('#openchat').click(openChat);
-}
+};
 
 socket.on('connect', () => {
   console.log('connected to socket with');
@@ -52,7 +53,7 @@ function send_typing_message(is_typing) {
 }
 
 function warning() {
-  return "Are you sure you want to leave?";
+  return 'Are you sure you want to leave?';
 }
 
 var chat = {
@@ -66,11 +67,11 @@ var chat = {
 function openChat() {
   let open = $('#open');
   open.empty();
-  open.html("<div class='row'>Waiting to connect to an ear!</div><div class='row'><div class='loader' id='load'></div></div>");
-  console.log("attempting to connect");
+  open.html('<div class=\'row\'>Waiting to connect to an ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div>');
+  console.log('attempting to connect');
   window.onbeforeunload = () => {
-    return "Are you sure you want to leave? Your chat connection will be lost.";
-  }
+    return 'Are you sure you want to leave? Your chat connection will be lost.';
+  };
 
   user_connect();
 }
@@ -82,8 +83,8 @@ function startChat() {
   open.attr('style', 'display: none');
 
   //add input bar to page
-  $("#e_space").css('height', '10vh');
-  $("#chat").attr('style', 'display: flex !important');
+  $('#e_space').css('height', '10vh');
+  $('#chat').attr('style', 'display: flex !important');
 
   $('#chatbox').attr('style', 'display: block');
   $('#chatbar').attr('style', 'visibility: visible');
@@ -110,20 +111,20 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-    let message = $('#inputBox').val();
-    if (message != '') {
-        send_message(message);
-        let messageObject = createMessage('user', message);
-        chat.messages.push(messageObject);
-        updateChat(messageObject);
-        message = $('#inputBox').val('');
-    }
+  let message = $('#inputBox').val();
+  if (message != '') {
+    send_message(message);
+    let messageObject = createMessage('user', message);
+    chat.messages.push(messageObject);
+    updateChat(messageObject);
+    message = $('#inputBox').val('');
+  }
 }
 
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
 
 $(() => {
-  $("#type_msg").html(chatElements(""));
+  $('#type_msg').html(chatElements(''));
   chatSetup(sendMessage);
 });
