@@ -1,35 +1,36 @@
 textarea {
-    font-family: "Roboto";
+  font-family: "Roboto", sans-serif;
 }
 
 .left-chat-bubble {
-    background-color: #96D7D2;
-    border: none;
-    border-radius: 1px;
-    width: auto;
-    max-width: 62%;
-    overflow: hidden;
-    word-break: break-all;
-    float: left;
-    padding: 5px;
+  background-color: #96d7d2;
+  border: none;
+  border-radius: 1px;
+  width: auto;
+  max-width: 62%;
+  overflow: hidden;
+  word-break: break-all;
+  float: left;
+  padding: 5px;
 }
 
 .right-chat-bubble {
-    background-color: #B2FEF8;
-    border: none;
-    border-radius: 1px;
-    width: auto;
-    max-width: 62%;
-    overflow: hidden;
-    word-break: break-all;
-    padding: 5px;
-    float: right;
+  background-color: #b2fef8;
+  border: none;
+  border-radius: 1px;
+  width: auto;
+  max-width: 62%;
+  overflow: hidden;
+  word-break: break-all;
+  padding: 5px;
+  float: right;
 }
 
-.container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    margin-top: .25em;
-    margin-bottom: .25em;
+.message-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  margin: 0.25em auto;
+  padding-left: 1em;
+  padding-right: 1em;
 }
