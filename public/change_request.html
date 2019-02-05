@@ -1,10 +1,11 @@
-<!DOCTYPE>
+<!DOCTYPE html>
 <html>
 <head>
   <title>Password Change</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/javascript/change_password.js"></script>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link href="/css/change_password.css" rel="stylesheet"> 
+  <link href="/css/change_password.css" rel="stylesheet">
 </head>
 <body>
   <div class="wrapper center">
@@ -15,11 +16,5 @@
       <input class="action_button" type="submit" value="Request">
     </form>
   </div>
-
-  <script>
-    $('#change_request').on('submit', (e) => {
-      alert('Password change request submitted. Check for confirmation email sent to your registered email.');
-    });
-  </script>
 </body>
 </html>

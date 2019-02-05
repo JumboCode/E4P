@@ -2,7 +2,13 @@
  * Return a message div based on the role and message string.
  */
 function createMessageDiv(side, message) {
-    return "<div class= 'message-container'><div class='" + side + "-chat-bubble'> " + escapeMessage(message) + "</div></div>";
+  return(`
+    <div class='message-container'>
+      <div class='${side}-chat-bubble'>
+        ${escapeMessage(message)}
+      </div>
+    </div>
+  `);
 }
 
 /*
@@ -21,14 +27,19 @@ function escapeMessage(message) {
 	let gt_re = new RegExp(">", "g");
 	message = message.replace(gt_re, "&gt");
 
-	return message
+	return message;
 }
 
 function chatElements(currentMessage) {
-  currentText = currentMessage ? currentMessage : "";
-  return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message...">'
-       + currentText + '</textarea>'
-       + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
+  let currentText = currentMessage ? currentMessage : "";
+  return(`
+    <textarea id='inputBox' type='text' autocomplete='off' placeholder="Type a message...">
+      ${currentText}
+    </textarea>
+    <div id='sendButton'>
+      <div id='sendButtonText'>Send</div>
+    </div>
+  `);
 }
 
 function chatSetup(sendMessage) {
@@ -41,7 +52,7 @@ function chatSetup(sendMessage) {
         clearTimeout(userTypingTimeout);
       }
 
-      userTypingTimeout = setTimeout(function(){
+      let userTypingTimeout = setTimeout(() => {
         send_typing_message(false);
       }, 5000);
     } else {
@@ -49,19 +60,18 @@ function chatSetup(sendMessage) {
       if (typeof(adminTypingTimeout) != "undefined") {
         clearTimeout(adminTypingTimeout);
       }
-      adminTypingTimeout = setTimeout(() => {
+      let adminTypingTimeout = setTimeout(() => {
         send_typing_message(CURRENT_CHAT_USER_ID, false);
       }, 5000);
     }
 
     // Send text message after userTyping message
-    if (e.which == 13 && !e.shiftKey) {
+    const ENTER = 13;
+    if (e.which == ENTER && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
 
-  $("#sendButton").click(function(e) {
-    sendMessage();
-  });
+  $("#sendButton").click(() => {sendMessage();});
 }
