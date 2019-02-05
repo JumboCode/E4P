@@ -26,22 +26,26 @@ function flagCheck(req, res, next) {
   next();
 }
 
-let pending_attempts = [];
 function limitCheck(req, res, next) {
-  pending_attempts.push(new Promise((resolve, reject) => {
-    Promise.all(pending_attempts).then(() => {
-      pending_attempts = pending_attempts.filter((x) => { return x != 'done'; });
-      auth.can_attempt_login(String(req.ip), (valid, time) => {
-        resolve('done');
-        if (valid) {
-          next();
-        } else {
-          let query = querystring.stringify({ time: time });
-          res.redirect('/admin/wait?' + query);
-        }
-      });
-    });
-  }));
+  auth.can_attempt_login(String(req.ip), (valid, time) => {
+    if (valid) {
+      next();
+    } else {
+      let query = querystring.stringify({ time: time });
+      res.redirect('/admin/wait?' + query);
+    }
+  });
+}
+
+function limitCheck(req, res, next) {
+  auth.can_attempt_login(String(req.ip), (valid, time) => {
+    if (valid) {
+      next();
+    } else {
+      let query = querystring.stringify({ time: time });
+      res.redirect('/admin/wait?' + query);
+    }
+  });
 }
 
 function limitReset(req, res, next) {

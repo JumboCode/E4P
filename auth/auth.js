@@ -165,45 +165,54 @@ function increment_attempt(ip, prev_attempts, cb) {
 
 function can_attempt_login(ip, cb) {
   assert(typeof ip === 'string');
+  let timestamp = Date.now();
+
   db.serialize(() => {
-    db.run('UPDATE login_attempts SET attempts = attempts + 1 WHERE ip = ?', ip, (err) => {
-      if (err) throw err;      
+    // insert or replace handles if this is the first attempt and no entry exists
+    //
+    // ip value is always just the passed in ip
+    //
+    // attempts is incremented only when there was a previous attempt and when
+    //          we haven't waited long enough. if we haven't attempted login 
+    //          before or if we've waited long enough, set attempts to 1
+    //
+    // next_attempt is adjusted only when there was not a previous attempt or
+    //              if we are below the max attempts. if we have attempted 
+    //              login before and if we've already tried more than allowed, 
+    //              we leave the timestamp unchanged
+
+    db.run('REPLACE INTO login_attempts (ip, attempts, next_attempt) \
+            VALUES (?,\
+                    CASE WHEN EXISTS (SELECT 1 FROM login_attempts WHERE ip = ?) AND \
+                              (SELECT next_attempt FROM login_attempts WHERE ip = ?) > ? \
+                         THEN (SELECT attempts FROM login_attempts WHERE ip = ?) + 1 \
+                         ELSE 1 \
+                    END,\
+                    CASE WHEN EXISTS (SELECT 1 FROM login_attempts WHERE ip = ?) AND \
+                              (SELECT attempts FROM login_attempts WHERE ip = ?) > ? \
+                         THEN (SELECT next_attempt FROM login_attempts WHERE ip = ?) \
+                         ELSE ? \
+                    END)', 
+           ip, ip, ip, timestamp, ip, ip, ip, MAX_ATTEMPTS, ip, timestamp + RETRY_WAIT_DURATION * 60 * 1000, (err) => {
+      if (err) throw err;
     });
 
     db.get('SELECT attempts, next_attempt FROM login_attempts WHERE ip = ?', ip, (err, row) => {
+      if (err) throw err;
+
+      if (!row) throw new Error('This isn\'t possible');
+
+      // we only need to check attempts because the query above resets attempts when enough time has elapsed
+      if (row.attempts <= MAX_ATTEMPTS) {
+        // console.log(ip + ' allowed attempt, this is attempt ' + (row.attempts + 1));
+        return cb(true);
+      }
       
+      // can't log in yet, wait time milliseconds
+      // console.log(ip + ' denied attempt');
+      let wait_time = row.next_attempt - timestamp;
+      return cb(false, wait_time);
     });
-  });
-
-    let timestamp = Date.now();
-
-    if (err) throw err;
-
-    // no previous attempt, log and allow
-    if (!row) {
-      // console.log(ip + ' allowed attempt, no previous attempt made');
-      increment_attempt(ip, /*this is attempt number*/0, () => { cb(true); });
-      return;// cb(true);
-    }
-
-    // still under the maximum allowed attempts, increment, update time and allow
-    if (row.attempts < MAX_ATTEMPTS) {
-      // console.log(ip + ' allowed attempt, this is attempt ' + (row.attempts + 1));
-      increment_attempt(ip, row.attempts, () => { cb(true); });
-      return;// cb(true);
-    }
-
-    // made too many attempts but waited alloted time, reset attempt count and allow
-    if (row.next_attempt < timestamp) {
-      // console.log(ip + ' allowed attempt, waited enough time');
-      increment_attempt(ip, 0, () => { cb(true); });
-      return;// cb(true);
-    }
-
-    // can't log in yet, wait time milliseconds
-    // console.log(ip + ' denied attempt');
-    let wait_time = row.next_attempt - timestamp;
-    return cb(false, wait_time);
   });
 }
 

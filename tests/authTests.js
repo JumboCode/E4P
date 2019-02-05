@@ -210,7 +210,7 @@ describe('AUTH TESTS', () => {
                 .send({ username: process.env.DEV_USER || 'jumbocode', password: process.env.DEV_PASS || 'mattlangan' })
                 .end((err, res) => {
                   res.should.have.status(302);
-                  res.should.have.header('location', '/admin/wait');
+                  res.should.have.header('location', /\/admin\/wait/);
                   done();
                   requester.close();
             });
