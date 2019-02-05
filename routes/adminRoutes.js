@@ -6,7 +6,7 @@ const auth = require('../auth/auth');
 let router = express.Router();
 
 function ensureAuthenticated(req, res, next) {
-  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return next(); }
+  if (process.env.NOAUTH || process.env.NODB) { return next(); }
   if (req.isAuthenticated()) { return next(); }
   res.redirect('/admin/login');
 }
@@ -25,7 +25,7 @@ router.get('/login', loggedIn, (req, res) => {
 });
 
 function flagCheck(req, res, next) {
-  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return res.redirect('/admin'); }
+  if (process.env.NOAUTH || process.env.NODB) { return res.redirect('/admin'); }
   next();
 }
 

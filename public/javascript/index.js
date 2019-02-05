@@ -21,12 +21,10 @@ socket.on('chat message', (data) => {
 });
 
 socket.on('typing', () => {
-  console.log('admin is typing');
   $('#typingIcon').css('display', 'block');
 });
 
 socket.on('stop typing', () => {
-  console.log('admin stopped typing');
   $('#typingIcon').css('display', 'none');
 });
 
@@ -66,7 +64,6 @@ var chat = {
 
 
 function openChat() {
-  open = document.getElementById("open");
   let open = $('#open');
   open.empty();
   open.html("<div class='row'>Waiting to connect to an ear!</div><div class='row'><div class='loader' id='load'></div></div>");

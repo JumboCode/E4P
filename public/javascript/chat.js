@@ -52,7 +52,7 @@ function chatSetup(sendMessage) {
         clearTimeout(userTypingTimeout);
       }
 
-      let userTypingTimeout = setTimeout(() => {
+      var userTypingTimeout = setTimeout(() => {
         send_typing_message(false);
       }, 5000);
     } else {
@@ -60,7 +60,7 @@ function chatSetup(sendMessage) {
       if (typeof(adminTypingTimeout) != "undefined") {
         clearTimeout(adminTypingTimeout);
       }
-      let adminTypingTimeout = setTimeout(() => {
+      var adminTypingTimeout = setTimeout(() => {
         send_typing_message(CURRENT_CHAT_USER_ID, false);
       }, 5000);
     }
