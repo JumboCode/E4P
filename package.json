@@ -5,7 +5,14 @@
   "main": "server.js",
   "scripts": {
     "test": "cp db.sqlite3 backup.sqlite3 && mocha --exit --recursive tests && mv backup.sqlite3 db.sqlite3",
-    "start": "node server.js"
+    "start": "node server.js",
+    "slint": "stylelint",
+    "slint-client": "stylelint ./public/**/*.css"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run slint-client"
+    }
   },
   "repository": {
     "type": "git",
@@ -34,6 +41,9 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^4.2",
-    "mocha": "^5.2"
+    "husky": "^1.3.1",
+    "mocha": "^5.2",
+    "stylelint": "^9.10.1",
+    "stylelint-config-standard": "^18.2.0"
   }
 }
