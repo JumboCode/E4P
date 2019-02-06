@@ -4,8 +4,8 @@
  *    x /admin/login
  *    x /admin/logout
  *    x /admin/change/request
- *    - /admin/change
- *    - /admin/wait
+ *    x /admin/change
+ *    x /admin/wait
  *
  *  POST:
  *    x /admin/login
@@ -183,6 +183,40 @@ describe('AUTH TESTS', () => {
       }).end((err, res) => {
           res.should.have.status(302);
           res.should.have.header('location', '/admin/logout');
+          done();
+    });
+  });
+
+  it('should get /admin/change and send back invalid page', (done) => {
+    chai.request(server)
+        .get('/admin/change')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
+    });
+  });
+
+  // TODO find a way to test good change requests but without email spam
+
+  it('should post /admin/change and send back invalid page', (done) => {
+    chai.request(server)
+        .post('/admin/change')
+        .redirects(0)
+        .send({ email: 'DNE' })
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
+          done();
+    });
+  });
+
+  it('should get /admin/wait', (done) => {
+    chai.request(server)
+        .get('/admin/wait')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.html;
           done();
     });
   });
