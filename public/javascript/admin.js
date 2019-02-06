@@ -105,6 +105,12 @@ function initialize() {
     // populateChat();
     updateUserOverview();
     generateAdminHeader();
+    let audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/examples/t-rex-roar.mp3');
+    const audioPromise = audio.play();
+    if (audioPromise !== null){
+        audioPromise.catch(() => { audio.play(); });
+    }
+
 }
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
