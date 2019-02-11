@@ -1,18 +1,18 @@
-:root{
-  --light-blue: #DEF3F3;
-  --dark-green: #248F89;
-  --medium-green: #51D2CA;
-  --light-green: #B2FEF8;
+:root {
+  --light-blue: #def3f3;
+  --dark-green: #248f89;
+  --medium-green: #51d2ca;
+  --light-green: #b2fef8;
 }
 
 .topnav {
-    background-color: var(--dark-green);
-    overflow: hidden;
-    width: 100%;
+  background-color: var(--dark-green);
+  overflow: hidden;
+  width: 100%;
 }
 
 .topnav a {
-  font-family: "Roboto";
+  font-family: "Roboto", sans-serif;
   float: left;
   color: var(--light-blue);
   text-align: center;

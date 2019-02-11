@@ -7,35 +7,28 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 const passport = require('passport');
-const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const auth = require('./auth/auth');
 const adminRoutes = require('./routes/adminRoutes');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
 
-if (process.env.NODB) {
-  console.log('NODB flag set, running without database and no authentication!');
-} else {
-  var db = mongoose.connection;
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useNewUrlParser: true });
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
 
-  app.use(bodyParser.urlencoded({extended: true}));
-  app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
-  app.use(cookieParser());
-  app.use(passport.initialize());
-  app.use(passport.session());
+passport.use(new LocalStrategy(auth.strategy));
+passport.serializeUser(auth.serialize);
+passport.deserializeUser(auth.deserialize);
 
-  var Admin = require('./models/adminModel');
-  passport.use(new LocalStrategy(Admin.authenticate));
-  passport.serializeUser(Admin.serializeUser);
-  passport.deserializeUser(Admin.deserializeUser);
-}
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -112,7 +105,7 @@ io.on('connection', (socket) => {
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
-  }); 
+  });
 
   // PHASE II
   // Admin Accepts User:
@@ -142,7 +135,6 @@ io.on('connection', (socket) => {
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
-    // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
 
     if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
@@ -169,14 +161,14 @@ io.on('connection', (socket) => {
 
   //User Typing Event:
   socket.on('typing', function(data) {
-    let receiver = data['room']; 
+    let receiver = data['room'];
     socket.broadcast.to(receiver).emit('typing', {room: receiver});
-  }); 
+  });
 
   socket.on('stop typing', function(data) {
-    let receiver = data['room']; 
-    socket.broadcast.to(receiver).emit('stop typing', {room: receiver}); 
-  }); 
+    let receiver = data['room'];
+    socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
+  });
 
 });
 
