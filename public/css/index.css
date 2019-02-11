@@ -222,30 +222,69 @@ img {
   width: 100%;
 }
 
-#inputBox {
-  border: var(--light-blue);
-  min-height: 10px;
-  width: 90%;
-  resize: none;
+@media (min-width: 620px) {
+  #inputBox {
+    border: var(--light-blue);
+    min-height: 10px;
+    width: 90%;
+    resize: none;
+  }
 }
 
-#sendButton {
-  background: var(--dark-green);
-  color: white;
-  height: 55px;
-  width: 10%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  border: solid rgb(200, 200, 200) 1px;
-  cursor: pointer;
+/*change to fit the needed space*/
+@media (max-width: 620px) {
+  #inputBox {
+    border: var(--light-blue);
+    min-height: 10px;
+    width: calc(100% - 50px);
+    resize: none;
+  }
 }
 
-#sendButton:hover {
-  background-color: rgb(200, 200, 200);
+@media (min-width: 620px) {
+  #sendButton {
+    background: var(--dark-green);
+    color: white;
+    height: 55px;
+    width: 10%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: solid rgb(200, 200, 200) 1px;
+    cursor: pointer;
+  }
+
+  #sendButton:hover {
+    background-color: rgb(200, 200, 200);
+  }
+  
+  #sendButtonText {
+      text-align: center;
+  }
 }
 
-#sendButtonText {
-    text-align: center;
+
+@media (max-width: 620px) {
+  #sendButton {
+    background: var(--dark-green);
+    color: white;
+    height: 55px;
+    width: 50px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: solid rgb(200, 200, 200) 1px;
+    cursor: pointer;
+  }
+
+  #sendButton:hover {
+    background-color: rgb(200, 200, 200);
+  }
+  
+  #sendButtonText {
+      text-align: center;
+  }
 }
+
