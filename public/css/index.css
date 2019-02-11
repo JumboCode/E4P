@@ -182,7 +182,7 @@ img {
   }
 }
 
-/*change to fit the needed space*/
+/* change to fit the needed space */
 @media (max-width: 620px) {
   #inputBox {
     border: var(--light-blue);
@@ -198,7 +198,6 @@ img {
     color: white;
     height: 55px;
     width: 10%;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -209,9 +208,9 @@ img {
   #sendButton:hover {
     background-color: rgb(200, 200, 200);
   }
-  
+
   #sendButtonText {
-      text-align: center;
+    text-align: center;
   }
 }
 
@@ -221,7 +220,6 @@ img {
     color: white;
     height: 55px;
     width: 50px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -232,9 +230,9 @@ img {
   #sendButton:hover {
     background-color: rgb(200, 200, 200);
   }
-  
+
   #sendButtonText {
-      text-align: center;
+    text-align: center;
   }
 }
 
@@ -291,4 +289,3 @@ img {
     overflow-y: scroll;
   }
 }
-
