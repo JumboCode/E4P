@@ -137,7 +137,7 @@ module.exports.change_password = change_password;
 ///////////////////////////////////////////////////////////////////////
 
 // TODO make these configurable (document configurability)
-const MAX_ATTEMPTS = process.env.maxAttempts || 2;
+const MAX_ATTEMPTS = process.env.maxAttempts || 10;
 const RETRY_WAIT_DURATION = process.env.retryWait || 5; // minutes
 
 function delete_login_attempt(ip) {

@@ -15,6 +15,7 @@
 
 //During the test the env variable is set to test
 process.env.NODE_ENV = 'test';
+process.env.maxAttempts = 2;
 
 //Require the dev-dependencies
 let chai = require('chai');
