@@ -16,29 +16,34 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-        
+
     <body onload="generateUserHeader()">
     <div class="topnav"></div>
 
     		<h2 class="flex-container" id = "open">
     			<div class="row"> Ears for Peers</div>
-    			<img src="img/elephant.jpg">
+    			<img src="img/baby_elephant.png">
     			<div class="row">
     				<button type="button" onclick="openChat()"> NEED TO TALK?</button>
     			</div>
-    		</h2> 
+                <p style="font-weight: bold">THIS SITE IS FOR TESTING ONLY</p>
+                <p style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
+
+    		</h2>
+
     		<div id="e_space"></div>
     		<div class="d-flex align-items-center justify-content-center flex-column" id="chat">
     			<div class="flex-container content" id="chatbox">
     				<div class="d-flex align-items-start flex-column" id="chathistory">
     					<div class="mt-auto p-2" id ="chat_admin"> </div>
+              <div id='typingIcon'>
+                <img src="img/typing_icon.png" alt='Typing...'>
+              </div>
     				</div>
     			</div>
-    	 
+
     			<div class="d-flex justify-content-center" id="chatbar">
     				<div class="input-group" id = "type_msg">
-    				  	<textarea id="msg" type="text" placeholder="Type message..."></textarea>
-    				    <button type="button" onclick="getMessage()">Send</button>
     				</div>
        			</div>
     		</div>

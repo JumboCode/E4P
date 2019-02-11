@@ -1,0 +1,41 @@
+<!DOCTYPE>
+<html>
+<head>
+  <title>Too Many Requests</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="/css/change_password.css" rel="stylesheet"> 
+</head>
+<body>
+  <div class="wrapper center">
+    <h1 class="banner">Woah! Slow Down There</h1>
+    <p>You're trying to do that alot.<br><span id="wait_msg"></span></p>
+  </div>
+
+  <script>
+    let params = new URLSearchParams(document.location.search.substring(1))
+    let time = params.get('time');
+
+    let wait_msg = 'Please try again ';
+    if (time) {
+      // 5 minutes
+      time = parseInt(time);
+      let milliseconds = Math.floor(time % 1000);
+      time = Math.floor(time / 1000);
+      let seconds = Math.floor(time % 60);
+      time = Math.floor(time / 60);
+      let minutes = Math.floor(time % 60);
+      time = Math.floor(time / 60);
+      let days = Math.floor(time % 24);
+      time = Math.floor(time / 24);
+      let years = Math.floor(time % 365);
+
+      wait_msg += minutes ? ('in ' + (years ? years + ' years ' : '') + (days ? days + ' days ' : '') + minutes + ' minutes.') : 'now.';
+    } else {
+      wait_msg += 'in a while...';
+    }
+
+    $('#wait_msg').html(wait_msg)
+  </script>
+</body>
+</html>

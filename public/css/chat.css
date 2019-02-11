@@ -1,43 +1,50 @@
+textarea {
+  font-family: "Roboto", sans-serif;
+}
+
 .left-chat-bubble {
-    background-color: #f8f8f8;
-    border: 1px solid #c8c8c8;
-    border-radius: 5px;
-    width: auto;
-    max-width: 62%;
-    overflow: hidden;
-    word-break: break-all;
-    float: left;
-    padding: 20px;
+  background-color: #96d7d2;
+  border: none;
+  border-radius: 1px;
+  width: auto;
+  max-width: 62%;
+  overflow: hidden;
+  word-break: break-all;
+  float: left;
+  padding: 5px;
 }
 
 .right-chat-bubble {
-    background-color: #f8f8f8;
-    border: 1px solid #c8c8c8;
-    border-radius: 5px;
-    width: auto;
-    max-width: 62%;
-    overflow: hidden;
-    word-break: break-all;
-    padding: 20px;
-    float: right;
+  background-color: #b2fef8;
+  border: none;
+  border-radius: 1px;
+  width: auto;
+  max-width: 62%;
+  overflow: hidden;
+  word-break: break-all;
+  padding: 5px;
+  float: right;
 }
 
-.container {
-    display: inline-block; 
-    position: relative;
-    width: 100%;
+.message-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  margin: 0.25em auto;
+  padding-left: 1em;
+  padding-right: 1em;
 }
 
 .left-time {
     position: relative;
-    top: 20px;
+    top: 4px;
     left: 10px;
     float: left;   
 }
 
 .right-time{
     position: relative;
-    top: 20px;
+    top: 4px;
     right: 10px;
     float: right;
 }

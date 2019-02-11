@@ -1,3 +1,7 @@
+window.onbeforeunload = () => {
+   return "Are you sure you want to leave? Your chat connections will be lost.";
+}
+
 const socket = io();
 
 socket.on('connect', () => {
@@ -8,15 +12,16 @@ socket.on('connect', () => {
 socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
-  console.log('recieved chat message on admin: ' + data);
+  addMessage(data.room, createMessage('user', data.message));
 
-  addMessage(data.room, createMessage('user', data.message))
+  // Chat message received, so user is not typing anymore
+  userNotTyping(data.room);
 });
 
 // removes a user from the waiting list
 function user_matched(user) {
   console.log('user matched ' + user);
-  
+
   // remove user from chat list if it exists
   for (let messageStream of chats) {
     if (messageStream.userId == user) {
@@ -46,6 +51,19 @@ function user_waiting(user, icon) {
   updateUserOverview();
 }
 
+
+socket.on('typing', user_typing);
+
+function user_typing(data) {
+  userIsTyping(data.room);
+}
+
+socket.on('stop typing', user_stop_typing);
+
+function user_stop_typing(data) {
+  userNotTyping(data.room);
+}
+
 // RECEIVE ^^^
 ///////////////////////////////////////
 // SEND    vvv
@@ -62,8 +80,24 @@ function accept_user(user) {
   socket.emit('accept user', user);
 }
 
+function send_typing_message(user_id, is_typing) {
+  if (is_typing == true) {
+    socket.emit('typing', {
+      room: CURRENT_CHAT_USER_ID
+    });
+  } else {
+    socket.emit('stop typing', {
+      room: CURRENT_CHAT_USER_ID
+    });
+   }
+}
+
+
 chats = [];
 CURRENT_CHAT_USER_ID = '';
+const ICON_SRC = "img/Animal Icons Small.png";
+
+/**************************** INITIALIZE ****************************/
 
 function initialize() {
     // Can be used for testing:
@@ -73,7 +107,8 @@ function initialize() {
     generateAdminHeader();
 }
 
-const ICON_SRC = "img/Animal Icons Small.png";
+/**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
+
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
@@ -81,24 +116,41 @@ function updateUserOverview() {
     tab.innerHTML = '';
 
     for (chat of chats) {
+        selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
         let iconTag = "";
         if (isNaN(parseInt(chat.icon))) {
             iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
         } else {
             iconTag = "<div class='icon'>" + chat.icon + "</div>";
         }
-      
-        userTypingHidden = chat.typing ? '' : 'hidden';
-        tab.innerHTML = tab.innerHTML 
-                      + "<button class='username' onclick='toggleChat(`" + chat.userId + "`)'>"
-                      + iconTag
-                      + "<div class='buttonId'>" + chat.userId + "</div>"
-                      + "<div class='buttonTypingDiv' " + userTypingHidden + ">"
-                      + "<img class='buttonTypingIcon' src='img/typing_icon.png'></div></button>";
+        iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
+        iconText[0] = iconText[0].toUp
+        messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
+        typing = chat.typing ? ' id=typing' : '';
+        alert = chat.alert ? ' id=alert' : '';
+        tab.innerHTML = tab.innerHTML
+                      + "<button class='username' " + selectedChat
+                      + " onclick='toggleChat(`" + chat.userId + "`)'>"
+                        + iconTag
+                        + "<div class='buttonText'>"
+                            + "<div class='buttonId'>" + iconText + "</div>"
+                            + "<div class='messagePreview'>" + messagePreview + "</div>"
+                        + "</div>"
+                        + "<div class='buttonTypingDiv'" + typing + ">"
+                            + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
+                        + "</div>"
+                        + "<div class='alertBar'" + alert + "></div>"
+                      + "</button>";
     }
 }
 
+function clearView() {
+    $('.chatAction').html("");
+    $('.messages').html("");
+}
+
 function toggleChat(userId) {
+    updateCurrentInput(CURRENT_CHAT_USER_ID);
     CURRENT_CHAT_USER_ID = userId
     tabId = 0;
     for (chat of chats) {
@@ -118,28 +170,35 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
             }
             else if (chat.active) {
-                actionDiv.innerHTML = "<input id='messageBox' type='text' name='messageInput' placeholder='Message' autocomplete='off'>"
-                                    + "<div id='sendButton' onclick='sendMessage()'><div id='sendButtonText'>Send</div></div>";
+                actionDiv.innerHTML = chatElements(chat.currentMessage);
+                chatSetup(sendMessage);
+                scrollDown()
             } else {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
         tabId++;
     }
-    $("#messageBox").on('keyup', function (e) {
-        if (e.keyCode == 13) {
-            sendMessage();
-        }
-    });
+
     scrollDown()
-
-
+    updateUserOverview();
 }
 
 function scrollDown() {
-    messageBox = document.getElementsByClassName("messagesBox")[0];
-    messageBox.scrollTop = messageBox.scrollHeight;
+    messagesBox = document.getElementsByClassName("messagesBox")[0];
+    messagesBox.scrollTop = messagesBox.scrollHeight;
 }
+
+function updateCurrentInput(userId) {
+    for (chat of chats) {
+        if (chat.userId == userId && chat.accepted && chat.active) {
+            currentMessage = $('#inputBox').val();
+            chat.currentMessage = currentMessage;
+        }
+    }
+}
+
+/**************************** SINGLE CHAT FUNCTIONS ****************************/
 
 /*
     Given a user identifier, creates a new chat for that user if the identifier is unique
@@ -155,63 +214,29 @@ function newChat(userId, icon) {
         }
     }
     if (validUser) {
-        chats.push({ userId: userId, messages: [], accepted: false, active: true, typing: false, icon: icon });
+        chats.push(
+            { userId: userId,
+              messages: [],
+              accepted: false,
+              active: true,
+              typing: false,
+              icon: icon,
+              alert: true,
+              currentMessage: "" }
+        );
     }
 }
 
-/*
-    To create a message object, we use the function createMessage. Given a role and a message string, 
-    this function appends creates a new messageObject that can be sent to addMessage.
-*/
-function createMessage(role, messageString) {
-    return { role: role, message: messageString, timestamp: new Date() };
-}
-
-function sendMessage() {
-    message = $('#messageBox').val();
-    if (message != '') {
-        console.log("sending message")
-        message = $('#messageBox').val();
-        send_message(CURRENT_CHAT_USER_ID, message);
-        messageObject = createMessage("admin", message);
-
-        addMessage(CURRENT_CHAT_USER_ID, messageObject);
-                
-        message = $('#messageBox').val('');
-    }
-
-}
-
-
-/*
-    Given a user identifier and a messageObject, appends the message object to that user's
-    chat if it exists, logs an error if that user chat doesn't exist 
-*/
-function addMessage(userId, messageObject) {
-    foundUser = false;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.messages.push(messageObject);
-            foundUser = true;
-            if (userId == CURRENT_CHAT_USER_ID) {
-                currentChat = document.getElementsByClassName("messages")[0];
-                messageSide = messageObject.role == 'admin' ? 'right' : 'left';
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
-            }
-        }
-        scrollDown();
-    }
-    if (!foundUser) {
-        console.log(Error('User with given identifier could not be found'));
-    }
-}
 
 function deactivateChat(userId) {
     foundUser = false;
     for (chat of chats) {
         if (userId == chat.userId) {
             chat.active = false;
+            chat.typing = false;
+            chat.alert = true;
             foundUser = true;
+            updateUserOverview();
         }
     }
     if (!foundUser) {
@@ -224,6 +249,7 @@ function acceptChat(userId) {
     for (chat of chats) {
         if (userId == chat.userId) {
             chat.accepted = true;
+            chat.alert = false;
             foundUser = true;
         }
     }
@@ -257,13 +283,6 @@ function removeChat(userId) {
     }
 }
 
-function clearView() {
-    $('.chatAction').html("");
-    $('.messages').html("");
-
-}
-
-
 function userIsTyping(userId) {
     for (chat of chats) {
         if (userId == chat.userId) {
@@ -272,8 +291,9 @@ function userIsTyping(userId) {
     }
     updateUserOverview();
     if (userId == CURRENT_CHAT_USER_ID) {
-        toggleChat(CURRENT_CHAT_USER_ID);
+        showCurrentTyping(true);
     }
+
 }
 
 function userNotTyping(userId) {
@@ -284,9 +304,75 @@ function userNotTyping(userId) {
     }
     updateUserOverview();
     if (userId == CURRENT_CHAT_USER_ID) {
-        toggleChat(CURRENT_CHAT_USER_ID);
+        showCurrentTyping(false);
     }
+
 }
+
+function showCurrentTyping(userIsTyping) {
+    currentUserTyping = userIsTyping ? 'block' : 'none';
+    $('#typingIcon').css('display', currentUserTyping);
+}
+
+
+/**************************** SINGLE MESSAGE FUNCTIONS ****************************/
+
+
+/*
+    To create a message object, we use the function createMessage. Given a role and a message string,
+    this function appends creates a new messageObject that can be sent to addMessage.
+*/
+function createMessage(role, messageString) {
+    return { role: role, message: messageString, timestamp: new Date() };
+}
+
+function sendMessage() {
+    message = $('#inputBox').val();
+    if (message != '') {
+        console.log("sending message")
+        message = $('#inputBox').val();
+        send_message(CURRENT_CHAT_USER_ID, message);
+        messageObject = createMessage("admin", message);
+
+        addMessage(CURRENT_CHAT_USER_ID, messageObject);
+
+        message = $('#inputBox').val('');
+    }
+
+}
+
+/*
+    Given a user identifier and a messageObject, appends the message object to that user's
+    chat if it exists, logs an error if that user chat doesn't exist
+*/
+function addMessage(userId, messageObject) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.messages.push(messageObject);
+            chat.alert = true;
+            foundUser = true;
+            if (userId == CURRENT_CHAT_USER_ID) {
+                currentChat = document.getElementsByClassName("messages")[0];
+                messageSide = 'left';
+                if (messageObject.role == 'admin') {
+                    chat.alert = false;
+                    messageSide = 'right';
+                }
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
+            }
+        }
+        scrollDown();
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+    updateUserOverview();
+}
+
+
+
+/**************************** TESTING FUNCTIONS ****************************/
 
 function mockChats() {
 
@@ -314,10 +400,6 @@ function mockChats() {
     // acceptChat('user2');
     // acceptChat('user3');
     deactivateChat('user3');
-}
-
-function getImageURL() {
-    return 'img/cow.jpg';
 }
 
 function populateChat() {

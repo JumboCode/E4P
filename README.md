@@ -40,6 +40,8 @@ mongod
   ```
 ## Team Members
 - Anika Agarwal
+- Titapa Chaiyakiturajai
+- Jack Collins
 - Jasmine Falk
 - Lucy Fan
 - Erena Inoue

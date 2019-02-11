@@ -7,35 +7,28 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 const passport = require('passport');
-const mongoose = require('mongoose');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const auth = require('./auth/auth');
 const adminRoutes = require('./routes/adminRoutes');
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
 
-if (process.env.NODB) {
-  console.log('NODB flag set, running without database and no authentication!');
-} else {
-  var db = mongoose.connection;
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/E4P', { useNewUrlParser: true });
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+app.use(cookieParser());
+app.use(passport.initialize());
+app.use(passport.session());
 
-  app.use(bodyParser.urlencoded({extended: true}));
-  app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
-  app.use(cookieParser());
-  app.use(passport.initialize());
-  app.use(passport.session());
+passport.use(new LocalStrategy(auth.strategy));
+passport.serializeUser(auth.serialize);
+passport.deserializeUser(auth.deserialize);
 
-  var Admin = require('./models/adminModel');
-  passport.use(new LocalStrategy(Admin.authenticate));
-  passport.serializeUser(Admin.serializeUser);
-  passport.deserializeUser(Admin.deserializeUser);
-}
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -112,7 +105,7 @@ io.on('connection', (socket) => {
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
-  }); 
+  });
 
   // PHASE II
   // Admin Accepts User:
@@ -129,26 +122,24 @@ io.on('connection', (socket) => {
   });
 
   // PHASE III
-  // recieve chat message from admin or user, and send it to a specific user's room
+  // receive chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', function(data) {
     // console.log(data.message);
 
     let message = data['message'];
-    let reciever = data['room'];
-    // console.log('reciever: ' + reciever);
-    socket.broadcast.to(reciever).emit('chat message', {message: message, room: reciever});
+    let receiver = data['room'];
+    // console.log('receiver: ' + receiver);
+    socket.broadcast.to(receiver).emit('chat message', {message: message, room: receiver});
   });
 
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
-    // console.log(socket.id + ' DISCONNECTED')
     var user_room_id = socket.id;
 
     if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
       icons.push(socket.icon);
     }
-
     var room = io.sockets.adapter.rooms[user_room_id];
     if (room) {
       // room exists, either admin or user left in room, send disconnect
@@ -167,6 +158,18 @@ io.on('connection', (socket) => {
       }
     }
   });
+
+  //User Typing Event:
+  socket.on('typing', function(data) {
+    let receiver = data['room'];
+    socket.broadcast.to(receiver).emit('typing', {room: receiver});
+  });
+
+  socket.on('stop typing', function(data) {
+    let receiver = data['room'];
+    socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
+  });
+
 });
 
 server.listen(process.env.PORT || 3000, function() {
