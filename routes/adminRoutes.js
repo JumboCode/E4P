@@ -2,8 +2,13 @@ const express = require('express');
 const passport = require('passport');
 const path = require('path');
 const auth = require('../auth/auth');
+const querystring = require('querystring');
 
 let router = express.Router();
+
+///////////////////////////////////////////////////////////////////////
+//        Helper Functions
+///////////////////////////////////////////////////////////////////////
 
 function ensureAuthenticated(req, res, next) {
   if (/*process.env.NOAUTH || process.env.NODB*/ false) { return next(); }
@@ -16,6 +21,42 @@ function loggedIn(req, res, next) {
   next();
 }
 
+function flagCheck(req, res, next) {
+  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return res.redirect('/admin'); }
+  next();
+}
+
+function limitCheck(req, res, next) {
+  auth.can_attempt_login(String(req.ip), (valid, time) => {
+    if (valid) {
+      next();
+    } else {
+      let query = querystring.stringify({ time: time });
+      res.redirect('/admin/wait?' + query);
+    }
+  });
+}
+
+function limitCheck(req, res, next) {
+  auth.can_attempt_login(String(req.ip), (valid, time) => {
+    if (valid) {
+      next();
+    } else {
+      let query = querystring.stringify({ time: time });
+      res.redirect('/admin/wait?' + query);
+    }
+  });
+}
+
+function limitReset(req, res, next) {
+  auth.delete_login_attempt(String(req.ip));
+  next();
+}
+
+///////////////////////////////////////////////////////////////////////
+//        Admin Routes
+///////////////////////////////////////////////////////////////////////
+
 router.get('/', ensureAuthenticated, (req, res) => {
   res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
 });
@@ -24,18 +65,17 @@ router.get('/login', loggedIn, (req, res) => {
   res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
 });
 
-function flagCheck(req, res, next) {
-  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return res.redirect('/admin'); }
-  next();
-}
-
-router.post('/login', flagCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), (req, res) => {
+router.post('/login', flagCheck, limitCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), limitReset, (req, res) => {
   res.redirect('/admin');
 });
 
 router.get('/logout', ensureAuthenticated, (req, res) => {
   req.logout();
   res.redirect('/admin/login');
+});
+
+router.get('/wait', (req, res) => {
+  res.sendFile('login_wait.html', {root: path.join(__dirname, '../public')});
 });
 
 router.get('/change/request', (req, res) => {

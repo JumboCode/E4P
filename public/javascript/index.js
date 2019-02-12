@@ -13,6 +13,7 @@ socket.on('chat message', function(data) {
   console.log('recieved chat message on index: ' + data);
   updateChat(createMessage('admin', data.message));
   $('#typingIcon').css('display', 'none');
+  alertSound();
 });
 
 socket.on('typing', () => {
@@ -125,6 +126,11 @@ function sendMessage() {
         updateChat(messageObject);
         message = $('#inputBox').val('');
     }
+}
+
+function alertSound() {
+    let audio = new Audio('audio/alert.mp3');
+    audio.play();
 }
 
 /* function to change accepted from true to false when admin accepts chat */

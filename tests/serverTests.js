@@ -109,7 +109,7 @@ describe('GET /admin', () => {
 
 // TODO these tests don't really check what pages are returned, just that
 // pages are always returned so we should really create more specific tests.
-describe('POST /', () => {
+/*describe('POST /', () => {
   it('it should POST /admin/login', (done) => {
     chai.request(server)
         .post('/admin/login')
@@ -122,3 +122,4 @@ describe('POST /', () => {
     });
   });
 });
+*/

@@ -13,7 +13,7 @@ socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
   addMessage(data.room, createMessage('user', data.message));
-
+  alertSound();
   // Chat message received, so user is not typing anymore
   userNotTyping(data.room);
 });
@@ -105,14 +105,13 @@ function initialize() {
     // populateChat();
     updateUserOverview();
     generateAdminHeader();
-    let audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/examples/t-rex-roar.mp3');
-    const audioPromise = audio.play();
-    if (audioPromise !== null){
-        audioPromise.catch(() => { audio.play(); });
-    }
-
 }
 
+
+function alertSound() {
+    let audio = new Audio('audio/alert.mp3');
+    audio.play();
+}
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
 
 
@@ -365,7 +364,7 @@ function addMessage(userId, messageObject) {
                     chat.alert = false;
                     messageSide = 'right';
                 }
-                $("#typingIcon").before(createMessageDiv(messageSide, messageObject.message));
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
             }
         }
         scrollDown();
