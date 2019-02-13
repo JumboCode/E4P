@@ -79,7 +79,7 @@ app.get('/img/:file', (req, res) => {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'img')});
 });
 
-app.post('/admin', function(req, res) {
+app.post('/admin', adminRoutes.ensureAuthenticated, function(req, res) {
   admins.push(req.body.admin);
 });
 
