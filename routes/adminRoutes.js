@@ -115,3 +115,4 @@ router.post('/change', (req, res) => {
 });
 
 module.exports = router;
+module.exports.ensureAuthenticated = ensureAuthenticated;
