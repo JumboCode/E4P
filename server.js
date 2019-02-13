@@ -37,6 +37,7 @@ app.use(bodyParser.json());
 
 // initialize admin id array
 let admins = [];
+let currentConversations = [];
 
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
@@ -105,6 +106,7 @@ io.on('connection', (socket) => {
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
+    currentConversations.push({ user: socket.id, room: socket.id, accepted: false, connected: true});
   });
 
   // PHASE II
@@ -115,6 +117,14 @@ io.on('connection', (socket) => {
   socket.on('accept user', (user_room_id) => {
     // TODO what if user_room_id no longer exists
     socket.join(user_room_id);
+
+    for (let conversation of currentConversations) {
+      if (conversation.room === user_room_id) {
+        conversation.accepted = true;
+      }
+    }
+    console.log(currentConversations);
+
     socket.broadcast.to(user_room_id).emit('admin matched');
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user matched', user_room_id);
@@ -157,6 +167,14 @@ io.on('connection', (socket) => {
         admins.splice(i, 1);
       }
     }
+
+    // Disconnect user ID from room
+    for (let conversation of currentConversations) {
+      if (conversation.user === user_room_id) {
+        conversation.connected = false;
+      }
+    }
+    console.log(currentConversations);
   });
 
   //User Typing Event:
