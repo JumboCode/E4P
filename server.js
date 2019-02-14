@@ -39,6 +39,12 @@ app.use(bodyParser.json());
 let admins = [];
 let currentConversations = [];
 
+function removeConversation(room) {
+  currentConversations = currentConversations.filter(function(ele){
+    return ele.room != room;
+  });
+}
+
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
 ///////////////////////////////////////////////////////////////////////
@@ -84,6 +90,10 @@ app.post('/admin', adminRoutes.ensureAuthenticated, function(req, res) {
   admins.push(req.body.admin);
 });
 
+app.get('/admin/conversations', adminRoutes.ensureAuthenticated, function(req, res) {
+  res.json(currentConversations);
+});
+
 ///////////////////////////////////////////////////////////////////////
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
@@ -106,7 +116,12 @@ io.on('connection', (socket) => {
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
-    currentConversations.push({ user: socket.id, room: socket.id, accepted: false, connected: true});
+    currentConversations.push(
+      { user: socket.id, 
+        icon: socket.icon,
+        room: socket.id, 
+        accepted: false, 
+        connected: true});
   });
 
   // PHASE II
@@ -172,9 +187,11 @@ io.on('connection', (socket) => {
     for (let conversation of currentConversations) {
       if (conversation.user === user_room_id) {
         conversation.connected = false;
+        // TODO: After user reconnect is implemented, we'll want to delay this
+        //       removing for some time
+        removeConversation(conversation.room);
       }
     }
-    console.log(currentConversations);
   });
 
   //User Typing Event:
@@ -187,8 +204,9 @@ io.on('connection', (socket) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
   });
-
 });
+
+
 
 server.listen(process.env.PORT || 3000, function() {
   	console.log('Node app is running on port 3000');
@@ -196,3 +214,5 @@ server.listen(process.env.PORT || 3000, function() {
 
 module.exports = app;
 module.exports.admins = admins;
+module.exports.currentConversations = currentConversations;
+
