@@ -13,7 +13,6 @@ socket.on('connect', () => {
         acceptChatUI(conversation.user);
       }
     }
-    console.log(chats)
     updateUserOverview();
   });
 
