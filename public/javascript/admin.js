@@ -5,7 +5,18 @@ window.onbeforeunload = () => {
 const socket = io();
 
 socket.on('connect', () => {
-  // send as POST request
+  // Load Existing Chats
+  $.get('/admin/conversations', function(conversations) {
+    for (let conversation of conversations) {
+      newChat(conversation.user, conversation.icon);
+      if (conversation.accepted) {
+        acceptChatUI(conversation.user);
+      }
+    }
+    updateUserOverview();
+  });
+
+  // Register as Admin
   $.post("/admin", { admin: socket.id });
 });
 
@@ -245,19 +256,23 @@ function deactivateChat(userId) {
 }
 
 function acceptChat(userId) {
-    foundUser = false;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.accepted = true;
-            chat.alert = false;
-            foundUser = true;
-        }
-    }
-    if (!foundUser) {
-        console.log(Error('User with given identifier could not be found'));
-    }
-    toggleChat(userId);
-    accept_user(userId);
+  acceptChatUI(userId);
+  accept_user(userId);
+}
+
+function acceptChatUI(userId) {
+  foundUser = false;
+  for (chat of chats) {
+      if (userId == chat.userId) {
+          chat.accepted = true;
+          chat.alert = false;
+          foundUser = true;
+      }
+  }
+  if (!foundUser) {
+      console.log(Error('User with given identifier could not be found'));
+  }
+  toggleChat(userId);
 }
 
 function removeChat(userId) {
