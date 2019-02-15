@@ -1,51 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>E4P Messaging</title>
-    <link rel="stylesheet" href="css/index.css"/>
-    <link rel="stylesheet" href="css/chat.css"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="javascript/chat.js"></script>
-    <script src="javascript/index.js"></script>
-    <script src="javascript/header.js"></script>
-    <link rel="stylesheet" href="css/header.css"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>E4P Messaging</title>
+  <link rel="stylesheet" href="css/index.css"/>
+  <link rel="stylesheet" href="css/chat.css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="javascript/chat.js"></script>
+  <script src="javascript/index.js"></script>
+  <script src="javascript/header.js"></script>
+  <link rel="stylesheet" href="css/header.css"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
-<body>
+<body onload="generateUserHeader()">
+  <div class="topnav"></div>
+  <h2 class="flex-container" id = "open">
+    <div class="row"> Ears for Peers</div>
+    <img src="img/baby_elephant.png">
+    <div class="row">
+      <button type="button" onclick="openChat()"> NEED TO TALK?</button>
+    </div>
+    <p style="font-weight: bold">THIS SITE IS FOR TESTING ONLY</p>
+    <p style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
 
-    <body onload="generateUserHeader()">
-    <div class="topnav"></div>
+  </h2>
 
-    		<h2 class="flex-container" id = "open">
-    			<div class="row"> Ears for Peers</div>
-    			<img src="img/baby_elephant.png">
-    			<div class="row">
-    				<button type="button" onclick="openChat()"> NEED TO TALK?</button>
-    			</div>
-                <p style="font-weight: bold">THIS SITE IS FOR TESTING ONLY</p>
-                <p style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
+  <div id="e_space"></div>
+  <div class="d-flex align-items-center justify-content-center flex-column" id="chat">
+    <div class="flex-container content" id="chatbox">
+      <div class="d-flex align-items-start flex-column" id="chathistory">
+        <div class="mt-auto p-2" id ="chat_admin"> </div>
+        <div id="typingIcon">
+          <img src="img/typing_icon.png" alt="Typing...">
+        </div>
+      </div>
+    </div>
 
-    		</h2>
-
-    		<div id="e_space"></div>
-    		<div class="d-flex align-items-center justify-content-center flex-column" id="chat">
-    			<div class="flex-container content" id="chatbox">
-    				<div class="d-flex align-items-start flex-column" id="chathistory">
-    					<div class="mt-auto p-2" id ="chat_admin"> </div>
-              <div id='typingIcon'>
-                <img src="img/typing_icon.png" alt='Typing...'>
-              </div>
-    				</div>
-    			</div>
-
-    			<div class="d-flex justify-content-center" id="chatbar">
-    				<div class="input-group" id = "type_msg">
-    				</div>
-       			</div>
-    		</div>
-    </body>
+    <div class="d-flex justify-content-center" id="chatbar">
+      <div class="input-group" id = "type_msg">
+      </div>
+    </div>
+  </div>
+</body>
 </html>
