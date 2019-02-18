@@ -40,7 +40,7 @@ let admins = [];
 let currentConversations = [];
 
 function removeConversation(room) {
-  currentConversations = currentConversations.filter(function(ele){
+  currentConversations = currentConversations.filter((ele) => {
     return ele.room != room;
   });
 }
@@ -53,12 +53,12 @@ function removeConversation(room) {
 if (app.get('env') == 'production') {
   app.use((req, res, next) => {
     if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(`https://${req.header('host')}${req.url}`)
+      res.redirect(`https://${req.header('host')}${req.url}`);
     } else {
       next();
     }
   });
-};
+}
 
 ///////////////////////////////////////////////////////////////////////
 //        Routes
@@ -66,11 +66,11 @@ if (app.get('env') == 'production') {
 
 app.use('/admin', adminRoutes);
 
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
   res.sendFile('index.html', {root: path.join(__dirname, 'public')});
 });
 
-app.get('/help', function(req, res) {
+app.get('/help', (req, res) => {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
 });
 
@@ -86,11 +86,12 @@ app.get('/img/:file', (req, res) => {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'img')});
 });
 
-app.post('/admin', adminRoutes.ensureAuthenticated, function(req, res) {
+app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   admins.push(req.body.admin);
+  res.sendStatus(200);
 });
 
-app.get('/admin/conversations', adminRoutes.ensureAuthenticated, function(req, res) {
+app.get('/admin/conversations', adminRoutes.ensureAuthenticated, (req, res) => {
   res.json(currentConversations);
 });
 
@@ -98,10 +99,12 @@ app.get('/admin/conversations', adminRoutes.ensureAuthenticated, function(req, r
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
 let overflow_id = 0;
-let icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
-             "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
-             "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
-             "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
+let icons = [
+  'bear', 'ox', 'flamingo', 'panda', 'giraffe', 'raccoon', 'chimpanzee', 'bullhead',
+  'doe', 'mandrill', 'badger', 'squirrel', 'rhino', 'dog', 'monkey', 'lynx',
+  'brownbear', 'marmoset', 'funnylion', 'deer', 'zebra', 'meerkat', 'elephant', 'cat',
+  'hare', 'puma', 'owl', 'antelope', 'lion', 'fox', 'wolf', 'hippo'
+];
 
 io.on('connection', (socket) => {
   // PHASE I
@@ -148,7 +151,7 @@ io.on('connection', (socket) => {
 
   // PHASE III
   // receive chat message from admin or user, and send it to a specific user's room
-  socket.on('chat message', function(data) {
+  socket.on('chat message', (data) => {
     // console.log(data.message);
 
     let message = data['message'];
@@ -195,19 +198,19 @@ io.on('connection', (socket) => {
   });
 
   //User Typing Event:
-  socket.on('typing', function(data) {
+  socket.on('typing', (data) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('typing', {room: receiver});
   });
 
-  socket.on('stop typing', function(data) {
+  socket.on('stop typing', (data) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
   });
 });
 
-server.listen(process.env.PORT || 3000, function() {
-  	console.log('Node app is running on port 3000');
+server.listen(process.env.PORT || 3000, () => {
+  console.log('Node app is running on port 3000');
 });
 
 module.exports = app;
