@@ -1,5 +1,5 @@
 window.onbeforeunload = () => {
-   return "Are you sure you want to leave? Your chat connections will be lost.";
+   alert("Are you sure you want to leave? Your chat connections will be lost.");
 }
 
 const socket = io();

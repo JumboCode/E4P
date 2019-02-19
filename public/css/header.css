@@ -21,7 +21,6 @@ nav {
   background: var(--dark-green);
 }
 
-
 .navbar a:hover {
   background-color: var(--light-blue);
   color: var(--dark-green);
