@@ -5,16 +5,15 @@
   --light-green: #b2fef8;
 }
 
-.topnav {
+nav {
   background-color: var(--dark-green);
   overflow: hidden;
   width: 100%;
 }
 
-.topnav a {
+.navbar a {
   font-family: "Roboto", sans-serif;
   float: left;
-  color: var(--light-blue);
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -22,16 +21,8 @@
   background: var(--dark-green);
 }
 
-.topnav-right {
-  float: right;
-}
 
-.topnav a:hover {
+.navbar a:hover {
   background-color: var(--light-blue);
   color: var(--dark-green);
-}
-
-.topnav a.active {
-  background-color: var(--dark-green);
-  color: white;
 }

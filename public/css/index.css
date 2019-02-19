@@ -45,7 +45,7 @@ img {
   height: 150px;
 }
 
-.topnav {
+.navbar {
   position: fixed;
   background-color: var(--dark-green);
   width: 100%;
