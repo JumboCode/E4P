@@ -37,6 +37,13 @@ app.use(bodyParser.json());
 
 // initialize admin id array
 let admins = [];
+let currentConversations = [];
+
+function removeConversation(room) {
+  currentConversations = currentConversations.filter((ele) => {
+    return ele.room != room;
+  });
+}
 
 ///////////////////////////////////////////////////////////////////////
 //        Server Configuration
@@ -46,12 +53,12 @@ let admins = [];
 if (app.get('env') == 'production') {
   app.use((req, res, next) => {
     if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(`https://${req.header('host')}${req.url}`)
+      res.redirect(`https://${req.header('host')}${req.url}`);
     } else {
       next();
     }
   });
-};
+}
 
 ///////////////////////////////////////////////////////////////////////
 //        Routes
@@ -59,11 +66,11 @@ if (app.get('env') == 'production') {
 
 app.use('/admin', adminRoutes);
 
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
   res.sendFile('index.html', {root: path.join(__dirname, 'public')});
 });
 
-app.get('/help', function(req, res) {
+app.get('/help', (req, res) => {
   res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
 });
 
@@ -81,20 +88,27 @@ app.get('/img/:file', (req, res) => {
 
 app.get('/audio/:file', (req, res) => {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});  
-})
+});
 
-app.post('/admin', function(req, res) {
+app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   admins.push(req.body.admin);
+  res.sendStatus(200);
+});
+
+app.get('/admin/conversations', adminRoutes.ensureAuthenticated, (req, res) => {
+  res.json(currentConversations);
 });
 
 ///////////////////////////////////////////////////////////////////////
 //        Sockets
 ///////////////////////////////////////////////////////////////////////
 let overflow_id = 0;
-let icons = ["bear", "ox", "flamingo", "panda", "giraffe", "raccoon", "chimpanzee", "bullhead",
-             "doe", "mandrill", "badger", "squirrel", "rhino", "dog", "monkey", "lynx",
-             "brownbear", "marmoset", "funnylion", "deer", "zebra", "meerkat", "elephant", "cat",
-             "hare", "puma", "owl", "antelope", "lion", "fox", "wolf", "hippo"];
+let icons = [
+  'bear', 'ox', 'flamingo', 'panda', 'giraffe', 'raccoon', 'chimpanzee', 'bullhead',
+  'doe', 'mandrill', 'badger', 'squirrel', 'rhino', 'dog', 'monkey', 'lynx',
+  'brownbear', 'marmoset', 'funnylion', 'deer', 'zebra', 'meerkat', 'elephant', 'cat',
+  'hare', 'puma', 'owl', 'antelope', 'lion', 'fox', 'wolf', 'hippo'
+];
 
 io.on('connection', (socket) => {
   // PHASE I
@@ -109,6 +123,12 @@ io.on('connection', (socket) => {
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
+    currentConversations.push(
+      { user: socket.id, 
+        icon: socket.icon,
+        room: socket.id, 
+        accepted: false, 
+        connected: true});
   });
 
   // PHASE II
@@ -119,6 +139,14 @@ io.on('connection', (socket) => {
   socket.on('accept user', (user_room_id) => {
     // TODO what if user_room_id no longer exists
     socket.join(user_room_id);
+
+    for (let conversation of currentConversations) {
+      if (conversation.room === user_room_id) {
+        conversation.accepted = true;
+      }
+    }
+    console.log(currentConversations);
+
     socket.broadcast.to(user_room_id).emit('admin matched');
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user matched', user_room_id);
@@ -127,7 +155,7 @@ io.on('connection', (socket) => {
 
   // PHASE III
   // receive chat message from admin or user, and send it to a specific user's room
-  socket.on('chat message', function(data) {
+  socket.on('chat message', (data) => {
     // console.log(data.message);
 
     let message = data['message'];
@@ -161,24 +189,34 @@ io.on('connection', (socket) => {
         admins.splice(i, 1);
       }
     }
+
+    // Disconnect user ID from room
+    for (let conversation of currentConversations) {
+      if (conversation.user === user_room_id) {
+        conversation.connected = false;
+        // TODO: After user reconnect is implemented, we'll want to delay this
+        //       removing for some time
+        removeConversation(conversation.room);
+      }
+    }
   });
 
   //User Typing Event:
-  socket.on('typing', function(data) {
+  socket.on('typing', (data) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('typing', {room: receiver});
   });
 
-  socket.on('stop typing', function(data) {
+  socket.on('stop typing', (data) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
   });
-
 });
 
-server.listen(process.env.PORT || 3000, function() {
-  	console.log('Node app is running on port 3000');
+server.listen(process.env.PORT || 3000, () => {
+  console.log('Node app is running on port 3000');
 });
 
 module.exports = app;
 module.exports.admins = admins;
+module.exports.currentConversations = currentConversations;

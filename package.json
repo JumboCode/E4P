@@ -6,8 +6,10 @@
   "scripts": {
     "test": "cp db.sqlite3 backup.sqlite3 && mocha --exit --recursive tests && mv backup.sqlite3 db.sqlite3",
     "start": "node server.js",
-    "slint": "stylelint",
-    "slint-client": "stylelint ./public/**/*.css"
+    "slint-client": "stylelint ./public/**/*.css",
+    "hlint-client": "htmlhint ./public/**/*.html",
+    "lint-client": "eslint ./public/**/*.js",
+    "lint": "npm run slint-client && npm run hlint-client && npm run lint-client"
   },
   "husky": {
     "hooks": {
@@ -41,6 +43,8 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^4.2",
+    "eslint": "^5.13.0",
+    "htmlhint": "^0.10.1",
     "husky": "^1.3.1",
     "mocha": "^5.2",
     "stylelint": "^9.10.1",
