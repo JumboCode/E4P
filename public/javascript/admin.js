@@ -8,9 +8,8 @@ socket.on('connect', () => {
   // Load Existing Chats
   $.get('/admin/conversations', function(conversations) {
     for (let conversation of conversations) {
-      newChat(conversation.user, conversation.icon);
-      if (conversation.accepted) {
-        acceptChatUI(conversation.user);
+      if (!conversation.accepted) {
+        newChat(conversation.user, conversation.icon);
       }
     }
     updateUserOverview();
@@ -41,6 +40,13 @@ function user_matched(user) {
     }
   }
 }
+
+socket.on('user unmatched', (conversation) => {
+  // TODO: display a message to the ear so they know this person was 
+  //       disconnected from an admin
+  newChat(conversation.user, conversation.icon);
+  updateUserOverview();
+});
 
 socket.on('user disconnect', end_chat);
 

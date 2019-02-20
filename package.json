@@ -8,7 +8,8 @@
     "start": "node server.js",
     "slint-client": "stylelint ./public/**/*.css",
     "hlint-client": "htmlhint ./public/**/*.html",
-    "lint-client": "eslint ./public/**/*.js"
+    "lint-client": "eslint ./public/**/*.js",
+    "lint": "npm run slint-client && npm run hlint-client && npm run lint-client"
   },
   "husky": {
     "hooks": {

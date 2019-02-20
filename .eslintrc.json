@@ -15,6 +15,7 @@
     "semi": ["error", "always"],
     "no-console": [0],
     "prefer-arrow-callback": ["error"],
-    "no-unused-vars": [1]
+    "no-unused-vars": [1],
+    "no-undef": [1]
   }
 }
