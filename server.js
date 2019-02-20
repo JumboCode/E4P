@@ -123,6 +123,7 @@ let icons = [
 io.on('connection', (socket) => {
   // PHASE I
   socket.on('user connect', () => {
+    console.log(socket.id);
     if (icons.length == 0) {
       overflow_id++;
       socket.icon = overflow_id.toString();
@@ -138,7 +139,9 @@ io.on('connection', (socket) => {
         icon: socket.icon,
         room: socket.id,
         accepted: false,
-        connected: true});
+        connected: true,
+        connected_admin: null
+      });
   });
 
   // PHASE II
@@ -153,6 +156,7 @@ io.on('connection', (socket) => {
     for (let conversation of currentConversations) {
       if (conversation.room === user_room_id) {
         conversation.accepted = true;
+        conversation.connected_admin = socket.id;
       }
     }
     console.log(currentConversations);
@@ -178,6 +182,8 @@ io.on('connection', (socket) => {
   // User Disconnects:
   socket.on('disconnect', () => {
     var user_room_id = socket.id;
+    console.log('disconnect');
+    console.log(socket.id);
 
     if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
       icons.push(socket.icon);
@@ -197,6 +203,7 @@ io.on('connection', (socket) => {
     for (let i = 0; i < admins.length; i++) {
       if (admins[i] == user_room_id) {
         admins.splice(i, 1);
+
       }
     }
 
@@ -207,6 +214,16 @@ io.on('connection', (socket) => {
         // TODO: After user reconnect is implemented, we'll want to delay this
         //       removing for some time
         removeConversation(conversation.room);
+      }
+      if (conversation.connected_admin == user_room_id) {
+        // Admin of this conversation is disconnecting
+        console.log('disconnecting admin from conversation');
+
+        conversation.connected_admin = null;
+        conversation.accepted = false;
+        for (let admin of admins) {
+          socket.broadcast.to(admin).emit('user unmatched', conversation);
+        }
       }
     }
   });
