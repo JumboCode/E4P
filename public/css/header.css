@@ -1,27 +1,32 @@
 :root {
   --light-blue: #def3f3;
   --dark-green: #248f89;
-  --medium-green: #51d2ca;
+  --medium-green: #96d7d2;
   --light-green: #b2fef8;
 }
 
-nav {
+.navbar {
   background-color: var(--dark-green);
-  overflow: hidden;
-  width: 100%;
 }
 
-.navbar a {
-  font-family: "Roboto", sans-serif;
-  float: left;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 25px;
-  background: var(--dark-green);
+.navbar-brand {
+  font-size: 1.75rem;
+  letter-spacing: 1.61px;
 }
 
-.navbar a:hover {
-  background-color: var(--light-blue);
-  color: var(--dark-green);
+.navbar-dark .navbar-brand {
+  color: var(--medium-green);
+}
+
+.navbar-dark .navbar-brand:hover {
+  color: var(--light-blue);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: var(--medium-green);
+  font-size: 1.25rem;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: var(--light-blue);
 }
