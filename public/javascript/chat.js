@@ -1,8 +1,10 @@
 /*
- * Return a message div based on the role and message string.
+ * Return a message div based on the role and message string and timestamp.
  */
-function createMessageDiv(side, message) {
-    return "<div class= 'message-container'><div class='" + side + "-chat-bubble'> " +  escapeMessage(message) + " </div><div class= '" + side + "-time'> " + getTimeString(new Date()) + " </div></div>";
+function createMessageDiv(side, message, timestamp) {
+    return "<div class= 'message-container'><div class='" + side + "-chat-bubble'> " 
+    	+  escapeMessage(message) + " </div><div class= '" + side + "-time'> " 
+    	+ getTimeString(timestamp) + " </div></div>";
 }
 
 /*

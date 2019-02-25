@@ -106,7 +106,7 @@ function updateChat(messageObj) {
   else {
       messageSide = 'right';
   }
-  newMessage = createMessageDiv(messageSide, messageObj.message);
+  newMessage = createMessageDiv(messageSide, messageObj.message, messageObj.timestamp);
   $("#typingIcon").before(newMessage);
   messages.scrollTop = messages.scrollHeight - messages.clientHeight;
 }
