@@ -111,8 +111,6 @@ div.icon {
   padding-left: 5%;
   min-width: 0;
   max-width: 100%;
-  max-height: 30px;
-  word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
 }
