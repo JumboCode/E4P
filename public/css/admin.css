@@ -58,22 +58,39 @@ img.icon {
   object-fit: none;
   object-position: 0 0;
   min-width: 60px;
-  height: 60px;
+  max-width: 60px;
+  min-height: 60px;
+  max-height: 60px;
 }
 
 div.icon {
-  display: inline-block;
-  vertical-align: top;
-  width: 60px;
-  height: 60px;
-  margin: 0;
-  padding: 22px 16px;
+  min-width: 60px;
+  max-width: 60px;
+  min-height: 60px;
+  max-height: 60px;
+  line-height: 60px;
+  text-align: center;
+  font-weight: 900;
+}
+
+.notIcon {
+  display: inherit;
+  min-height: 60px;
+  max-height: 60px;
 }
 
 .username {
   display: inline-block;
-  vertical-align: top;
-  padding: 22px 16px;
+}
+
+.buttonText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: auto;
+  min-width: 70%;
+  max-width: 70%;
+  overflow: hidden;
 }
 
 .buttonId {
@@ -84,22 +101,21 @@ div.icon {
   overflow: auto;
 }
 
-.buttonText {
-  display: flex;
-  flex-direction: column;
-  width: 70%;
-}
-
 .messagePreview {
   padding-left: 5%;
-  max-width: 80%;
-  min-width: 60%;
   overflow: hidden;
-  max-height: 50%;
+  min-width: 0;
+  max-width: 100%;
+  /*max-height: 30%;*/
+  max-height: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .buttonTypingDiv {
-  width: 20%;
+  min-width: 20%;
+  max-width: 20%;
   visibility: hidden;
 }
 
@@ -112,8 +128,10 @@ div.icon {
 }
 
 .alertBar {
-  width: 10%;
+  min-width: 10%;
+  max-width: 10%;
   min-height: 60px;
+  max-height: 60px;
 }
 
 .alertBar#alert {

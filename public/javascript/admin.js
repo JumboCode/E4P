@@ -135,28 +135,33 @@ function updateUserOverview() {
     for (chat of chats) {
         selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
         let iconTag = "";
+        let iconText = "";
+
         if (isNaN(parseInt(chat.icon))) {
             iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
+            iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
         } else {
             iconTag = "<div class='icon'>" + chat.icon + "</div>";
+            iconText = "User " + chat.icon;
         }
-        iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
-        iconText[0] = iconText[0].toUp
+
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
         typing = chat.typing ? ' id=typing' : '';
         alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML
                       + "<button class='username' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                        + iconTag
-                        + "<div class='buttonText'>"
-                            + "<div class='buttonId'>" + iconText + "</div>"
-                            + "<div class='messagePreview'>" + messagePreview + "</div>"
+                        // + iconTag
+                        + "<div class='notIcon'>"
+                          + "<div class='buttonText'>"
+                              // + "<div class='buttonId'>" + iconText + "</div>"
+                              + "<div class='messagePreview'>" + messagePreview + "</div>"
+                          + "</div>"
+                          + "<div class='buttonTypingDiv'" + typing + ">"
+                              + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
+                          + "</div>"
+                          + "<div class='alertBar'" + alert + "></div>"
                         + "</div>"
-                        + "<div class='buttonTypingDiv'" + typing + ">"
-                            + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
-                        + "</div>"
-                        + "<div class='alertBar'" + alert + "></div>"
                       + "</button>";
     }
 }
