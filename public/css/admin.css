@@ -112,7 +112,7 @@ div.icon {
   min-width: 0;
   max-width: 100%;
   max-height: 30px;
-  white-space: nowrap;
+  word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
 }
