@@ -1,22 +1,20 @@
 window.onbeforeunload = () => {
-   return "Are you sure you want to leave? Your chat connections will be lost.";
-}
+  return "Are you sure you want to leave? Your chat connections will be lost.";
+};
 
 const socket = io();
 
 socket.on('connect', () => {
-  // Load Existing Chats
-  $.get('/admin/conversations', function(conversations) {
+  // Register as Admin
+  $.post("/admin", { admin: socket.id }, (conversations) => {
     for (let conversation of conversations) {
       if (!conversation.accepted) {
         newChat(conversation.user, conversation.icon);
       }
     }
+    
     updateUserOverview();
   });
-
-  // Register as Admin
-  $.post("/admin", { admin: socket.id });
 });
 
 socket.on('user matched', user_matched);

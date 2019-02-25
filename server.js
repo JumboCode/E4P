@@ -88,10 +88,6 @@ app.get('/img/:file', (req, res) => {
 
 app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   admins.push(req.body.admin);
-  res.sendStatus(200);
-});
-
-app.get('/admin/conversations', adminRoutes.ensureAuthenticated, (req, res) => {
   res.json(currentConversations);
 });
 
@@ -199,7 +195,9 @@ io.on('connection', (socket) => {
         conversation.connected = false;
         // TODO: After user reconnect is implemented, we'll want to delay this
         //       removing for some time
-        removeConversation(conversation.room);
+        conversation.timeout = setTimeout(() => {
+          removeConversation(conversation.room);
+        }, process.env.DISCONNECT_GRACE_PERIOD || 60000);
       }
       if (conversation.connected_admin == user_room_id) {
         // Admin of this conversation is disconnecting
