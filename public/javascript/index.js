@@ -128,7 +128,7 @@ function getMessage() {
 function updateChat(messageObj) {
   let messages = document.getElementById('chathistory');
   const messageSide = (messageObj.role == 'admin' ? 'left' : 'right');
-  const newMessage = createMessageDiv(messageSide, messageObj.message);
+  const newMessage = createMessageDiv(messageSide, messageObj.message, messageObj.timestamp);
   $('#typingIcon').before(newMessage);
   messages.scrollTop = messages.scrollHeight - messages.clientHeight;
 }
