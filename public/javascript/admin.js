@@ -1,5 +1,5 @@
 window.onbeforeunload = () => {
-   return "Are you sure you want to leave? Your chat connections will be lost.";
+   alert("Are you sure you want to leave? Your chat connections will be lost.");
 }
 
 const socket = io();
@@ -176,7 +176,7 @@ function toggleChat(userId) {
             currentChat.innerHTML = "";
             for (message of chat.messages) {
                 messageSide = message.role == 'admin' ? 'right' : 'left';
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message, message.timestamp)
             }
 
             currentUserTyping = chat.typing ? 'block' : 'none';
@@ -380,7 +380,7 @@ function addMessage(userId, messageObject) {
                     chat.alert = false;
                     messageSide = 'right';
                 }
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message, messageObject.timestamp);
             }
         }
         scrollDown();

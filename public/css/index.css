@@ -34,10 +34,10 @@ h3 {
 
 body {
   font-family: "Roboto", sans-serif;
-  font-size: 24px;
+  font-size: 1rem;
   color: rgba(0, 0, 0, 0.87);
-  letter-spacing: 0.75px;
   text-align: left;
+  letter-spacing: 0.75px;
 }
 
 img {
@@ -45,7 +45,7 @@ img {
   height: 150px;
 }
 
-.topnav {
+.navbar {
   position: fixed;
   background-color: var(--dark-green);
   width: 100%;
