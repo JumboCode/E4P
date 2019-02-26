@@ -36,15 +36,15 @@ textarea {
 }
 
 .left-time {
-    position: relative;
-    top: 4px;
-    left: 10px;
-    float: left;   
+  position: relative;
+  top: 4px;
+  left: 10px;
+  float: left;
 }
 
-.right-time{
-    position: relative;
-    top: 4px;
-    right: 10px;
-    float: right;
+.right-time {
+  position: relative;
+  top: 4px;
+  right: 10px;
+  float: right;
 }
