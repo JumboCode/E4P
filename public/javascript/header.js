@@ -16,19 +16,21 @@ function generateHeader(role) {
   logout = '/admin/logout';
 
   if (role === 'user') {
-    buttons ="<a href='/help' target='_blank'>Help</a>" +
-    "<a href='http://sites.tufts.edu/ears4peers/contact-us/' target='_blank'>Feedback</a>" +
-    "<a href=" + login + ">Login</a>";
+    buttons ='<li class="nav-item"><a class="nav-link" href="/help" target="_blank">Help</a></li>' +
+    '<li class="nav-item"><a class="nav-link" href="http://sites.tufts.edu/ears4peers/contact-us/" target="_blank">Feedback</a></li>' +
+    '<li class="nav-item"><a class="nav-link" href=' + login + '>Login</a></li>';
   } else if (role === 'login') {
-    buttons = "<a href='/help' target='_blank'>Help</a>" +
-    "<a href='http://sites.tufts.edu/ears4peers/contact-us/' target='_blank'>Feedback</a>";
+    buttons = '<li class="nav-item"><a class="nav-link" href="/help" target="_blank">Help</a></li>' +
+    '<li class="nav-item"><a class="nav-link" href="http://sites.tufts.edu/ears4peers/contact-us/" target="_blank">Feedback</a></li>';
   } else {
-    buttons = "<a href=" + logout + ">Logout</a>";
+    buttons = '<li class="nav-item"><a class="nav-link" href=" + logout + ">Logout</a></li>';
   }
 
-  document.getElementsByClassName("topnav")[0].innerHTML = 
-    "<a class='active' href='" + home + "'>E4P</a>"
-    + "<div class='topnav-right'>"
+  document.getElementsByClassName('navbar')[0].innerHTML = 
+    '<a class="navbar-brand" href="" + home + "">E4P</a>'
+    + '<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">'
+    + '<span class="navbar-toggler-icon"></span></button>'
+    + '<div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto" style="color: black">'
     +   buttons
-    + "</div>";
+    + '</ul></div>';
 }
