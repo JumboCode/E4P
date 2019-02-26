@@ -17,11 +17,11 @@ function generateHeader(role) {
   let buttons;
 
   if (role === 'user') {
-    buttons ='<li class="nav-item"><a class="nav-link" href="https://sites.tufts.edu/ears4peers/" target="_blank">E4P Homepage</a></li>' +
+    buttons ='<li class="nav-item"><a class="nav-link" href="https://sites.tufts.edu/ears4peers/" target="_blank">More Resources</a></li>' +
     '<li class="nav-item"><a class="nav-link" href="http://sites.tufts.edu/ears4peers/contact-us/" target="_blank">Feedback</a></li>' +
-    '<li class="nav-item"><a class="nav-link" href=' + login + '>Login</a></li>';
+    '<li class="nav-item"><a class="nav-link" href=' + login + '>Admin</a></li>';
   } else if (role === 'login_page') {
-    buttons = '<li class="nav-item"><a class="nav-link" href="https://sites.tufts.edu/ears4peers/" target="_blank">E4P Homepage</a></li>' +
+    buttons = '<li class="nav-item"><a class="nav-link" href="https://sites.tufts.edu/ears4peers/" target="_blank">More Resources</a></li>' +
     '<li class="nav-item"><a class="nav-link" href="http://sites.tufts.edu/ears4peers/contact-us/" target="_blank">Feedback</a></li>';
   } else {
     buttons = '<li class="nav-item"><a class="nav-link" href="' + logout + '">Logout</a></li>';
