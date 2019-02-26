@@ -1,24 +1,36 @@
 function generateAdminHeader() {
-	generateHeader('admin');
+  generateHeader('admin');
 }
 
 function generateUserHeader() {
-	generateHeader('user');
+  generateHeader('user');
+}
+
+function generateLoginHeader() {
+  generateHeader('login');
 }
 
 function generateHeader(role) {
-	href = role === 'user' ? '/' : '/admin';
-	login = '/admin/login';
-	logout = '/admin/logout';
-	buttons = role === 'user' ? 
-		"<a href='/help' target='_blank'>Help</a>" +
-		"<a href='http://sites.tufts.edu/ears4peers/contact-us/' target='_blank'>Feedback</a>" +
-		"<a href=" + login + ">Login</a>" :
-		"<a href=" + logout + ">Logout</a>";
+  home = '/';
+  login = '/admin/login';
+  logout = '/admin/logout';
 
-	document.getElementsByClassName("topnav")[0].innerHTML = 
-		"<a class='active' href='" + href + "'>E4P</a>"
-		+ "<div class='topnav-right'>"
-		+ 	buttons
-		+ "</div>";
+  if (role === 'user') {
+    buttons ='<li class="nav-item"><a class="nav-link" href="/help" target="_blank">Help</a></li>' +
+    '<li class="nav-item"><a class="nav-link" href="http://sites.tufts.edu/ears4peers/contact-us/" target="_blank">Feedback</a></li>' +
+    '<li class="nav-item"><a class="nav-link" href=' + login + '>Login</a></li>';
+  } else if (role === 'login') {
+    buttons = '<li class="nav-item"><a class="nav-link" href="/help" target="_blank">Help</a></li>' +
+    '<li class="nav-item"><a class="nav-link" href="http://sites.tufts.edu/ears4peers/contact-us/" target="_blank">Feedback</a></li>';
+  } else {
+    buttons = '<li class="nav-item"><a class="nav-link" href=" + logout + ">Logout</a></li>';
+  }
+
+  document.getElementsByClassName('navbar')[0].innerHTML = 
+    '<a class="navbar-brand" href="" + home + "">E4P</a>'
+    + '<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">'
+    + '<span class="navbar-toggler-icon"></span></button>'
+    + '<div class="collapse navbar-collapse" id="navbarSupportedContent"><ul class="navbar-nav ml-auto" style="color: black">'
+    +   buttons
+    + '</ul></div>';
 }

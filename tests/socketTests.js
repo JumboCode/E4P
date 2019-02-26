@@ -7,6 +7,7 @@ let expect = require('chai').expect;
 let should = chai.should();
 let server = require('../server');
 let admins = require('../server').admins;
+let currentConversations = require('../server').currentConversations;
 let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
@@ -170,7 +171,7 @@ describe('socket tests', () => {
     });
   });
   
-  describe('User Typing Messages', () => {
+  describe('User Stop Typing Messages', () => {
     it('should send stop typing notices back and forth between admin and user', (done) => {
       // setup connections
       admin1.on('user waiting', (id1) => {
@@ -192,6 +193,19 @@ describe('socket tests', () => {
         done();
       });
 
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+    });
+  });
+
+  describe('Update currentConversations', () => {
+    it('should add conversation to currentConversations', (done) => {
+      admin1.on('user waiting', (id1) => {
+        admin1.emit('accept user', id1);
+        expect(currentConversations.length).to.equal(1);
+        expect(currentConversations[0].user).to.equal(currentConversations[0].room);
+        done();
+      });
+      
       setTimeout(() => { user1.emit('user connect'); }, 50);
     });
   });
