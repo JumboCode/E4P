@@ -84,10 +84,6 @@ app.post('/setavailable', adminRoutes.ensureAuthenticated, (req, res) => {
   res.sendStatus(200);
 });
 
-app.get('/help', (req, res) => {
-  res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
-});
-
 app.get('/css/:file', (req, res) => {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'css')});
 });
