@@ -119,7 +119,6 @@ let icons = [
   'brownbear', 'marmoset', 'funnylion', 'deer', 'zebra', 'meerkat', 'elephant', 'cat',
   'hare', 'puma', 'owl', 'antelope', 'lion', 'fox', 'wolf', 'hippo'
 ];
-icons = [icons[1]]
 
 io.on('connection', (socket) => {
   // PHASE I
