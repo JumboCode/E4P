@@ -1,16 +1,45 @@
-const socket = io();
+let socket = io();
+
+let PREV_ROOM_ID = '';
+
+function retrieveLocalStorage() {
+  PREV_ROOM_ID = window.localStorage.getItem('roomID');
+  if (PREV_ROOM_ID) {
+    // retrieve local storage if it exists
+    // ROOM_ID = localStorage.getItem('roomID');
+    console.log('Reconnected with: ' + PREV_ROOM_ID);
+
+    // user needs to reconnect using localStorage ID
+    socket.emit('user reconnect', PREV_ROOM_ID, socket.id);
+    // startChat();
+    }
+}
 
 socket.on('connect', () => {
   console.log('connected to socket');
+  retrieveLocalStorage();
 });
 
 socket.on('admin matched', () => {
   startChat();
+  console.log('Prev room id: ' + PREV_ROOM_ID);
+  if (!PREV_ROOM_ID) {
+    console.log('No previous room id')
+    window.localStorage.setItem('roomID', socket.id);
+  }
+  else {
+      console.log('FOUND previous room id');
+  }
   console.log('admin matched');
 });
 
+socket.on('admin disconnect', () => {
+  console.log("Admin left!");
+  // admin has disconnected, do something
+  // updateChat(createMessage('admin', 'ALERT: Admin disconnected!'));
+});
+
 socket.on('chat message', function(data) {
-  console.log('recieved chat message on index: ' + data);
   updateChat(createMessage('admin', data.message));
   $('#typingIcon').css('display', 'none');
 });
@@ -30,11 +59,13 @@ function send_message(msg) {
     message: msg,
     room: socket.id
   });
-}
+};
 
 function user_connect() {
   socket.emit('user connect');
 };
+
+socket.emit('assign as user');
 
 function send_typing_message(is_typing) {
   if (is_typing) {
@@ -127,6 +158,11 @@ function sendMessage() {
     }
 }
 
+function admin_matched() {
+  startChat();
+  console.log('admin matched');
+}
+
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
 
@@ -134,3 +170,16 @@ $(function() {
   $("#type_msg").html(chatElements(""));
   chatSetup(sendMessage);
 });
+
+
+
+function resetStorage() {
+  window.localStorage.removeItem('roomID');
+}
+
+function disconnect() {
+  socket.disconnect();
+  socket = io();
+  socket.emit('user reconnect', PREV_ROOM_ID, socket.id);
+  console.log('here');
+}
