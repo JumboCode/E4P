@@ -121,13 +121,29 @@ io.on('connection', (socket) => {
       socket.broadcast.to(admin).emit('user waiting', socket.id, socket.icon);
     }
     currentConversations.push(
-      { user: socket.id, 
+      { user: socket.id,
         icon: socket.icon,
-        room: socket.id, 
-        accepted: false, 
+        room: socket.id,
+        accepted: false,
         connected: true,
         connected_admin: null
       });
+  });
+
+  socket.on('user reconnect', (old_socket_id, current_socket_id) => {
+
+      console.log('Old socket ID: ' + old_socket_id);
+
+      for (let conversation of currentConversations) {
+        if (conversation.user === old_socket_id) {
+          socket.join(conversation.room);
+          conversation.user = socket.id;
+        }
+      }
+
+      // socket.broadcast.to(socket.id).emit('admin matched');
+      socket.broadcast.to(current_socket_id).emit('admin matched');
+
   });
 
   // PHASE II
@@ -179,19 +195,37 @@ io.on('connection', (socket) => {
       // room exists, either admin or user left in room, send disconnect
       socket.broadcast.to(user_room_id).emit('user disconnect', user_room_id);
     } else {
-      // room DNE, no one else connected, user was pending
-      // TODO what if admin disconnected first, dont need to send 'accept user'
-      for (let admin of admins) {
-        socket.broadcast.to(admin).emit('user matched', user_room_id);
+          // room DNE, no one else connected, user was pending
+          // TODO what if admin disconnected first, dont need to send 'accept user'
+          for (let admin of admins) {
+            socket.broadcast.to(admin).emit('user matched', user_room_id);
       }
     }
     // Removes admin ID from admins array when an admin disconnects
     for (let i = 0; i < admins.length; i++) {
       if (admins[i] == user_room_id) {
         admins.splice(i, 1);
-
       }
     }
+
+
+    //////////
+    if (socket.role == 'user') {
+        // user left before admin
+        console.log('user left');
+        socket.broadcast.to(user_room_id).emit('user disconnect', user_room_id);
+    }
+    else if (socket.role == 'admin' && socket.user_room_id) {
+        // admin accidentally left while still connected to user
+        console.log('ADMIN LEFT');
+        socket.broadcast.to(socket.user_room_id).emit('admin disconnect');
+        socket.broadcast.to(socket.user_room_id).emit('wait for admin reconnect');
+    }
+    else if (socket.role == 'admin') {
+        // admin left, and was not connected with anyone
+        console.log('ADMIN LEFT but not connected to anyone');
+    }
+    /////////
 
     // Disconnect user ID from room
     for (let conversation of currentConversations) {
@@ -213,6 +247,15 @@ io.on('connection', (socket) => {
       }
     }
   });
+
+  socket.on('assign as user', () => {
+      socket.role = 'user';
+  });
+
+  socket.on('assign as admin', () => {
+    socket.role = 'admin';
+  });
+
 
   //User Typing Event:
   socket.on('typing', (data) => {
