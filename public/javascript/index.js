@@ -180,5 +180,6 @@ function resetStorage() {
 function disconnect() {
   socket.disconnect();
   socket = io();
+  socket.emit('user reconnect', PREV_ROOM_ID, socket.id);
   console.log('here');
 }

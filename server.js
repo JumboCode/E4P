@@ -141,6 +141,8 @@ io.on('connection', (socket) => {
         }
       }
 
+      console.log(currentConversations);
+
       // socket.broadcast.to(socket.id).emit('admin matched');
       socket.broadcast.to(current_socket_id).emit('admin matched');
 
