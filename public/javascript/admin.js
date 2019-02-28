@@ -50,11 +50,21 @@ socket.on('user disconnect', end_chat);
 
 // ends a chat with given user
 function end_chat(user) {
+  /* TODO: Conversations stick around for some time after the user leaves
+   * to allow for reconnections. The chat should no longer 
+   * be deactivated immediately.
+   * Instead, the admin should receive a notice that the user has
+   * left, and receive another notive when the user returns.
+   */
+
   console.log('user disconnected ' + user);
+
+  /*
   deactivateChat(user);
 
   // reload the current window:
   toggleChat(CURRENT_CHAT_USER_ID);
+  */
 }
 
 socket.on('user waiting', user_waiting);

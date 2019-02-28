@@ -101,6 +101,7 @@ let icons = [
   'brownbear', 'marmoset', 'funnylion', 'deer', 'zebra', 'meerkat', 'elephant', 'cat',
   'hare', 'puma', 'owl', 'antelope', 'lion', 'fox', 'wolf', 'hippo'
 ];
+let reconnectionTimeouts = {};
 
 io.on('connection', (socket) => {
   // PHASE I
@@ -126,24 +127,6 @@ io.on('connection', (socket) => {
       });
   });
 
-  socket.on('user reconnect', (old_socket_id, current_socket_id) => {
-
-      console.log('Old socket ID: ' + old_socket_id);
-
-      for (let conversation of currentConversations) {
-        if (conversation.user === old_socket_id) {
-          socket.join(conversation.room);
-          conversation.user = socket.id;
-        }
-      }
-
-      console.log(currentConversations);
-
-      // socket.broadcast.to(socket.id).emit('admin matched');
-      socket.broadcast.to(current_socket_id).emit('admin matched');
-
-  });
-
   // PHASE II
   // Admin Accepts User:
   // 1. put admin in same room as user
@@ -160,7 +143,10 @@ io.on('connection', (socket) => {
       }
     }
     console.log(currentConversations);
+    console.log('sending admin matched to:');
+    console.log(user_room_id);
 
+    socket.broadcast.to(user_room_id).emit('invalid');
     socket.broadcast.to(user_room_id).emit('admin matched');
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user matched', user_room_id);
@@ -174,6 +160,10 @@ io.on('connection', (socket) => {
 
     let message = data['message'];
     let receiver = data['room'];
+
+    console.log(message);
+    console.log(receiver);
+
     // console.log('receiver: ' + receiver);
     socket.broadcast.to(receiver).emit('chat message', {message: message, room: receiver});
   });
@@ -182,8 +172,6 @@ io.on('connection', (socket) => {
   // User Disconnects:
   socket.on('disconnect', () => {
     var user_room_id = socket.id;
-    console.log('disconnect');
-    console.log(socket.id);
 
     if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
       icons.push(socket.icon);
@@ -206,32 +194,15 @@ io.on('connection', (socket) => {
       }
     }
 
-
-    //////////
-    if (socket.role == 'user') {
-        // user left before admin
-        console.log('user left');
-        socket.broadcast.to(user_room_id).emit('user disconnect', user_room_id);
-    }
-    else if (socket.role == 'admin' && socket.user_room_id) {
-        // admin accidentally left while still connected to user
-        console.log('ADMIN LEFT');
-        socket.broadcast.to(socket.user_room_id).emit('admin disconnect');
-        socket.broadcast.to(socket.user_room_id).emit('wait for admin reconnect');
-    }
-    else if (socket.role == 'admin') {
-        // admin left, and was not connected with anyone
-        console.log('ADMIN LEFT but not connected to anyone');
-    }
-    /////////
-
     // Disconnect user ID from room
     for (let conversation of currentConversations) {
       if (conversation.user === user_room_id) {
         conversation.connected = false;
+        console.log('conversation disconnected');
         // TODO: After user reconnect is implemented, we'll want to delay this
         //       removing for some time
-        conversation.timeout = setTimeout(() => {
+        reconnectionTimeouts[conversation.room] = setTimeout(() => {
+          delete reconnectionTimeouts[conversation.room];
           removeConversation(conversation.room);
         }, process.env.DISCONNECT_GRACE_PERIOD || 60000);
       }
@@ -246,16 +217,41 @@ io.on('connection', (socket) => {
         }
       }
     }
+    console.log(currentConversations);
   });
 
-  socket.on('assign as user', () => {
-      socket.role = 'user';
-  });
+  socket.on('user reconnect', (old_socket_id) => {
+    let foundUser = false;
+    console.log('Old socket ID: ' + old_socket_id);
+    console.log('New socket ID: ' + socket.id);
 
-  socket.on('assign as admin', () => {
-    socket.role = 'admin';
-  });
+    for (let conversation of currentConversations) {
+      if (conversation.user === old_socket_id) {
+        clearTimeout(reconnectionTimeouts[conversation.room]);
+        delete reconnectionTimeouts[conversation.room];
+        foundUser = true;
+        console.log('found user\'s old room');
+        socket.join(conversation.room);
+        conversation.user = socket.id;
+        // socket.broadcast.to(socket.id).emit('admin matched');
+        socket.emit('reconnected with old socket id');
 
+      }
+    }
+
+    console.log('foundUser: ');
+    console.log(foundUser);
+
+    if (!foundUser) {
+      console.log('invalid old socket id, current id:');
+      console.log(socket.id);
+      console.log('sending message now');
+      socket.emit('invalid old socket id');
+    }
+    console.log(currentConversations);
+
+    
+  });
 
   //User Typing Event:
   socket.on('typing', (data) => {

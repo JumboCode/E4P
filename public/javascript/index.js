@@ -1,35 +1,51 @@
 let socket = io();
 
-let PREV_ROOM_ID = '';
+let prevRoomID = '';
 
-function retrieveLocalStorage() {
-  PREV_ROOM_ID = window.localStorage.getItem('roomID');
-  if (PREV_ROOM_ID) {
-    // retrieve local storage if it exists
-    // ROOM_ID = localStorage.getItem('roomID');
-    console.log('Reconnected with: ' + PREV_ROOM_ID);
+function connectWithStoredID() {
+  prevRoomID = window.localStorage.getItem('roomID');
+  console.log('Prev room id: ' + prevRoomID);
+
+  if (prevRoomID !== '') {
+    console.log('Reconnecting with: ' + prevRoomID);
 
     // user needs to reconnect using localStorage ID
-    socket.emit('user reconnect', PREV_ROOM_ID, socket.id);
-    // startChat();
-    }
+    socket.emit('user reconnect', prevRoomID);
+  }
 }
+
+socket.on('test', () => {
+  console.log('test');
+});
 
 socket.on('connect', () => {
   console.log('connected to socket');
-  retrieveLocalStorage();
+  console.log(socket);
+  console.log(chat);
+
+  if (chat.active) {
+    console.log('Chat is active, connecting with stored ID');
+    connectWithStoredID();
+  }
+});
+
+socket.on('invalid old socket id', () => {
+  /* TODO: Tell user that their chat is not valid anymore (convert console
+      log into a displayed message.)
+      
+      This function only gets called when a user was in the middle of a 
+      conversation. If the user presses the "Connect me to an Ear" button,
+      their id is saved in localStorage, and this function does not get 
+      called until after they disconnect during a conversation.
+  */
+  console.log('Tried to reconnect, but your conversation seems to be too old.' + 
+              'You usually cannot disconnect for more than 5 minutes');
+
+  window.localStorage.setItem('roomID', socket.id);
 });
 
 socket.on('admin matched', () => {
   startChat();
-  console.log('Prev room id: ' + PREV_ROOM_ID);
-  if (!PREV_ROOM_ID) {
-    console.log('No previous room id')
-    window.localStorage.setItem('roomID', socket.id);
-  }
-  else {
-      console.log('FOUND previous room id');
-  }
   console.log('admin matched');
 });
 
@@ -57,11 +73,12 @@ socket.on('stop typing', () => {
 function send_message(msg) {
   socket.emit('chat message', {
     message: msg,
-    room: socket.id
+    room: chat.roomId
   });
 };
 
 function user_connect() {
+  console.log(socket)
   socket.emit('user connect');
 };
 
@@ -70,11 +87,11 @@ socket.emit('assign as user');
 function send_typing_message(is_typing) {
   if (is_typing) {
     socket.emit('typing', {
-      room: socket.id
+      room: chat.roomId
     });
   } else {
     socket.emit('stop typing', {
-      room: socket.id
+      room: chat.roomId
     });
   }
 }
@@ -85,9 +102,10 @@ function warning() {
 
 var chat = {
   userId: 'user1',
+  roomId: '',
   messages: [],
   accepted: false,
-  active: true
+  active: false
 };
 
 
@@ -99,8 +117,13 @@ function openChat() {
   window.onbeforeunload = () => {
     return "Are you sure you want to leave? Your chat connection will be lost.";
   }
+  
+  // User is connecting: Fix the current room id in localStorage and the chat object:
+  window.localStorage.setItem('roomID', socket.id);
+  chat.roomId = socket.id;
 
   user_connect();
+  chat.active = true;
 }
 
 function startChat() {
@@ -179,7 +202,7 @@ function resetStorage() {
 
 function disconnect() {
   socket.disconnect();
-  socket = io();
-  socket.emit('user reconnect', PREV_ROOM_ID, socket.id);
-  console.log('here');
+  socket.connect({'forceNew':true });
+
+  //connectWithStoredID();
 }
