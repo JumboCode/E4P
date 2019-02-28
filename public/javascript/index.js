@@ -116,6 +116,8 @@ function startChat() {
   chatbar = document.getElementById('chatbar');
   chatbar.style.visibility= 'visible';
   chat.accepted = true;
+
+  $('#typingIcon').before(createStatusDiv('An ear has accepted your message.'));
 }
 
 
