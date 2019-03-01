@@ -35,6 +35,16 @@ textarea {
   padding-right: 1em;
 }
 
+.status-container {
+  display: inline-block;
+  width: 100%;
+  margin: 0.25em auto;
+  padding-left: 1em;
+  padding-right: 1em;
+  text-align: center;
+  font-size: 0.7rem;
+}
+
 .left-time {
   position: relative;
   top: 8px;
