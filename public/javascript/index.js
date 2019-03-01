@@ -117,7 +117,8 @@ function startChat() {
   chatbar.style.visibility= 'visible';
   chat.accepted = true;
 
-  $('#typingIcon').before(createStatusDiv('An ear has accepted your message.'));
+  $('#typingIcon').before(createStatusDiv('An Ear has accepted your conversation.'));
+  $('#typingIcon').before(createStatusDiv('Talk to us about anything that\'s on your mind.'));
 }
 
 

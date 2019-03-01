@@ -336,8 +336,8 @@ function userNotTyping(userId) {
 }
 
 function showCurrentTyping(userIsTyping) {
-    currentUserTyping = userIsTyping ? 'block' : 'none';
-    $('#typingIcon').css('display', currentUserTyping);
+  currentUserTyping = userIsTyping ? 'block' : 'none';
+  $('#typingIcon').css('display', currentUserTyping);
 }
 
 
@@ -349,7 +349,7 @@ function showCurrentTyping(userIsTyping) {
     this function appends creates a new messageObject that can be sent to addMessage.
 */
 function createMessage(role, messageString) {
-    return { role: role, message: messageString, timestamp: new Date() };
+  return { role: role, message: escapeMessage(messageString), timestamp: new Date() };
 }
 
 function sendMessage() {
