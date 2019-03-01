@@ -187,15 +187,7 @@ $(function() {
   chatSetup(sendMessage);
 });
 
-
-
-function resetStorage() {
-  window.localStorage.removeItem('roomID');
-}
-
 function disconnect() {
   socket.disconnect();
   socket.connect({'forceNew':true });
-
-  //connectWithStoredID();
 }
