@@ -1,9 +1,7 @@
 let socket = io();
 
-let prevRoomID = '';
-
 function connectWithStoredID() {
-  prevRoomID = window.localStorage.getItem('roomID');
+  let prevRoomID = window.localStorage.getItem('roomID');
   console.log('Prev room id: ' + prevRoomID);
 
   if (prevRoomID !== '') {
@@ -19,10 +17,6 @@ socket.on('test', () => {
 });
 
 socket.on('connect', () => {
-  console.log('connected to socket');
-  console.log(socket);
-  console.log(chat);
-
   if (chat.active) {
     console.log('Chat is active, connecting with stored ID');
     connectWithStoredID();
@@ -38,7 +32,7 @@ socket.on('invalid old socket id', () => {
       their id is saved in localStorage, and this function does not get 
       called until after they disconnect during a conversation.
   */
-  console.log('Tried to reconnect, but your conversation seems to be too old.' + 
+  console.log('Tried to reconnect, but your conversation seems to be too old. ' + 
               'You usually cannot disconnect for more than 5 minutes');
 
   window.localStorage.setItem('roomID', socket.id);
@@ -101,7 +95,6 @@ function warning() {
 }
 
 var chat = {
-  userId: 'user1',
   roomId: '',
   messages: [],
   accepted: false,

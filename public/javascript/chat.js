@@ -32,9 +32,9 @@ function chatElements(currentMessage) {
 }
 
 function chatSetup(sendMessage) {
-  $("#inputBox").keydown(function(e) {
+  $("#inputBox").keydown((e) => {
     // Check if on user side
-    if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.userId) != "undefined") {
+    if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.roomId) != "undefined") {
       send_typing_message(true);
       // clear timout that would send message "stop typing" message
       if (typeof(userTypingTimeout) != "undefined") {

@@ -220,13 +220,13 @@ io.on('connection', (socket) => {
     console.log(currentConversations);
   });
 
-  socket.on('user reconnect', (old_socket_id) => {
+  socket.on('user reconnect', (old_room_id) => {
     let foundUser = false;
-    console.log('Old socket ID: ' + old_socket_id);
+    console.log('Old socket ID: ' + old_room_id);
     console.log('New socket ID: ' + socket.id);
 
     for (let conversation of currentConversations) {
-      if (conversation.user === old_socket_id) {
+      if (conversation.room === old_room_id) {
         clearTimeout(reconnectionTimeouts[conversation.room]);
         delete reconnectionTimeouts[conversation.room];
         foundUser = true;
@@ -249,8 +249,6 @@ io.on('connection', (socket) => {
       socket.emit('invalid old socket id');
     }
     console.log(currentConversations);
-
-    
   });
 
   //User Typing Event:
