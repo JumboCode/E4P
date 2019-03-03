@@ -207,8 +207,8 @@ function toggleChat(userId) {
 }
 
 function scrollDown() {
-    messagesBox = document.getElementsByClassName("messagesBox")[0];
-    messagesBox.scrollTop = messagesBox.scrollHeight;
+  let mbox = $('.messagesBox').first();
+  mbox.scrollTop(mbox.prop('scrollHeight') - mbox.prop('clientHeight'));
 }
 
 function updateCurrentInput(userId) {
@@ -318,6 +318,7 @@ function userIsTyping(userId) {
     updateUserOverview();
     if (userId == CURRENT_CHAT_USER_ID) {
         showCurrentTyping(true);
+        scrollDown();
     }
 
 }
