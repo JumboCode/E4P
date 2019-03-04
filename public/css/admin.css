@@ -7,6 +7,8 @@ body { font-family: "Roboto", sans-serif; }
   max-width: 800px;
   min-width: 600px;
   overflow-x: auto;
+  border-radius: 3px;
+  border-color: grey;
 }
 
 .main-content {
@@ -26,13 +28,12 @@ body { font-family: "Roboto", sans-serif; }
 
 /* Style the buttons that are used to open the tab content */
 .tab button {
-  background-color: #96d7d2;
+  background-color: white;
   display: flex;
   flex-direction: row;
   color: black;
   padding: 0 0;
   width: 100%;
-  outline: none;
   text-align: left;
   cursor: pointer;
   transition: 0.3s;
@@ -41,7 +42,8 @@ body { font-family: "Roboto", sans-serif; }
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-  background-color: #b2fef8;
+  background-color: lightgray;
+  opacity: 0.5px;
 }
 
 /* Create an active/current "tab button" class */
@@ -50,7 +52,7 @@ body { font-family: "Roboto", sans-serif; }
 }
 
 #selectedTab {
-  background-color: #248f89;
+  background-color: #96d7d2;
 }
 
 .username {
@@ -177,6 +179,8 @@ div.icon {
   height: 100%;
   width: 100%;
   cursor: pointer;
+  background-color: white;
+  color: var(--dark-green);
 }
 
 .chatAction #inputBox {
@@ -200,7 +204,8 @@ div.icon {
 #sendButton:hover,
 #delete:hover,
 #accept:hover {
-  background-color: rgb(200, 200, 200);
+  background-color: var(--dark-green);
+  color: white;
 }
 
 .chatAction #sendButtonText {
