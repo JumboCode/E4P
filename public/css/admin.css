@@ -151,6 +151,10 @@ div.icon {
   flex-direction: row;
 }
 
+.chatAction #pause {
+  background-color: grey;
+}
+
 .chatAction #delete,
 #accept {
   height: 100%;

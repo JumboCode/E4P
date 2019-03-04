@@ -46,10 +46,38 @@ socket.on('user unmatched', (conversation) => {
   updateUserOverview();
 });
 
-socket.on('user disconnect', end_chat);
+socket.on('user disconnect', pause_chat);
+
+function pause_chat(user) {
+  console.log('user disconnected ' + user);
+
+  pauseChat(user);
+
+  toggleChat(CURRENT_CHAT_USER_ID);
+}
+
+socket.on('user gone for good', delete_chat);
+
+function delete_chat(user) {
+  console.log('user chat being deleted ' + user);
+
+  deactivateChat(user);
+
+  toggleChat(CURRENT_CHAT_USER_ID);
+}
+
+socket.on('user reconnect', resume_chat);
+
+function resume_chat(user) {
+  console.log('user reconnected ' + user);
+
+  reactivateChat(user);
+
+  toggleChat(CURRENT_CHAT_USER_ID);
+}
 
 // ends a chat with given user
-function end_chat(user) {
+// function end_chat(user) {
   /* TODO: Conversations stick around for some time after the user leaves
    * to allow for reconnections. The chat should no longer 
    * be deactivated immediately.
@@ -57,15 +85,15 @@ function end_chat(user) {
    * left, and receive another notive when the user returns.
    */
 
-  console.log('user disconnected ' + user);
+  // console.log('user disconnected ' + user);
+
+  // deactivateChat(user);
 
   /*
-  deactivateChat(user);
-
   // reload the current window:
   toggleChat(CURRENT_CHAT_USER_ID);
   */
-}
+// }
 
 socket.on('user waiting', user_waiting);
 
@@ -198,7 +226,11 @@ function toggleChat(userId) {
                 actionDiv.innerHTML = chatElements(chat.currentMessage);
                 chatSetup(sendMessage);
                 scrollDown()
-            } else {
+            }
+            else if (chat.reconnecting) {
+                actionDiv.innerHTML = "<div id='pause'>User Disconnected...</div>";
+            }
+            else {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
@@ -247,19 +279,20 @@ function newChat(userId, icon) {
               typing: false,
               icon: icon,
               alert: true,
+              reconnecting: false,
               currentMessage: "" }
         );
     }
 }
 
-
-function deactivateChat(userId) {
+function reactivateChat(userId) {
     foundUser = false;
     for (chat of chats) {
         if (userId == chat.userId) {
-            chat.active = false;
+            chat.active = true;
             chat.typing = false;
             chat.alert = true;
+            chat.reconnecting = false;
             foundUser = true;
             updateUserOverview();
         }
@@ -268,6 +301,40 @@ function deactivateChat(userId) {
         console.log(Error('User with given identifier could not be found'));
     }
 }
+
+function pauseChat(userId) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.active = false;
+            chat.typing = false;
+            chat.alert = true;
+            chat.reconnecting = true;
+            foundUser = true;
+            updateUserOverview();
+        }
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+}
+
+function deactivateChat(userId) {
+    foundUser = false;
+    for (chat of chats) {
+        if (userId == chat.userId) {
+            chat.active = false;
+            chat.typing = false;
+            chat.alert = true;
+            chat.reconnecting = false;
+            foundUser = true;
+            updateUserOverview();
+        }
+    }
+    if (!foundUser) {
+        console.log(Error('User with given identifier could not be found'));
+    }
+} 
 
 function acceptChat(userId) {
   acceptChatUI(userId);
