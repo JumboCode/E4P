@@ -140,7 +140,7 @@ function updateUserOverview() {
         typing = chat.typing ? ' id=typing' : '';
         alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML
-                      + "<button class='username' " + selectedChat
+                      + "<button class='btn btn-light' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
                         + iconTag
                         + "<div class='buttonText'>"
@@ -178,14 +178,14 @@ function toggleChat(userId) {
 
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
-                actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
+                actionDiv.innerHTML = "<button id='accept' class='btn btn-light' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
             }
             else if (chat.active) {
                 actionDiv.innerHTML = chatElements(chat.currentMessage);
                 chatSetup(sendMessage);
                 scrollDown()
             } else {
-                actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
+                actionDiv.innerHTML = "<button id='delete' class='btn btn-light' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
             }
         }
         tabId++;
