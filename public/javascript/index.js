@@ -5,7 +5,7 @@ $(document).ready(() => {
       <div class='row'>Ears for Peers</div>
       <img src='img/baby_elephant.png'>
       <div class='row'>
-        <button type='button' onclick='openChat()'>Connect Me to an Ear</button>
+        <button type='button' class="btn btn-outline-info" onclick='openChat()'>Connect Me to an Ear</button>
       </div>
       <p style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
     `;
@@ -46,6 +46,7 @@ socket.on('chat message', (data) => {
 socket.on('typing', () => {
   console.log('admin is typing');
   $('#typingIcon').css('display', 'block');
+  scrollDown();
 });
 
 socket.on('stop typing', () => {
@@ -91,7 +92,7 @@ var chat = {
 function openChat() {
   let openPanel = document.getElementById('open');
   openPanel.innerHTML = '';
-  openPanel.innerHTML = ' <div class=\'row\'>Waiting to connect to an ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div>';
+  openPanel.innerHTML = ' <div class=\'row\'>Waiting to connect to an ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div><div class=\'row\' style="margin-top: 16px"><span style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 7am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</span></div>';
   console.log('attempting to connect');
   window.onbeforeunload = () => {
     return 'Are you sure you want to leave? Your chat connection will be lost.';
@@ -116,6 +117,9 @@ function startChat() {
   chatbar = document.getElementById('chatbar');
   chatbar.style.visibility= 'visible';
   chat.accepted = true;
+
+  $('#typingIcon').before(createStatusDiv('An Ear has accepted your conversation.'));
+  $('#typingIcon').before(createStatusDiv('Talk to us about anything that\'s on your mind.'));
 }
 
 
@@ -124,13 +128,17 @@ function getMessage() {
   window.onbeforeunload = warning;
 }
 
+function scrollDown() {
+  let mbox = $('#chathistory');
+  mbox.scrollTop(mbox.prop('scrollHeight') - mbox.prop('clientHeight'));
+}
 
 function updateChat(messageObj) {
   let messages = document.getElementById('chathistory');
   const messageSide = (messageObj.role == 'admin' ? 'left' : 'right');
   const newMessage = createMessageDiv(messageSide, messageObj.message, messageObj.timestamp);
   $('#typingIcon').before(newMessage);
-  messages.scrollTop = messages.scrollHeight - messages.clientHeight;
+  scrollDown();
 }
 
 
