@@ -101,7 +101,6 @@ let icons = [
   'brownbear', 'marmoset', 'funnylion', 'deer', 'zebra', 'meerkat', 'elephant', 'cat',
   'hare', 'puma', 'owl', 'antelope', 'lion', 'fox', 'wolf', 'hippo'
 ];
-icons = [icons[0]]
 let reconnectionTimeouts = {};
 
 io.on('connection', (socket) => {
@@ -206,6 +205,9 @@ io.on('connection', (socket) => {
           // remove related objects from data structs
           delete reconnectionTimeouts[conversation.room];
           removeConversation(conversation.room);
+          for (let id in io.sockets.adapter.rooms[conversation.room].sockets) {
+            io.sockets.connected[id].leave(conversation.room);
+          }
 
           // recycle icon
           if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
