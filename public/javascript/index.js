@@ -46,6 +46,7 @@ socket.on('chat message', (data) => {
 socket.on('typing', () => {
   console.log('admin is typing');
   $('#typingIcon').css('display', 'block');
+  scrollDown();
 });
 
 socket.on('stop typing', () => {
@@ -127,13 +128,17 @@ function getMessage() {
   window.onbeforeunload = warning;
 }
 
+function scrollDown() {
+  let mbox = $('#chathistory');
+  mbox.scrollTop(mbox.prop('scrollHeight') - mbox.prop('clientHeight'));
+}
 
 function updateChat(messageObj) {
   let messages = document.getElementById('chathistory');
   const messageSide = (messageObj.role == 'admin' ? 'left' : 'right');
   const newMessage = createMessageDiv(messageSide, messageObj.message, messageObj.timestamp);
   $('#typingIcon').before(newMessage);
-  messages.scrollTop = messages.scrollHeight - messages.clientHeight;
+  scrollDown();
 }
 
 
