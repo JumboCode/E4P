@@ -24,7 +24,7 @@ socket.on('user matched', user_matched);
 
 socket.on('chat message', function(data) {
   addMessage(data.room, createMessage('user', data.message));
-  alertSound();
+  messageSound();
   // Chat message received, so user is not typing anymore
   userNotTyping(data.room);
 });
@@ -58,7 +58,7 @@ socket.on('user waiting', user_waiting);
 function user_waiting(user, icon) {
   console.log('user waiting ' + user);
   console.log('creating new chat for user waiting');
-  newChat(user, icon);
+  newChatWithAlert(user, icon);
   updateUserOverview();
 }
 
@@ -118,11 +118,6 @@ function initialize() {
     generateAdminHeader();
 }
 
-
-function alertSound() {
-    let audio = new Audio('audio/alert.mp3');
-    audio.play();
-}
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
 
 
@@ -243,6 +238,10 @@ function newChat(userId, icon) {
     }
 }
 
+function newChatWithAlert(userId, icon) {
+  newChat(userId, icon);
+  chatSound();
+}
 
 function deactivateChat(userId) {
     foundUser = false;
