@@ -42,7 +42,7 @@ function user_matched(user) {
 }
 
 socket.on('user unmatched', (conversation) => {
-  // TODO: display a message to the ear so they know this person was 
+  // TODO: display a message to the ear so they know this person was
   //       disconnected from an admin
   newChat(conversation.user, conversation.icon);
   updateUserOverview();
@@ -110,8 +110,8 @@ function send_typing_message(user_id, is_typing) {
 }
 
 
-chats = [];
-CURRENT_CHAT_USER_ID = '';
+let chats = [];
+let CURRENT_CHAT_USER_ID = '';
 const ICON_SRC = "img/Animal Icons Small.png";
 
 /**************************** INITIALIZE ****************************/
@@ -172,38 +172,36 @@ function clearView() {
 }
 
 function toggleChat(userId) {
-    updateCurrentInput(CURRENT_CHAT_USER_ID);
-    CURRENT_CHAT_USER_ID = userId
-    tabId = 0;
-    for (chat of chats) {
-        if (chat.userId == userId) {
-            currentChat = document.getElementsByClassName("messages")[0];
-            currentChat.innerHTML = "";
-            for (message of chat.messages) {
-                messageSide = message.role == 'admin' ? 'right' : 'left';
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message, message.timestamp)
-            }
-
-            currentUserTyping = chat.typing ? 'block' : 'none';
-            $('#typingIcon').css('display', currentUserTyping);
-
-            actionDiv = document.getElementsByClassName("chatAction")[0];
-            if (!chat.accepted) {
-                actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
-            }
-            else if (chat.active) {
-                actionDiv.innerHTML = chatElements(chat.currentMessage);
-                chatSetup(sendMessage);
-                scrollDown()
-            } else {
-                actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
-            }
-        }
-        tabId++;
+  //Update global 'current chat' state.
+  updateCurrentInput(CURRENT_CHAT_USER_ID);
+  CURRENT_CHAT_USER_ID = userId;
+  //Get the index of the selected chat.
+  let tabId = chats.findIndex((cht) => cht.userId === userId);
+  if (tabId !== -1) {
+    //Get the current chat object.
+    let chat = chats[tabId];
+    //Rehydrate message info.
+    let currentChat = $('.messages').first();
+    currentChat.html('');
+    chat.messages.forEach((msg) => {currentChat.append(
+      createMessageDiv(msg.role === 'admin' ? 'right' : 'left', msg.message, msg.timestamp)
+    );});
+    //Set typing indicator.
+    $('#typingIcon').css('display', (chat.typing ? 'block' : 'none'));
+    //Update available actions.
+    let actionDiv = $('.chatAction').first();
+    if (!chat.accepted) {
+      actionDiv.html('<button id=\'accept\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Thread</button>');
+    } else if (chat.active) {
+      actionDiv.html(chatElements(chat.currentMessage));
+      chatSetup(sendMessage);
+      scrollDown();
+    } else {
+      actionDiv.html('<button id=\'delete\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
     }
-
-    scrollDown()
-    updateUserOverview();
+  }
+  scrollDown();
+  updateUserOverview();
 }
 
 function scrollDown() {
