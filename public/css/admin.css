@@ -219,3 +219,8 @@ div.icon {
   width: 100%;
   height: 100%;
 }
+
+.legal {
+  color: #bababa;
+  font-size: 6px;
+}
