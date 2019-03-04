@@ -167,6 +167,7 @@ function updateUserOverview() {
 }
 
 function clearView() {
+    $('#chat-header').empty();
     $('.chatAction').html("");
     $('.messages').html("");
 }
@@ -180,6 +181,9 @@ function toggleChat(userId) {
   if (tabId !== -1) {
     //Get the current chat object.
     let chat = chats[tabId];
+    //Set chat header.
+    $('#chatHeader-icon').html(`<img class='icon' src='${ICON_SRC}' id='${chat.icon}'>`);
+    $('#chatHeader-pseudonym').text(chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1));
     //Rehydrate message info.
     let currentChat = $('.messages').first();
     currentChat.html('');
