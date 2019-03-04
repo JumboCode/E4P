@@ -11,4 +11,3 @@ function getUserInfo() {
 		// window.location = window.location.origin + "/admin";
 	});
 }
-
