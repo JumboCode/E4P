@@ -72,7 +72,7 @@ socket.on('admin matched', () => {
 });
 
 socket.on('admin disconnect', () => {
-  console.log("Admin left!");
+  console.log('Admin left!');
   // admin has disconnected, do something
   // updateChat(createMessage('admin', 'ALERT: Admin disconnected!'));
 });
@@ -99,10 +99,10 @@ function send_message(msg) {
     message: msg,
     room: chat.roomId
   });
-};
+}
 
 function user_connect() {
-  console.log(socket)
+  console.log(socket);
   socket.emit('user connect');
 }
 

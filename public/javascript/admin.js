@@ -1,12 +1,12 @@
 window.onbeforeunload = () => {
-   alert("Are you sure you want to leave? Your chat connections will be lost.");
-}
+  alert('Are you sure you want to leave? Your chat connections will be lost.');
+};
 
 const socket = io();
 
 socket.on('connect', () => {
   // Register as Admin
-  $.post("/admin", { admin: socket.id }, (conversations) => {
+  $.post('/admin', { admin: socket.id }, (conversations) => {
     for (let conversation of conversations) {
       if (!conversation.accepted) {
         newChat(conversation.user, conversation.icon);
@@ -19,7 +19,7 @@ socket.on('connect', () => {
 
 socket.on('user matched', user_matched);
 
-socket.on('chat message', function(data) {
+socket.on('chat message', (data) => {
   addMessage(data.room, createMessage('user', data.message));
 
   // Chat message received, so user is not typing anymore
@@ -33,8 +33,8 @@ function user_matched(user) {
   // remove user from chat list if it exists
   for (let messageStream of chats) {
     if (messageStream.userId == user) {
-        removeChat(user);
-        break;
+      removeChat(user);
+      break;
     }
   }
 }
@@ -46,54 +46,32 @@ socket.on('user unmatched', (conversation) => {
   updateUserOverview();
 });
 
-socket.on('user disconnect', pause_chat);
+socket.on('user disconnect', (userId) => {
+  // TODO: display a message saying the user disconnected but might come back
+  console.log('user disconnected ' + userId);
 
-function pause_chat(user) {
-  console.log('user disconnected ' + user);
-
-  pauseChat(user);
-
-  toggleChat(CURRENT_CHAT_USER_ID);
-}
-
-socket.on('user gone for good', delete_chat);
-
-function delete_chat(user) {
-  console.log('user chat being deleted ' + user);
-
-  deactivateChat(user);
+  pauseChat(userId);
 
   toggleChat(CURRENT_CHAT_USER_ID);
-}
+});
 
-socket.on('user reconnect', resume_chat);
+socket.on('user gone for good', (userId) => {
+  // TODO: display a message saying the user disconnected and did not come back in time
+  console.log('user chat being deleted ' + userId);
 
-function resume_chat(user) {
-  console.log('user reconnected ' + user);
-
-  reactivateChat(user);
+  deactivateChat(userId);
 
   toggleChat(CURRENT_CHAT_USER_ID);
-}
+});
 
-// ends a chat with given user
-// function end_chat(user) {
-  /* TODO: Conversations stick around for some time after the user leaves
-   * to allow for reconnections. The chat should no longer 
-   * be deactivated immediately.
-   * Instead, the admin should receive a notice that the user has
-   * left, and receive another notive when the user returns.
-   */
+socket.on('user reconnect', (userId) => {
+  // TODO: display a message saying the user reconnected
+  console.log('user reconnected ' + userId);
 
-  // console.log('user disconnected ' + user);
+  reactivateChat(userId);
 
-  // deactivateChat(user);
-
-  /*
-  // reload the current window:
   toggleChat(CURRENT_CHAT_USER_ID);
-  */
-// }
+});
 
 socket.on('user waiting', user_waiting);
 
@@ -103,7 +81,6 @@ function user_waiting(user, icon) {
   newChat(user, icon);
   updateUserOverview();
 }
-
 
 socket.on('typing', user_typing);
 
@@ -142,22 +119,21 @@ function send_typing_message(user_id, is_typing) {
     socket.emit('stop typing', {
       room: CURRENT_CHAT_USER_ID
     });
-   }
+  }
 }
-
 
 chats = [];
 CURRENT_CHAT_USER_ID = '';
-const ICON_SRC = "img/Animal Icons Small.png";
+const ICON_SRC = 'img/Animal Icons Small.png';
 
 /**************************** INITIALIZE ****************************/
 
 function initialize() {
-    // Can be used for testing:
-    // mockChats();
-    // populateChat();
-    updateUserOverview();
-    generateAdminHeader();
+  // Can be used for testing:
+  // mockChats();
+  // populateChat();
+  updateUserOverview();
+  generateAdminHeader();
 }
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
@@ -233,6 +209,7 @@ function toggleChat(userId) {
                 scrollDown()
             }
             else if (chat.reconnecting) {
+                // TODO: style this message
                 actionDiv.innerHTML = "<div id='pause'>User Disconnected...</div>";
             }
             else {
@@ -308,20 +285,20 @@ function reactivateChat(userId) {
 }
 
 function pauseChat(userId) {
-    foundUser = false;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.active = false;
-            chat.typing = false;
-            chat.alert = true;
-            chat.reconnecting = true;
-            foundUser = true;
-            updateUserOverview();
-        }
+  let foundUser = false;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      chat.active = false;
+      chat.typing = false;
+      chat.alert = true;
+      chat.reconnecting = true;
+      foundUser = true;
+      updateUserOverview();
     }
-    if (!foundUser) {
-        console.log(Error('User with given identifier could not be found'));
-    }
+  }
+  if (!foundUser) {
+    console.log(Error('User with given identifier could not be found'));
+  }
 }
 
 function deactivateChat(userId) {
