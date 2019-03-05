@@ -167,7 +167,7 @@ function updateUserOverview() {
 }
 
 function clearView() {
-    $('#chat-header').empty();
+    $('#chatHeader').empty();
     $('.chatAction').html("");
     $('.messages').html("");
 }
