@@ -29,7 +29,8 @@ body { font-family: "Roboto", sans-serif; }
 /* Style the buttons that are used to open the tab content */
 .tab button {
   /* background-color: #96d7d2; */
-  /*background-color: #def3f3; */
+
+  /* background-color: #def3f3; */
   background-color: white;
   display: flex;
   flex-direction: row;

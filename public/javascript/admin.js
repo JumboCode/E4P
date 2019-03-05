@@ -167,7 +167,8 @@ function updateUserOverview() {
 }
 
 function clearView() {
-    $('#chatHeader').empty();
+    $('#chatHeader-icon').empty();
+    $('#chatHeader-pseudonym').empty();
     $('.chatAction').html("");
     $('.messages').html("");
 }
