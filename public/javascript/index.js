@@ -41,6 +41,7 @@ socket.on('chat message', (data) => {
   console.log('recieved chat message on index: ' + data);
   updateChat(createMessage('admin', data.message));
   $('#typingIcon').css('display', 'none');
+  messageSound();
 });
 
 socket.on('typing', () => {
