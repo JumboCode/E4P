@@ -149,7 +149,7 @@ function updateUserOverview() {
         typing = chat.typing ? ' id=typing' : '';
         alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML
-                      + "<button class='username' " + selectedChat
+                      + "<button class='btn btn-light' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
                         + "<div class='iconParent'>" + iconTag + "</div>"
                         + "<div class='notIcon'>"
@@ -195,13 +195,13 @@ function toggleChat(userId) {
     //Update available actions.
     let actionDiv = $('.chatAction').first();
     if (!chat.accepted) {
-      actionDiv.html('<button id=\'accept\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Thread</button>');
+      actionDiv.html('<button id=\'accept\' class=\'btn btn-light\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Thread</button>');
     } else if (chat.active) {
       actionDiv.html(chatElements(chat.currentMessage));
       chatSetup(sendMessage);
       scrollDown();
     } else {
-      actionDiv.html('<button id=\'delete\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
+      actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
     }
   }
   scrollDown();
@@ -209,8 +209,8 @@ function toggleChat(userId) {
 }
 
 function scrollDown() {
-    messagesBox = document.getElementsByClassName("messagesBox")[0];
-    messagesBox.scrollTop = messagesBox.scrollHeight;
+  let mbox = $('.messagesBox').first();
+  mbox.scrollTop(mbox.prop('scrollHeight') - mbox.prop('clientHeight'));
 }
 
 function updateCurrentInput(userId) {
@@ -320,6 +320,7 @@ function userIsTyping(userId) {
     updateUserOverview();
     if (userId == CURRENT_CHAT_USER_ID) {
         showCurrentTyping(true);
+        scrollDown();
     }
 
 }
