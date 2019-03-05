@@ -1,6 +1,6 @@
 window.onbeforeunload = () => {
-  return "Are you sure you want to leave? Your chat connections will be lost.";
-};
+   alert("Are you sure you want to leave? Your chat connections will be lost.");
+}
 
 const socket = io();
 
@@ -171,28 +171,33 @@ function updateUserOverview() {
     for (chat of chats) {
         selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
         let iconTag = "";
+        let iconText = "";
+
         if (isNaN(parseInt(chat.icon))) {
             iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
+            iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
         } else {
             iconTag = "<div class='icon'>" + chat.icon + "</div>";
+            iconText = "User " + chat.icon;
         }
-        iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
-        iconText[0] = iconText[0].toUp
+
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
         typing = chat.typing ? ' id=typing' : '';
         alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML
-                      + "<button class='username' " + selectedChat
+                      + "<button class='btn btn-light' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                        + iconTag
-                        + "<div class='buttonText'>"
-                            + "<div class='buttonId'>" + iconText + "</div>"
-                            + "<div class='messagePreview'>" + messagePreview + "</div>"
+                        + "<div class='iconParent'>" + iconTag + "</div>"
+                        + "<div class='notIcon'>"
+                          + "<div class='buttonText'>"
+                              + "<div class='buttonId'>" + iconText + "</div>"
+                              + "<div class='messagePreview'>" + messagePreview + "</div>"
+                          + "</div>"
+                          + "<div class='buttonTypingDiv'" + typing + ">"
+                              + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
+                          + "</div>"
+                          + "<div class='alertBar'" + alert + "></div>"
                         + "</div>"
-                        + "<div class='buttonTypingDiv'" + typing + ">"
-                            + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
-                        + "</div>"
-                        + "<div class='alertBar'" + alert + "></div>"
                       + "</button>";
     }
 }
@@ -212,7 +217,7 @@ function toggleChat(userId) {
             currentChat.innerHTML = "";
             for (message of chat.messages) {
                 messageSide = message.role == 'admin' ? 'right' : 'left';
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message)
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message, message.timestamp)
             }
 
             currentUserTyping = chat.typing ? 'block' : 'none';
@@ -220,7 +225,7 @@ function toggleChat(userId) {
 
             actionDiv = document.getElementsByClassName("chatAction")[0];
             if (!chat.accepted) {
-                actionDiv.innerHTML = "<button id='accept' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
+                actionDiv.innerHTML = "<button id='accept' class='btn btn-light' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
             }
             else if (chat.active) {
                 actionDiv.innerHTML = chatElements(chat.currentMessage);
@@ -242,8 +247,8 @@ function toggleChat(userId) {
 }
 
 function scrollDown() {
-    messagesBox = document.getElementsByClassName("messagesBox")[0];
-    messagesBox.scrollTop = messagesBox.scrollHeight;
+  let mbox = $('.messagesBox').first();
+  mbox.scrollTop(mbox.prop('scrollHeight') - mbox.prop('clientHeight'));
 }
 
 function updateCurrentInput(userId) {
@@ -388,6 +393,7 @@ function userIsTyping(userId) {
     updateUserOverview();
     if (userId == CURRENT_CHAT_USER_ID) {
         showCurrentTyping(true);
+        scrollDown();
     }
 
 }
@@ -406,8 +412,8 @@ function userNotTyping(userId) {
 }
 
 function showCurrentTyping(userIsTyping) {
-    currentUserTyping = userIsTyping ? 'block' : 'none';
-    $('#typingIcon').css('display', currentUserTyping);
+  currentUserTyping = userIsTyping ? 'block' : 'none';
+  $('#typingIcon').css('display', currentUserTyping);
 }
 
 
@@ -419,7 +425,7 @@ function showCurrentTyping(userIsTyping) {
     this function appends creates a new messageObject that can be sent to addMessage.
 */
 function createMessage(role, messageString) {
-    return { role: role, message: messageString, timestamp: new Date() };
+  return { role: role, message: escapeMessage(messageString), timestamp: new Date() };
 }
 
 function sendMessage() {
@@ -455,7 +461,7 @@ function addMessage(userId, messageObject) {
                     chat.alert = false;
                     messageSide = 'right';
                 }
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message);
+                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message, messageObject.timestamp);
             }
         }
         scrollDown();

@@ -1,9 +1,15 @@
 /*
- * Return a message div based on the role and message string.
+ * Return a message div based on the role and message string and timestamp.
  */
-function createMessageDiv(side, message) {
-    return "<div class= 'message-container'><div class='" + side + "-chat-bubble'> " + escapeMessage(message) + "</div></div>";
+function createMessageDiv(side, message, timestamp) {
+  return '<div class= \'message-container\'><div class=\'' + side + '-chat-bubble\'> '
+    +  escapeMessage(message) + ' </div><div class= \'' + side + '-time\'> '
+    + getTimeString(timestamp) + ' </div></div>';
 }
+
+const createStatusDiv = (message) => `
+  <div class='status-container'>${message}</div>
+`;
 
 /*
  * Returns the formatted time stamp.
@@ -13,40 +19,40 @@ function getTimeString(time) {
 }
 
 function escapeMessage(message) {
-	// Escape "<"
-	let lt_re = new RegExp("<", "g");
-	message = message.replace(lt_re, "&lt");
+  // Escape "<"
+  let lt_re = new RegExp('<', 'g');
+  message = message.replace(lt_re, '&lt');
 
-	// Escape ">"
-	let gt_re = new RegExp(">", "g");
-	message = message.replace(gt_re, "&gt");
+  // Escape ">"
+  let gt_re = new RegExp('>', 'g');
+  message = message.replace(gt_re, '&gt');
 
-	return message
+  return message;
 }
 
 function chatElements(currentMessage) {
-  currentText = currentMessage ? currentMessage : "";
+  currentText = currentMessage ? currentMessage : '';
   return '<textarea id="inputBox" type="text" autocomplete="off" placeholder="Type a message...">'
        + currentText + '</textarea>'
        + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
 }
 
 function chatSetup(sendMessage) {
-  $("#inputBox").keydown((e) => {
+  $('#inputBox').keydown((e) => {
     // Check if on user side
-    if (typeof(CURRENT_CHAT_USER_ID) == "undefined" && typeof(chat.roomId) != "undefined") {
+    if (typeof(CURRENT_CHAT_USER_ID) == 'undefined' && typeof(chat.userId) != 'undefined') {
       send_typing_message(true);
       // clear timout that would send message "stop typing" message
-      if (typeof(userTypingTimeout) != "undefined") {
+      if (typeof(userTypingTimeout) != 'undefined') {
         clearTimeout(userTypingTimeout);
       }
 
-      userTypingTimeout = setTimeout(function(){
+      userTypingTimeout = setTimeout(() => {
         send_typing_message(false);
       }, 5000);
     } else {
       send_typing_message(CURRENT_CHAT_USER_ID, true);
-      if (typeof(adminTypingTimeout) != "undefined") {
+      if (typeof(adminTypingTimeout) != 'undefined') {
         clearTimeout(adminTypingTimeout);
       }
       adminTypingTimeout = setTimeout(() => {
@@ -61,7 +67,7 @@ function chatSetup(sendMessage) {
     }
   });
 
-  $("#sendButton").click(function(e) {
+  $('#sendButton').click((e) => {
     sendMessage();
   });
 }

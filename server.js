@@ -70,8 +70,18 @@ app.get('/', (req, res) => {
   res.sendFile('index.html', {root: path.join(__dirname, 'public')});
 });
 
-app.get('/help', (req, res) => {
-  res.sendFile('help_page.html', {root: path.join(__dirname, 'public')});
+var ISAVAILABLE = (process.env.ISAVAILABLE === 'true' ? true : (process.env.ISAVAILABLE === 'false' ? false : true));
+const DOAVAILCHECK = (process.env.DOAVAILCHECK === 'true' ? true : false);
+app.get('/available', (req, res) => {
+  let now = new Date();
+  const standardAvailability = (now.getHours() < 7 || now.getHours() > 19);
+  const isAvailable = !DOAVAILCHECK || (ISAVAILABLE && standardAvailability);
+  res.json({isAvailable: isAvailable});
+});
+
+app.post('/setavailable', adminRoutes.ensureAuthenticated, (req, res) => {
+  ISAVAILABLE = req.body.isAvailable;
+  res.sendStatus(200);
 });
 
 app.get('/css/:file', (req, res) => {
