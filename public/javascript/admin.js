@@ -220,7 +220,7 @@ function toggleChat(userId) {
             }
             else if (chat.reconnecting) {
                 // TODO: style this message
-                actionDiv.innerHTML = "<div id='pause'>User Disconnected...</div>";
+                actionDiv.innerHTML = "<div id='pause'>User Disconnected</div>";
             }
             else {
                 actionDiv.innerHTML = "<button id='delete' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
