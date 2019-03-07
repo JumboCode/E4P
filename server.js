@@ -96,6 +96,10 @@ app.get('/img/:file', (req, res) => {
   res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'img')});
 });
 
+app.get('/audio/:file', (req, res) => {
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});  
+});
+
 app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   admins.push(req.body.admin);
   res.json(currentConversations);

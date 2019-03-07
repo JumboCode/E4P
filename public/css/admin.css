@@ -28,6 +28,9 @@ body { font-family: "Roboto", sans-serif; }
 
 /* Style the buttons that are used to open the tab content */
 .tab button {
+  /* background-color: #96d7d2; */
+
+  /* background-color: #def3f3; */
   background-color: white;
   display: flex;
   flex-direction: row;
@@ -52,6 +55,7 @@ body { font-family: "Roboto", sans-serif; }
 }
 
 #selectedTab {
+  /* background-color: #248f89; */
   background-color: #96d7d2;
 }
 
@@ -152,14 +156,14 @@ div.icon {
   border-left: none;
   height: 100%;
   background-color: #def3f3;
-  padding-top: 0.25em;
-  padding-bottom: 0.25em;
 }
 
 /* Style the box that shows all the messages */
 .messagesBox {
   max-height: 90%;
   overflow-y: scroll;
+  padding-top: 1em;
+  padding-bottom: 0.25em;
 }
 
 /* Styles the */
@@ -225,6 +229,21 @@ div.icon {
 #typingIcon img {
   width: 100%;
   height: 100%;
+}
+
+#chatHeader {
+  display: flex;
+  justify-content: center;
+  background-color: #96d7d2;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#chatHeader-pseudonym {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 1.75rem;
 }
 
 .legal {
