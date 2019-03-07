@@ -215,8 +215,11 @@ io.on('connection', (socket) => {
           // remove related objects from data structs
           delete reconnectionTimeouts[conversation.room];
           removeConversation(conversation.room);
-          for (let id in io.sockets.adapter.rooms[conversation.room].sockets) {
-            io.sockets.connected[id].leave(conversation.room);
+          let room = io.sockets.adapter.rooms[conversation.room];
+          if (room) {
+            for (let id in room.sockets) {
+              io.sockets.connected[id].leave(conversation.room);
+            }
           }
 
           // recycle icon

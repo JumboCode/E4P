@@ -43,33 +43,31 @@ socket.on('user unmatched', (conversation) => {
   // TODO: display a message to the ear so they know this person was 
   //       disconnected from an admin
   newChat(conversation.user, conversation.icon);
+  addMessage(conversation.user, createMessage('status', 'This user was disconnected from a previous Ear.'));
   updateUserOverview();
 });
 
 socket.on('user disconnect', (userId) => {
   // TODO: display a message saying the user disconnected but might come back
   console.log('user disconnected ' + userId);
-
+  addMessage(userId, createMessage('status', 'The user has disconnected. They might return soon.'));
   pauseChat(userId);
-
   toggleChat(CURRENT_CHAT_USER_ID);
 });
 
 socket.on('user gone for good', (userId) => {
   // TODO: display a message saying the user disconnected and did not come back in time
   console.log('user chat being deleted ' + userId);
-
+  addMessage(userId, createMessage('status', 'The user did not reconnect in time.'));
   deactivateChat(userId);
-
   toggleChat(CURRENT_CHAT_USER_ID);
 });
 
 socket.on('user reconnect', (userId) => {
   // TODO: display a message saying the user reconnected
   console.log('user reconnected ' + userId);
-
+  addMessage(userId, createMessage('status', 'The user has reconnected.'));
   reactivateChat(userId);
-
   toggleChat(CURRENT_CHAT_USER_ID);
 });
 
@@ -183,6 +181,19 @@ function clearView() {
     $('.messages').html("");
 }
 
+function appendMessageToDiv(message, div) {
+  let toAppend = '';
+  if (message.role == 'status') {
+    toAppend = createStatusDiv(message.message);
+  } else if (message.role == 'admin') {
+    toAppend = createMessageDiv('right', message.message, message.timestamp);
+  } else {
+    toAppend = createMessageDiv('left', message.message, message.timestamp);
+  }
+
+  div.innerHTML += toAppend;
+}
+
 function toggleChat(userId) {
     updateCurrentInput(CURRENT_CHAT_USER_ID);
     CURRENT_CHAT_USER_ID = userId
@@ -192,8 +203,7 @@ function toggleChat(userId) {
             currentChat = document.getElementsByClassName("messages")[0];
             currentChat.innerHTML = "";
             for (message of chat.messages) {
-                messageSide = message.role == 'admin' ? 'right' : 'left';
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message, message.timestamp)
+              appendMessageToDiv(message, currentChat);
             }
 
             currentUserTyping = chat.typing ? 'block' : 'none';
@@ -429,20 +439,16 @@ function addMessage(userId, messageObject) {
     for (chat of chats) {
         if (userId == chat.userId) {
             chat.messages.push(messageObject);
-            chat.alert = true;
+            messageObject.role == 'admin' ? chat.alert = false : chat.alert = true;
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
                 currentChat = document.getElementsByClassName("messages")[0];
-                messageSide = 'left';
-                if (messageObject.role == 'admin') {
-                    chat.alert = false;
-                    messageSide = 'right';
-                }
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message, messageObject.timestamp);
+                appendMessageToDiv(messageObject, currentChat);
             }
         }
         scrollDown();
     }
+
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
