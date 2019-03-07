@@ -217,8 +217,3 @@ $(() => {
   $('#type_msg').html(chatElements(''));
   chatSetup(sendMessage);
 });
-
-function disconnect() {
-  socket.disconnect();
-  socket.connect({'forceNew':true });
-}
