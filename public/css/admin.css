@@ -160,7 +160,7 @@ div.icon {
 
 /* Style the box that shows all the messages */
 .messagesBox {
-  max-height: 90%;
+  max-height: 75%;
   overflow-y: scroll;
   padding-top: 1em;
   padding-bottom: 0.25em;
