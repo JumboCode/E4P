@@ -193,7 +193,7 @@ function appendMessageToDiv(message, div) {
     toAppend = createMessageDiv('left', message.message, message.timestamp);
   }
 
-  div.innerHTML += toAppend;
+  div.append(toAppend);
 }
 
 function toggleChat(userId) {
@@ -211,9 +211,7 @@ function toggleChat(userId) {
     //Rehydrate message info.
     let currentChat = $('.messages').first();
     currentChat.html('');
-    chat.messages.forEach((msg) => {currentChat.append(
-      createMessageDiv(msg.role === 'admin' ? 'right' : 'left', msg.message, msg.timestamp)
-    );});
+    chat.messages.forEach((msg) => {appendMessageToDiv(msg, currentChat)});
     //Set typing indicator.
     $('#typingIcon').css('display', (chat.typing ? 'block' : 'none'));
     //Update available actions.
@@ -225,7 +223,7 @@ function toggleChat(userId) {
       chatSetup(sendMessage);
       scrollDown();
     } else if (chat.reconnecting) {
-      actionDiv.innerHTML = "<div id='pause'>User Disconnected</div>";
+      actionDiv.html('<div id=\'pause\'>User Disconnected</div>');
     } else {
       actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
     }
@@ -240,12 +238,12 @@ function scrollDown() {
 }
 
 function updateCurrentInput(userId) {
-    for (chat of chats) {
-        if (chat.userId == userId && chat.accepted && chat.active) {
-            currentMessage = $('#inputBox').val();
-            chat.currentMessage = currentMessage;
-        }
+  for (chat of chats) {
+    if (chat.userId == userId && chat.accepted && chat.active) {
+      currentMessage = $('#inputBox').val();
+      chat.currentMessage = currentMessage;
     }
+  }
 }
 
 /**************************** SINGLE CHAT FUNCTIONS ****************************/
@@ -441,14 +439,14 @@ function sendMessage() {
     chat if it exists, logs an error if that user chat doesn't exist
 */
 function addMessage(userId, messageObject) {
-    foundUser = false;
-    for (chat of chats) {
+    let foundUser = false;
+    for (let chat of chats) {
         if (userId == chat.userId) {
             chat.messages.push(messageObject);
             messageObject.role == 'admin' ? chat.alert = false : chat.alert = true;
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
-                currentChat = document.getElementsByClassName("messages")[0];
+                let currentChat = $('.messages').first();
                 appendMessageToDiv(messageObject, currentChat);
             }
         }
