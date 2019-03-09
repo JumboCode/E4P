@@ -179,12 +179,14 @@ div.icon {
 }
 
 .chatAction #delete,
-#accept {
+#accept,
+#pause {
   height: 100%;
   width: 100%;
   cursor: pointer;
   background-color: white;
   color: var(--dark-green);
+  text-align: center;
 }
 
 .chatAction #inputBox {

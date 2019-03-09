@@ -37,17 +37,6 @@ function limitCheck(req, res, next) {
   });
 }
 
-function limitCheck(req, res, next) {
-  auth.can_attempt_login(String(req.ip), (valid, time) => {
-    if (valid) {
-      next();
-    } else {
-      let query = querystring.stringify({ time: time });
-      res.redirect('/admin/wait?' + query);
-    }
-  });
-}
-
 function limitReset(req, res, next) {
   auth.delete_login_attempt(String(req.ip));
   next();
