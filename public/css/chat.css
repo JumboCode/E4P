@@ -3,34 +3,65 @@ textarea {
 }
 
 .left-chat-bubble {
-  background-color: #96d7d2;
+  background-color: var(--light-blue);
+  color: #323333;
+  font-size: 12px;
   border: none;
   border-radius: 1px;
   width: auto;
   max-width: 62%;
   overflow: hidden;
-  word-break: break-all;
   float: left;
-  padding: 5px;
+  padding: 0.3em 1.3em 0.3em 1.3em;
+  overflow-wrap: break-word;
 }
 
 .right-chat-bubble {
-  background-color: #b2fef8;
+  background-color: #96d7d2;
+  color: #323333;
+  font-size: 12px;
   border: none;
   border-radius: 1px;
   width: auto;
   max-width: 62%;
   overflow: hidden;
-  word-break: break-all;
-  padding: 5px;
   float: right;
+  overflow-wrap: break-word;
+  padding: 0.3em 1.3em 0.3em 1.3em;
 }
 
 .message-container {
+  border-radius: 3px;
   display: inline-block;
   position: relative;
   width: 100%;
   margin: 0.25em auto;
+  padding-left: 1.5em;
+  padding-right: 1.5em;
+}
+
+.status-container {
+  display: inline-block;
+  width: 100%;
+  margin: 0.25em auto;
   padding-left: 1em;
   padding-right: 1em;
+  text-align: center;
+  font-size: 0.7rem;
+}
+
+.left-time {
+  position: relative;
+  top: 8px;
+  left: 10px;
+  float: left;
+  font-size: 0.7rem;
+}
+
+.right-time {
+  position: relative;
+  top: 8px;
+  right: 10px;
+  float: right;
+  font-size: 0.7rem;
 }

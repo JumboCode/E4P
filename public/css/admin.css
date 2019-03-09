@@ -28,6 +28,9 @@ body { font-family: "Roboto", sans-serif; }
 
 /* Style the buttons that are used to open the tab content */
 .tab button {
+  /* background-color: #96d7d2; */
+
+  /* background-color: #def3f3; */
   background-color: white;
   display: flex;
   flex-direction: row;
@@ -38,7 +41,6 @@ body { font-family: "Roboto", sans-serif; }
   cursor: pointer;
   transition: 0.3s;
   align-items: center;
-  overflow-x: auto;
 }
 
 /* Change background color of buttons on hover */
@@ -53,29 +55,55 @@ body { font-family: "Roboto", sans-serif; }
 }
 
 #selectedTab {
+  /* background-color: #248f89; */
   background-color: #96d7d2;
-}
-
-img.icon {
-  object-fit: none;
-  object-position: 0 0;
-  min-width: 60px;
-  height: 60px;
-}
-
-div.icon {
-  display: inline-block;
-  vertical-align: top;
-  width: 60px;
-  height: 60px;
-  margin: 0;
-  padding: 22px 16px;
 }
 
 .username {
   display: inline-block;
-  vertical-align: top;
-  padding: 22px 16px;
+}
+
+.iconParent {
+  display: flex;
+  min-width: 25%;
+  max-width: 25%;
+}
+
+img.icon {
+  margin: auto;
+  object-fit: none;
+  object-position: 0 0;
+  min-width: 60px;
+  max-width: 60px;
+  min-height: 60px;
+  max-height: 60px;
+}
+
+div.icon {
+  margin: auto;
+  min-width: 60px;
+  max-width: 60px;
+  min-height: 60px;
+  max-height: 60px;
+  line-height: 60px;
+  text-align: center;
+  font-weight: 900;
+}
+
+.notIcon {
+  display: flex;
+  min-width: 75%;
+  max-width: 75%;
+  min-height: 60px;
+  max-height: 60px;
+}
+
+.buttonText {
+  display: flex;
+  flex-direction: column;
+  margin: auto;
+  min-width: 70%;
+  max-width: 70%;
 }
 
 .buttonId {
@@ -83,25 +111,20 @@ div.icon {
   max-width: 80%;
   min-width: 60%;
   font-size: 15px;
-  overflow: auto;
-}
-
-.buttonText {
-  display: flex;
-  flex-direction: column;
-  width: 70%;
 }
 
 .messagePreview {
   padding-left: 5%;
-  max-width: 80%;
-  min-width: 60%;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
   overflow: hidden;
-  max-height: 50%;
+  text-overflow: ellipsis;
 }
 
 .buttonTypingDiv {
-  width: 20%;
+  min-width: 20%;
+  max-width: 20%;
   visibility: hidden;
 }
 
@@ -114,8 +137,10 @@ div.icon {
 }
 
 .alertBar {
-  width: 10%;
+  min-width: 10%;
+  max-width: 10%;
   min-height: 60px;
+  max-height: 60px;
 }
 
 .alertBar#alert {
@@ -130,15 +155,15 @@ div.icon {
   width: 70%;
   border-left: none;
   height: 100%;
-  background-color: #def3f3;
-  padding-top: 0.25em;
-  padding-bottom: 0.25em;
+  background-color: white;
 }
 
 /* Style the box that shows all the messages */
 .messagesBox {
-  max-height: 90%;
+  max-height: 75%;
   overflow-y: scroll;
+  padding-top: 1em;
+  padding-bottom: 0.25em;
 }
 
 /* Styles the */
@@ -151,19 +176,23 @@ div.icon {
   bottom: 0;
   display: flex;
   flex-direction: row;
+  border: solid;
+  border-width: 1px;
+  border-color: lightgray;
 }
 
 .chatAction #delete,
-#accept {
+#accept,
+#pause {
   height: 100%;
   width: 100%;
   cursor: pointer;
   background-color: white;
   color: var(--dark-green);
+  text-align: center;
 }
 
 .chatAction #inputBox {
-  border: var(--light-blue);
   height: 100%;
   width: 85%;
   resize: none;
@@ -176,8 +205,9 @@ div.icon {
   flex-direction: column;
   justify-content: center;
   background-color: #96d7d2;
-  border: solid rgb(200, 200, 200) 1px;
   cursor: pointer;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 #sendButton:hover,
@@ -202,4 +232,24 @@ div.icon {
 #typingIcon img {
   width: 100%;
   height: 100%;
+}
+
+#chatHeader {
+  display: flex;
+  justify-content: center;
+  background-color: #96d7d2;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#chatHeader-pseudonym {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 1.75rem;
+}
+
+.legal {
+  color: #bababa;
+  font-size: 6px;
 }

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>E4P Messaging</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -8,6 +9,7 @@
   <script src="javascript/chat.js"></script>
   <script src="javascript/index.js"></script>
   <script src="javascript/header.js"></script>
+  <script src="javascript/sound.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -17,7 +19,6 @@
 </head>
 <body onload="generateUserHeader()">
   <nav class="navbar navbar-expand-lg navbar-dark"></nav>
-<<<<<<< HEAD
     
     <h2 class="flex-container" id = "open">
     <div class="row"> Ears for Peers</div>
@@ -32,10 +33,6 @@
 
     <div id="e_space"></div>
       <div class="wrapper">
-=======
-  <h2 class="flex-container" id = "open"></h2>
-  <div id="e_space"></div>
->>>>>>> 373bb9d02443f5370a14da217dfbca140abb522b
   <div class="d-flex align-items-center justify-content-center flex-column" id="chat">
     <div class="flex-container content" id="chatbox">
       <div class="d-flex align-items-start flex-column" id="chathistory">
@@ -50,6 +47,6 @@
       </div>
     </div>
   </div>
-</div>
+  <audio id='newMessageSound' src='audio/newMessage.mp3' type='audio/mp3'></audio>
 </body>
 </html>
