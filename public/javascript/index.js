@@ -51,6 +51,11 @@ socket.on('connect', () => {
   }
 });
 
+socket.on('reconnected with old socket id', () => {
+  $('#typingIcon').before(createStatusDiv('You\'ve been reconnected to your chat.'));
+  $('#typingIcon').before(createStatusDiv('Keep this browser window open to receive and send messages.'));
+});
+
 socket.on('invalid old socket id', () => {
   /* TODO: Tell user that their chat is not valid anymore (convert console
       log into a displayed message.)
@@ -62,6 +67,9 @@ socket.on('invalid old socket id', () => {
   */
   console.log('Tried to reconnect, but your conversation seems to be too old. ' + 
               'You usually cannot disconnect for more than 5 minutes');
+  $('#typingIcon').before(createStatusDiv('You\'ve been disconnected from your chat.'));
+  $('#typingIcon').before(createStatusDiv('Keep this browser window open to receive and send messages.'));
+  $('#typingIcon').before(createStatusDiv('If you\'re gone for more than 5 minutes you will be disconnected.'));
 
   window.localStorage.setItem('roomID', socket.id);
 });
