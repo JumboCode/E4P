@@ -120,8 +120,8 @@ function send_typing_message(user_id, is_typing) {
   }
 }
 
-chats = [];
-CURRENT_CHAT_USER_ID = '';
+let chats = [];
+let CURRENT_CHAT_USER_ID = '';
 const ICON_SRC = 'img/Animal Icons Small.png';
 
 /**************************** INITIALIZE ****************************/
@@ -279,20 +279,20 @@ function newChat(userId, icon) {
 }
 
 function reactivateChat(userId) {
-    foundUser = false;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.active = true;
-            chat.typing = false;
-            chat.alert = true;
-            chat.reconnecting = false;
-            foundUser = true;
-            updateUserOverview();
-        }
+  let foundUser = false;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      chat.active = true;
+      chat.typing = false;
+      chat.alert = true;
+      chat.reconnecting = false;
+      foundUser = true;
+      updateUserOverview();
     }
-    if (!foundUser) {
-        console.log(Error('User with given identifier could not be found'));
-    }
+  }
+  if (!foundUser) {
+    console.log(Error('User with given identifier could not be found'));
+  }
 }
 
 function pauseChat(userId) {
