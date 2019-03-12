@@ -155,7 +155,7 @@ div.icon {
   width: 70%;
   border-left: none;
   height: 100%;
-  background-color: #def3f3;
+  background-color: white;
 }
 
 /* Style the box that shows all the messages */
@@ -176,6 +176,9 @@ div.icon {
   bottom: 0;
   display: flex;
   flex-direction: row;
+  border: solid;
+  border-width: 1px;
+  border-color: lightgray;
 }
 
 .chatAction #delete,
@@ -190,7 +193,6 @@ div.icon {
 }
 
 .chatAction #inputBox {
-  border: var(--light-blue);
   height: 100%;
   width: 85%;
   resize: none;
@@ -203,8 +205,9 @@ div.icon {
   flex-direction: column;
   justify-content: center;
   background-color: #96d7d2;
-  border: solid rgb(200, 200, 200) 1px;
   cursor: pointer;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 #sendButton:hover,
