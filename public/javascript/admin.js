@@ -12,6 +12,7 @@ socket.on('connect', () => {
         newChat(conversation.user, conversation.icon);
       }
     }
+    socket.emit('sound on');
     updateUserOverview();
   });
 
@@ -20,6 +21,10 @@ socket.on('connect', () => {
 });
 
 socket.on('user matched', user_matched);
+
+socket.on('sound on', () => {
+  console.log('sound on');
+});
 
 socket.on('chat message', function(data) {
   addMessage(data.room, createMessage('user', data.message));
@@ -122,6 +127,7 @@ function initialize() {
     // populateChat();
     updateUserOverview();
     generateAdminHeader();
+    newChatSoundLoop();
 }
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
