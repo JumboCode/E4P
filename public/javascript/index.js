@@ -134,10 +134,12 @@ var chat = {
 
 
 function openChat() {
-  open = document.getElementById("open");
+  let open = document.getElementById('open');
   open.innerHTML = '';
-  open.innerHTML = " <div class='container-fluid text-center'>Waiting to connect to an ear!</div><div class='row'><div class='loader' id='load'></div></div>";
-  console.log("attempting to connect");
+  open.innerHTML = '<div class=\'container-fluid text-center\'>Waiting to connect to an Ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div>' +
+                   '<div class=\'row\' style="margin-top: 16px"><span style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 7am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</span></div>' + 
+                   '<div class=\'row\' style="margin-top: 16px"><span style="font-size: 16px">Feel free to call and hang up after a few rings. The Ear on duty might be asleep.</span></div>';
+  console.log('attempting to connect');
   window.onbeforeunload = () => {
     return 'Are you sure you want to leave? Your chat connection will be lost.';
   };
