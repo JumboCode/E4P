@@ -201,8 +201,9 @@ describe('socket tests', () => {
     it('should add conversation to currentConversations', (done) => {
       admin1.on('user waiting', (id1) => {
         admin1.emit('accept user', id1);
-        expect(currentConversations.length).to.equal(1);
-        expect(currentConversations[0].user).to.equal(currentConversations[0].room);
+        expect(currentConversations.length).to.not.equal(0);
+        let currentIndex = currentConversations.length - 1;
+        expect(currentConversations[currentIndex].user).to.equal(currentConversations[currentIndex].room);
         done();
       });
       

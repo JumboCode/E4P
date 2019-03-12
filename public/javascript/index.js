@@ -1,13 +1,29 @@
-const socket = io();
+let socket = io();
+
+function connectWithStoredID() {
+  let prevRoomID = window.localStorage.getItem('roomID');
+  console.log('Prev room id: ' + prevRoomID);
+
+  if (prevRoomID !== '') {
+    console.log('Reconnecting with: ' + prevRoomID);
+
+    // user needs to reconnect using localStorage ID
+    socket.emit('user reconnect', prevRoomID);
+  }
+}
+
+socket.on('test', () => {
+  console.log('test');
+});
 
 $(document).ready(() => {
   const availableUI = `
       <div class='row'>Ears for Peers</div>
       <img src='img/baby_elephant.png'>
-      <div class='row'>
+      <div class='row align-items-center'>
         <button type='button' class="btn btn-outline-info" onclick='openChat()'>Connect Me to an Ear</button>
       </div>
-      <p style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
+      <p id='footer' style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
     `;
   const unavailableUI = `
       <div class='row'>Ears for Peers</div>
@@ -29,7 +45,33 @@ $(document).ready(() => {
 });
 
 socket.on('connect', () => {
-  console.log('connected to socket');
+  if (chat.active) {
+    console.log('Chat is active, connecting with stored ID');
+    connectWithStoredID();
+  }
+});
+
+socket.on('reconnected with old socket id', () => {
+  $('#typingIcon').before(createStatusDiv('You\'ve been reconnected to your chat.'));
+  $('#typingIcon').before(createStatusDiv('Keep this browser window open to receive and send messages.'));
+});
+
+socket.on('invalid old socket id', () => {
+  /* TODO: Tell user that their chat is not valid anymore (convert console
+      log into a displayed message.)
+      
+      This function only gets called when a user was in the middle of a 
+      conversation. If the user presses the "Connect me to an Ear" button,
+      their id is saved in localStorage, and this function does not get 
+      called until after they disconnect during a conversation.
+  */
+  console.log('Tried to reconnect, but your conversation seems to be too old. ' + 
+              'You usually cannot disconnect for more than 5 minutes');
+  $('#typingIcon').before(createStatusDiv('You\'ve been disconnected from your chat.'));
+  $('#typingIcon').before(createStatusDiv('Keep this browser window open to receive and send messages.'));
+  $('#typingIcon').before(createStatusDiv('If you\'re gone for more than 5 minutes you will be disconnected.'));
+
+  window.localStorage.setItem('roomID', socket.id);
 });
 
 socket.on('admin matched', () => {
@@ -37,10 +79,17 @@ socket.on('admin matched', () => {
   console.log('admin matched');
 });
 
+socket.on('admin disconnect', () => {
+  console.log('Admin left!');
+  // admin has disconnected, do something
+  // updateChat(createMessage('admin', 'ALERT: Admin disconnected!'));
+});
+
 socket.on('chat message', (data) => {
   console.log('recieved chat message on index: ' + data);
   updateChat(createMessage('admin', data.message));
   $('#typingIcon').css('display', 'none');
+  messageSound();
 });
 
 socket.on('typing', () => {
@@ -57,22 +106,25 @@ socket.on('stop typing', () => {
 function send_message(msg) {
   socket.emit('chat message', {
     message: msg,
-    room: socket.id
+    room: chat.roomId
   });
 }
 
 function user_connect() {
+  console.log(socket);
   socket.emit('user connect');
 }
+
+socket.emit('assign as user');
 
 function send_typing_message(is_typing) {
   if (is_typing) {
     socket.emit('typing', {
-      room: socket.id
+      room: chat.roomId
     });
   } else {
     socket.emit('stop typing', {
-      room: socket.id
+      room: chat.roomId
     });
   }
 }
@@ -82,23 +134,30 @@ function warning() {
 }
 
 var chat = {
-  userId: 'user1',
+  roomId: '',
   messages: [],
   accepted: false,
-  active: true
+  active: false
 };
 
 
 function openChat() {
-  let openPanel = document.getElementById('open');
-  openPanel.innerHTML = '';
-  openPanel.innerHTML = ' <div class=\'row\'>Waiting to connect to an ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div><div class=\'row\' style="margin-top: 16px"><span style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 7am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</span></div>';
+  let open = document.getElementById('open');
+  open.innerHTML = '';
+  open.innerHTML = '<div class=\'container-fluid text-center\'>Waiting to connect to an Ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div>' +
+                   '<div class=\'row\' style="margin-top: 16px"><span style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 7am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</span></div>' + 
+                   '<div class=\'row\' style="margin-top: 16px"><span style="font-size: 16px">Feel free to call and hang up after a few rings. The Ear on duty might be asleep.</span></div>';
   console.log('attempting to connect');
   window.onbeforeunload = () => {
     return 'Are you sure you want to leave? Your chat connection will be lost.';
   };
+  
+  // User is connecting: Fix the current room id in localStorage and the chat object:
+  window.localStorage.setItem('roomID', socket.id);
+  chat.roomId = socket.id;
 
   user_connect();
+  chat.active = true;
 }
 
 function startChat() {
@@ -155,6 +214,11 @@ function sendMessage() {
     updateChat(messageObject);
     message = $('#inputBox').val('');
   }
+}
+
+function admin_matched() {
+  startChat();
+  console.log('admin matched');
 }
 
 /* function to change accepted from true to false when admin accepts chat */

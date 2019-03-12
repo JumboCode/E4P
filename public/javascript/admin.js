@@ -1,29 +1,27 @@
 window.onbeforeunload = () => {
-   alert("Are you sure you want to leave? Your chat connections will be lost.");
-}
+  alert('Are you sure you want to leave? Your chat connections will be lost.');
+};
 
 const socket = io();
 
 socket.on('connect', () => {
-  // Load Existing Chats
-  $.get('/admin/conversations', function(conversations) {
+  // Register as Admin
+  $.post('/admin', { admin: socket.id }, (conversations) => {
     for (let conversation of conversations) {
       if (!conversation.accepted) {
         newChat(conversation.user, conversation.icon);
       }
     }
+    
     updateUserOverview();
   });
-
-  // Register as Admin
-  $.post("/admin", { admin: socket.id });
 });
 
 socket.on('user matched', user_matched);
 
-socket.on('chat message', function(data) {
+socket.on('chat message', (data) => {
   addMessage(data.room, createMessage('user', data.message));
-
+  messageSound();
   // Chat message received, so user is not typing anymore
   userNotTyping(data.room);
 });
@@ -35,39 +33,52 @@ function user_matched(user) {
   // remove user from chat list if it exists
   for (let messageStream of chats) {
     if (messageStream.userId == user) {
-        removeChat(user);
-        break;
+      removeChat(user);
+      break;
     }
   }
 }
 
 socket.on('user unmatched', (conversation) => {
-  // TODO: display a message to the ear so they know this person was 
+  // TODO: display a message to the ear so they know this person was
   //       disconnected from an admin
   newChat(conversation.user, conversation.icon);
+  addMessage(conversation.user, createMessage('status', 'This user was disconnected from a previous Ear.'));
   updateUserOverview();
 });
 
-socket.on('user disconnect', end_chat);
-
-// ends a chat with given user
-function end_chat(user) {
-  console.log('user disconnected ' + user);
-  deactivateChat(user);
-
-  // reload the current window:
+socket.on('user disconnect', (userId) => {
+  // TODO: display a message saying the user disconnected but might come back
+  console.log('user disconnected ' + userId);
+  addMessage(userId, createMessage('status', 'The user has disconnected. They might return soon.'));
+  pauseChat(userId);
   toggleChat(CURRENT_CHAT_USER_ID);
-}
+});
+
+socket.on('user gone for good', (userId) => {
+  // TODO: display a message saying the user disconnected and did not come back in time
+  console.log('user chat being deleted ' + userId);
+  addMessage(userId, createMessage('status', 'The user did not reconnect in time.'));
+  deactivateChat(userId);
+  toggleChat(CURRENT_CHAT_USER_ID);
+});
+
+socket.on('user reconnect', (userId) => {
+  // TODO: display a message saying the user reconnected
+  console.log('user reconnected ' + userId);
+  addMessage(userId, createMessage('status', 'The user has reconnected.'));
+  reactivateChat(userId);
+  toggleChat(CURRENT_CHAT_USER_ID);
+});
 
 socket.on('user waiting', user_waiting);
 
 function user_waiting(user, icon) {
   console.log('user waiting ' + user);
   console.log('creating new chat for user waiting');
-  newChat(user, icon);
+  newChatWithAlert(user, icon);
   updateUserOverview();
 }
-
 
 socket.on('typing', user_typing);
 
@@ -106,22 +117,21 @@ function send_typing_message(user_id, is_typing) {
     socket.emit('stop typing', {
       room: CURRENT_CHAT_USER_ID
     });
-   }
+  }
 }
 
-
-chats = [];
-CURRENT_CHAT_USER_ID = '';
-const ICON_SRC = "img/Animal Icons Small.png";
+let chats = [];
+let CURRENT_CHAT_USER_ID = '';
+const ICON_SRC = 'img/Animal Icons Small.png';
 
 /**************************** INITIALIZE ****************************/
 
 function initialize() {
-    // Can be used for testing:
-    // mockChats();
-    // populateChat();
-    updateUserOverview();
-    generateAdminHeader();
+  // Can be used for testing:
+  // mockChats();
+  // populateChat();
+  updateUserOverview();
+  generateAdminHeader();
 }
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
@@ -167,43 +177,59 @@ function updateUserOverview() {
 }
 
 function clearView() {
+    $('#chatHeader-icon').empty();
+    $('#chatHeader-pseudonym').empty();
     $('.chatAction').html("");
     $('.messages').html("");
 }
 
+function appendMessageToDiv(message, div) {
+  let toAppend = '';
+  if (message.role == 'status') {
+    toAppend = createStatusDiv(message.message);
+  } else if (message.role == 'admin') {
+    toAppend = createMessageDiv('right', message.message, message.timestamp);
+  } else {
+    toAppend = createMessageDiv('left', message.message, message.timestamp);
+  }
+
+  div.append(toAppend);
+}
+
 function toggleChat(userId) {
-    updateCurrentInput(CURRENT_CHAT_USER_ID);
-    CURRENT_CHAT_USER_ID = userId
-    tabId = 0;
-    for (chat of chats) {
-        if (chat.userId == userId) {
-            currentChat = document.getElementsByClassName("messages")[0];
-            currentChat.innerHTML = "";
-            for (message of chat.messages) {
-                messageSide = message.role == 'admin' ? 'right' : 'left';
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, message.message, message.timestamp)
-            }
-
-            currentUserTyping = chat.typing ? 'block' : 'none';
-            $('#typingIcon').css('display', currentUserTyping);
-
-            actionDiv = document.getElementsByClassName("chatAction")[0];
-            if (!chat.accepted) {
-                actionDiv.innerHTML = "<button id='accept' class='btn btn-light' onclick='acceptChat(CURRENT_CHAT_USER_ID)'>Accept Thread</button>"
-            }
-            else if (chat.active) {
-                actionDiv.innerHTML = chatElements(chat.currentMessage);
-                chatSetup(sendMessage);
-                scrollDown()
-            } else {
-                actionDiv.innerHTML = "<button id='delete' class='btn btn-light' onclick='removeChat(CURRENT_CHAT_USER_ID)'>Delete Thread</button>";
-            }
-        }
-        tabId++;
+  //Update global 'current chat' state.
+  updateCurrentInput(CURRENT_CHAT_USER_ID);
+  CURRENT_CHAT_USER_ID = userId;
+  //Get the index of the selected chat.
+  let tabId = chats.findIndex((cht) => cht.userId === userId);
+  if (tabId !== -1) {
+    //Get the current chat object.
+    let chat = chats[tabId];
+    //Set chat header.
+    $('#chatHeader-icon').html(`<img class='icon' src='${ICON_SRC}' id='${chat.icon}'>`);
+    $('#chatHeader-pseudonym').text(chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1));
+    //Rehydrate message info.
+    let currentChat = $('.messages').first();
+    currentChat.html('');
+    chat.messages.forEach((msg) => {appendMessageToDiv(msg, currentChat)});
+    //Set typing indicator.
+    $('#typingIcon').css('display', (chat.typing ? 'block' : 'none'));
+    //Update available actions.
+    let actionDiv = $('.chatAction').first();
+    if (!chat.accepted) {
+      actionDiv.html('<button id=\'accept\' class=\'btn btn-light\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Thread</button>');
+    } else if (chat.active) {
+      actionDiv.html(chatElements(chat.currentMessage));
+      chatSetup(sendMessage);
+      scrollDown();
+    } else if (chat.reconnecting) {
+      actionDiv.html('<div id=\'pause\'>User Disconnected</div>');
+    } else {
+      actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
     }
-
-    scrollDown()
-    updateUserOverview();
+  }
+  scrollDown();
+  updateUserOverview();
 }
 
 function scrollDown() {
@@ -212,12 +238,12 @@ function scrollDown() {
 }
 
 function updateCurrentInput(userId) {
-    for (chat of chats) {
-        if (chat.userId == userId && chat.accepted && chat.active) {
-            currentMessage = $('#inputBox').val();
-            chat.currentMessage = currentMessage;
-        }
+  for (chat of chats) {
+    if (chat.userId == userId && chat.accepted && chat.active) {
+      currentMessage = $('#inputBox').val();
+      chat.currentMessage = currentMessage;
     }
+  }
 }
 
 /**************************** SINGLE CHAT FUNCTIONS ****************************/
@@ -244,11 +270,50 @@ function newChat(userId, icon) {
               typing: false,
               icon: icon,
               alert: true,
+              reconnecting: false,
               currentMessage: "" }
         );
     }
 }
 
+function reactivateChat(userId) {
+  let foundUser = false;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      chat.active = true;
+      chat.typing = false;
+      chat.alert = true;
+      chat.reconnecting = false;
+      foundUser = true;
+      updateUserOverview();
+    }
+  }
+  if (!foundUser) {
+    console.log(Error('User with given identifier could not be found'));
+  }
+}
+
+function pauseChat(userId) {
+  let foundUser = false;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      chat.active = false;
+      chat.typing = false;
+      chat.alert = true;
+      chat.reconnecting = true;
+      foundUser = true;
+      updateUserOverview();
+    }
+  }
+  if (!foundUser) {
+    console.log(Error('User with given identifier could not be found'));
+  }
+}
+
+function newChatWithAlert(userId, icon) {
+  newChat(userId, icon);
+  chatSound();
+}
 
 function deactivateChat(userId) {
     foundUser = false;
@@ -257,6 +322,7 @@ function deactivateChat(userId) {
             chat.active = false;
             chat.typing = false;
             chat.alert = true;
+            chat.reconnecting = false;
             foundUser = true;
             updateUserOverview();
         }
@@ -264,7 +330,7 @@ function deactivateChat(userId) {
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
-}
+} 
 
 function acceptChat(userId) {
   acceptChatUI(userId);
@@ -373,24 +439,20 @@ function sendMessage() {
     chat if it exists, logs an error if that user chat doesn't exist
 */
 function addMessage(userId, messageObject) {
-    foundUser = false;
-    for (chat of chats) {
+    let foundUser = false;
+    for (let chat of chats) {
         if (userId == chat.userId) {
             chat.messages.push(messageObject);
-            chat.alert = true;
+            messageObject.role == 'admin' ? chat.alert = false : chat.alert = true;
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
-                currentChat = document.getElementsByClassName("messages")[0];
-                messageSide = 'left';
-                if (messageObject.role == 'admin') {
-                    chat.alert = false;
-                    messageSide = 'right';
-                }
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message, messageObject.timestamp);
+                let currentChat = $('.messages').first();
+                appendMessageToDiv(messageObject, currentChat);
             }
         }
         scrollDown();
     }
+
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
