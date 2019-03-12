@@ -5,7 +5,7 @@ $(document).ready(() => {
       <div class='row'>Ears for Peers</div>
       <img src='img/baby_elephant.png'>
       <div class='row'>
-        <button type='button' onclick='openChat()'>Connect Me to an Ear</button>
+        <button type='button' class="btn btn-outline-info" onclick='openChat()'>Connect Me to an Ear</button>
       </div>
       <p style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
     `;
