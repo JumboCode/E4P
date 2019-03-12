@@ -16,6 +16,34 @@ socket.on('test', () => {
   console.log('test');
 });
 
+$(document).ready(() => {
+  const availableUI = `
+      <div class='row'>Ears for Peers</div>
+      <img src='img/baby_elephant.png'>
+      <div class='row'>
+        <button type='button' class="btn btn-outline-info" onclick='openChat()'>Connect Me to an Ear</button>
+      </div>
+      <p style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
+    `;
+  const unavailableUI = `
+      <div class='row'>Ears for Peers</div>
+      <img src='img/baby_elephant.png'>
+      <p style="font-size: 16px">Ears for Peers is currently unavailable. </p>
+      <p style="font-size: 16px">Our line is open from 7pm-7am every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
+    `;
+  $.getJSON('/available')
+    .done((data) => {
+      if (data.isAvailable) {
+        $('#open').html(availableUI);
+      } else {
+        $('#open').html(unavailableUI);
+      }
+    })
+    .fail(() => {
+      $('#open').html(unavailableUI);
+    });
+});
+
 socket.on('connect', () => {
   if (chat.active) {
     console.log('Chat is active, connecting with stored ID');
@@ -44,19 +72,22 @@ socket.on('admin matched', () => {
 });
 
 socket.on('admin disconnect', () => {
-  console.log("Admin left!");
+  console.log('Admin left!');
   // admin has disconnected, do something
   // updateChat(createMessage('admin', 'ALERT: Admin disconnected!'));
 });
 
-socket.on('chat message', function(data) {
+socket.on('chat message', (data) => {
+  console.log('recieved chat message on index: ' + data);
   updateChat(createMessage('admin', data.message));
   $('#typingIcon').css('display', 'none');
+  messageSound();
 });
 
 socket.on('typing', () => {
   console.log('admin is typing');
   $('#typingIcon').css('display', 'block');
+  scrollDown();
 });
 
 socket.on('stop typing', () => {
@@ -69,12 +100,12 @@ function send_message(msg) {
     message: msg,
     room: chat.roomId
   });
-};
+}
 
 function user_connect() {
-  console.log(socket)
+  console.log(socket);
   socket.emit('user connect');
-};
+}
 
 socket.emit('assign as user');
 
@@ -91,7 +122,7 @@ function send_typing_message(is_typing) {
 }
 
 function warning() {
-  return "Are you sure you want to leave?";
+  return 'Are you sure you want to leave?';
 }
 
 var chat = {
@@ -103,13 +134,13 @@ var chat = {
 
 
 function openChat() {
-  open = document.getElementById("open");
-  open.innerHTML = '';
-  open.innerHTML = " <div class='row'>Waiting to connect to an ear!</div><div class='row'><div class='loader' id='load'></div></div>";
-  console.log("attempting to connect");
+  let openPanel = document.getElementById('open');
+  openPanel.innerHTML = '';
+  openPanel.innerHTML = ' <div class=\'row\'>Waiting to connect to an ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div><div class=\'row\' style="margin-top: 16px"><span style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 7am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</span></div>';
+  console.log('attempting to connect');
   window.onbeforeunload = () => {
-    return "Are you sure you want to leave? Your chat connection will be lost.";
-  }
+    return 'Are you sure you want to leave? Your chat connection will be lost.';
+  };
   
   // User is connecting: Fix the current room id in localStorage and the chat object:
   window.localStorage.setItem('roomID', socket.id);
@@ -121,20 +152,23 @@ function openChat() {
 
 function startChat() {
   // get rid of open buttons
-  open = document.getElementById("open");
-  open.innerHTML = '';
-  open.style.display = "none";
+  let openPanel = document.getElementById('open');
+  openPanel.innerHTML = '';
+  openPanel.style.display = 'none';
 
 
   //add input bar to page
-  $("#e_space").css('height', '10vh');
-  $("#chat").attr('style', 'display: flex !important');
-  chatbox = document.getElementById("chatbox");
-  chatbox.style.display = "block";
+  $('#e_space').css('height', '10vh');
+  $('#chat').attr('style', 'display: flex !important');
+  chatbox = document.getElementById('chatbox');
+  chatbox.style.display = 'block';
 
-  chatbar = document.getElementById("chatbar");
-  chatbar.style.visibility= "visible";
+  chatbar = document.getElementById('chatbar');
+  chatbar.style.visibility= 'visible';
   chat.accepted = true;
+
+  $('#typingIcon').before(createStatusDiv('An Ear has accepted your conversation.'));
+  $('#typingIcon').before(createStatusDiv('Talk to us about anything that\'s on your mind.'));
 }
 
 
@@ -143,19 +177,17 @@ function getMessage() {
   window.onbeforeunload = warning;
 }
 
+function scrollDown() {
+  let mbox = $('#chathistory');
+  mbox.scrollTop(mbox.prop('scrollHeight') - mbox.prop('clientHeight'));
+}
 
 function updateChat(messageObj) {
-  messages = document.getElementById("chathistory");
-  chatbox = document.getElementById("chatbox");
-  if (messageObj.role == 'admin') {
-      messageSide = 'left';
-  }
-  else {
-      messageSide = 'right';
-  }
-  newMessage = createMessageDiv(messageSide, messageObj.message);
-  $("#typingIcon").before(newMessage);
-  messages.scrollTop = messages.scrollHeight - messages.clientHeight;
+  let messages = document.getElementById('chathistory');
+  const messageSide = (messageObj.role == 'admin' ? 'left' : 'right');
+  const newMessage = createMessageDiv(messageSide, messageObj.message, messageObj.timestamp);
+  $('#typingIcon').before(newMessage);
+  scrollDown();
 }
 
 
@@ -164,14 +196,14 @@ function createMessage(role, messageString) {
 }
 
 function sendMessage() {
-    message = $('#inputBox').val();
-    if (message != '') {
-        send_message(message);
-        messageObject = createMessage('user', message);
-        chat.messages.push(messageObject);
-        updateChat(messageObject);
-        message = $('#inputBox').val('');
-    }
+  let message = $('#inputBox').val();
+  if (message != '') {
+    send_message(message);
+    let messageObject = createMessage('user', message);
+    chat.messages.push(messageObject);
+    updateChat(messageObject);
+    message = $('#inputBox').val('');
+  }
 }
 
 function admin_matched() {
@@ -182,12 +214,7 @@ function admin_matched() {
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
 
-$(function() {
-  $("#type_msg").html(chatElements(""));
+$(() => {
+  $('#type_msg').html(chatElements(''));
   chatSetup(sendMessage);
 });
-
-function disconnect() {
-  socket.disconnect();
-  socket.connect({'forceNew':true });
-}

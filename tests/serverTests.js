@@ -24,16 +24,6 @@ describe('GET /', () => {
     });
   });
 
-  it('it should GET /help', (done) => {
-    chai.request(server)
-        .get('/help')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.should.be.html;
-          done();
-    });
-  });
-
   it('it should not GET /notapage', (done) => {
     chai.request(server)
         .get('/notapage')
