@@ -12,9 +12,6 @@ function connectWithStoredID() {
   }
 }
 
-socket.on('test', () => {
-  console.log('test');
-});
 
 $(document).ready(() => {
   const availableUI = `
@@ -22,6 +19,7 @@ $(document).ready(() => {
       <img src='img/baby_elephant.png'>
       <div class='row align-items-center'>
         <button type='button' class="btn btn-outline-info" onclick='openChat()'>Connect Me to an Ear</button>
+
       </div>
       <p id='footer' style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
     `;
@@ -49,6 +47,7 @@ socket.on('connect', () => {
     console.log('Chat is active, connecting with stored ID');
     connectWithStoredID();
   }
+
 });
 
 socket.on('reconnected with old socket id', () => {
@@ -57,19 +56,16 @@ socket.on('reconnected with old socket id', () => {
 });
 
 socket.on('invalid old socket id', () => {
-  /* TODO: Tell user that their chat is not valid anymore (convert console
-      log into a displayed message.)
-      
-      This function only gets called when a user was in the middle of a 
+  /* 
+      This function only gets called when a user was in the middle of a
       conversation. If the user presses the "Connect me to an Ear" button,
-      their id is saved in localStorage, and this function does not get 
+      their id is saved in localStorage, and this function does not get
       called until after they disconnect during a conversation.
   */
-  console.log('Tried to reconnect, but your conversation seems to be too old. ' + 
-              'You usually cannot disconnect for more than 5 minutes');
-  $('#typingIcon').before(createStatusDiv('You\'ve been disconnected from your chat.'));
-  $('#typingIcon').before(createStatusDiv('Keep this browser window open to receive and send messages.'));
-  $('#typingIcon').before(createStatusDiv('If you\'re gone for more than 5 minutes you will be disconnected.'));
+  deactivateChat();
+  $('#typingIcon').before(createStatusDiv('Tried to reconnect, but your conversation seems to be too old. ' +
+                                          'You usually cannot disconnect for more than 5 minutes.'));
+  $('.input-group').html('<a id="goHomeLink" href="/"><div id="delete">Take me back to the home page</div></a>');
 
   window.localStorage.setItem('roomID', socket.id);
 });
@@ -117,7 +113,7 @@ function user_connect() {
   socket.emit('user connect');
 }
 
-socket.emit('assign as user');
+
 
 function send_typing_message(is_typing) {
   if (is_typing) {
@@ -153,7 +149,7 @@ function openChat() {
   window.onbeforeunload = () => {
     return 'Are you sure you want to leave? Your chat connection will be lost.';
   };
-  
+
   // User is connecting: Fix the current room id in localStorage and the chat object:
   window.localStorage.setItem('roomID', socket.id);
   chat.roomId = socket.id;
@@ -223,10 +219,11 @@ function admin_matched() {
   console.log('admin matched');
 }
 
-/* function to change accepted from true to false when admin accepts chat */
-/* function to change active to false when user exits out */
-
 $(() => {
   $('#type_msg').html(chatElements(''));
   chatSetup(sendMessage);
 });
+
+function deactivateChat() {
+  chat.active = false;
+}
