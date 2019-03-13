@@ -77,6 +77,7 @@ socket.on('invalid old socket id', () => {
 socket.on('admin matched', () => {
   startChat();
   console.log('admin matched');
+  $('#typingIcon').css('display', 'none');
 });
 
 socket.on('admin disconnect', () => {
@@ -106,7 +107,8 @@ socket.on('stop typing', () => {
 function send_message(msg) {
   socket.emit('chat message', {
     message: msg,
-    room: chat.roomId
+    room: chat.roomId,
+    role: 'user'
   });
 }
 
