@@ -209,6 +209,51 @@ describe('socket tests', () => {
       
       setTimeout(() => { user1.emit('user connect'); }, 50);
     });
+
+    it('should add messages to currentConversations', (done) => {
+      /*admin1.on('chat message', (id1) => {
+        admin1.emit('accept user', id1);
+        expect(currentConversations.length).to.not.equal(0);
+        let currentIndex = currentConversations.length - 1;
+        done();
+      });
+*/
+      admin1.on('user waiting', (id1) => {
+        admin1.emit('accept user', id1);
+      });
+
+      user1.on('admin matched', () => {
+        user1.emit('chat message', { message: 'foobar', room: user1.id, role: 'user'});
+      });
+
+      // chat messages
+      admin1.on('chat message', (msg) => {
+        expect(msg.message).to.equal('foobar');
+        expect(msg.room).to.equal(user1.id);
+        admin1.emit('chat message', { message: 'letsgobos', room: msg.room, role: 'admin' });
+      });
+
+      user1.on('chat message', (msg) => {
+        expect(msg.message).to.equal('letsgobos');
+        expect(msg.room).to.equal(user1.id);
+
+        let currentIndex = currentConversations.length - 1;
+        expect(currentConversations[currentIndex].messages.length).to.not.equal(0);
+
+        // TODO: finish these tests
+        expect(currentConversations[currentIndex].messages[0].message).to.equal('foobar');
+        expect(currentConversations[currentIndex].messages[0].role).to.equal('user');
+        expect(currentConversations[currentIndex].messages[1].message).to.equal('letsgobos');
+        expect(currentConversations[currentIndex].messages[1].role).to.equal('admin');
+
+        done();
+      });
+
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+
+
+      
+    });
   });
 
 });

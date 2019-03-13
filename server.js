@@ -97,7 +97,7 @@ app.get('/img/:file', (req, res) => {
 });
 
 app.get('/audio/:file', (req, res) => {
-  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});  
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});
 });
 
 app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
@@ -135,9 +135,11 @@ io.on('connection', (socket) => {
       { user: socket.id,
         icon: socket.icon,
         room: socket.id,
-        accepted: false,
+        active: false,
+        everAccepted: false,
         connected: true,
-        connected_admin: null
+        connected_admin: null,
+        messages: []
       });
   });
 
@@ -152,7 +154,9 @@ io.on('connection', (socket) => {
 
     for (let conversation of currentConversations) {
       if (conversation.room === user_room_id) {
-        conversation.accepted = true;
+        conversation.active = true;
+        // everAccepted will never be set to false again
+        conversation.everAccepted = true;
         conversation.connected_admin = socket.id;
       }
     }
@@ -170,16 +174,24 @@ io.on('connection', (socket) => {
   // PHASE III
   // receive chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', (data) => {
-    // console.log(data.message);
+    let message = data.message;
+    let room = data.room;
+    let role = data.role;
 
-    let message = data['message'];
-    let receiver = data['room'];
-
-    console.log(message);
-    console.log(receiver);
+    // Add message to conversation
+    for (let conversation of currentConversations) {
+      if (conversation.room === room) {
+        conversation.messages.push(
+          { message: message, 
+            timestamp: new Date(), 
+            role: role
+          }
+        );
+      }
+    }
 
     // console.log('receiver: ' + receiver);
-    socket.broadcast.to(receiver).emit('chat message', {message: message, room: receiver});
+    socket.broadcast.to(room).emit('chat message', {message: message, room: room});
   });
 
   // PHASE IV
@@ -194,20 +206,19 @@ io.on('connection', (socket) => {
         console.log('disconnecting user from conversation');
         
         /* 
-         * if we know the disconnecting socket was a user in a room, 
+         * If we know the disconnecting socket was a user in a room,
          * use conversation.room as the original socketid that admins are tracking
          */
-
-        if (conversation.accepted) {
-          // user was previously accepted so notify anyone else in the room the user left
+        if (conversation.everAccepted || conversation.connected_admin != null) {
+          // notify anyone else in the room the user left
           io.to(conversation.room).emit('user disconnect', conversation.room);
         } else {
-          // user was not accepted so we can just let admins remove from menus
+          // user was never accepted so we can just let admins remove from menus
           for (let admin of admins) {
             io.to(admin).emit('user matched', conversation.room);
           }
         }
-        
+
         socket_is_user = true;
         conversation.connected = false;
 
@@ -230,13 +241,13 @@ io.on('connection', (socket) => {
           if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
             icons.push(socket.icon);
           }
-        }, process.env.DISCONNECT_GRACE_PERIOD || 60000);
+        }, process.env.DISCONNECT_GRACE_PERIOD || 5 * 60000); // 5 minutes
       } else if (conversation.connected_admin === socket.id) {
         // disconnecting socket was an admin
         console.log('disconnecting admin from conversation');
 
         conversation.connected_admin = null;
-        conversation.accepted = false;
+        conversation.active = false;
 
         // let other admins pick up the conversation
         for (let admin of admins) {
@@ -296,6 +307,10 @@ io.on('connection', (socket) => {
   socket.on('stop typing', (data) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
+  });
+
+  socket.on('sound on', () => {
+    socket.emit('sound on');
   });
 });
 

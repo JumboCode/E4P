@@ -30,3 +30,8 @@
 .navbar-dark .navbar-nav .nav-link:hover {
   color: var(--light-blue);
 }
+
+.navbar-button {
+  background-color: var(--dark-green);
+  border: none;
+}
