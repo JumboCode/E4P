@@ -44,9 +44,10 @@ function user_matched(user) {
 }
 
 socket.on('user unmatched', (conversation) => {
-  // TODO: display a message to the ear so they know this person was
-  //       disconnected from an admin
   newChat(conversation.user, conversation.icon);
+  for (let message of conversation.messages) {
+    addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
+  }
   addMessage(conversation.user, createMessage('status', 'This user was disconnected from a previous Ear.'));
   updateUserOverview();
 });
