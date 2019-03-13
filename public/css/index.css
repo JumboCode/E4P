@@ -320,6 +320,7 @@ img {
   align-items: center;
   text-align: center;
   border-radius: 3px;
+  border: solid rgb(200, 200, 200) 1px;
   padding: 1em;
 }
 

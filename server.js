@@ -97,7 +97,7 @@ app.get('/img/:file', (req, res) => {
 });
 
 app.get('/audio/:file', (req, res) => {
-  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});  
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});
 });
 
 app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
@@ -192,9 +192,9 @@ io.on('connection', (socket) => {
       if (conversation.user === socket.id) {
         // disconnecting socket was a user
         console.log('disconnecting user from conversation');
-        
-        /* 
-         * if we know the disconnecting socket was a user in a room, 
+
+        /*
+         * if we know the disconnecting socket was a user in a room,
          * use conversation.room as the original socketid that admins are tracking
          */
 
@@ -207,7 +207,7 @@ io.on('connection', (socket) => {
             io.to(admin).emit('user matched', conversation.room);
           }
         }
-        
+
         socket_is_user = true;
         conversation.connected = false;
 
