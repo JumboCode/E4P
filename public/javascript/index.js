@@ -8,20 +8,10 @@ function connectWithStoredID() {
     console.log('Reconnecting with: ' + prevRoomID);
 
     // user needs to reconnect using localStorage ID
-    let stillConnected = false;
     socket.emit('user reconnect', prevRoomID);
-
-
   }
 }
 
-// socket.on('reconnect request received', () => {
-//
-// }
-
-socket.on('test', () => {
-  console.log('test');
-});
 
 $(document).ready(() => {
   const availableUI = `
@@ -60,11 +50,6 @@ socket.on('connect', () => {
 
 });
 
-
-socket.emit('test', function(bool) {
-  console.log(bool);
-});
-
 socket.on('invalid old socket id', () => {
   /* TODO: Tell user that their chat is not valid anymore (convert console
       log into a displayed message.)
@@ -78,9 +63,6 @@ socket.on('invalid old socket id', () => {
   $('#typingIcon').before(createStatusDiv('Tried to reconnect, but your conversation seems to be too old. ' +
                                           'You usually cannot disconnect for more than 5 minutes.'));
   $('.input-group').html('<a id="goHomeLink" href="/"><div id="delete">Take me back to the home page</div></a>');
-  // $('.input-group').html('<div id="delete"><a id="goHomeLink" href="/">Take me back to the home page</a></div>');
-  console.log('Tried to reconnect, but your conversation seems to be too old. ' +
-              'You usually cannot disconnect for more than 5 minutes');
 
   window.localStorage.setItem('roomID', socket.id);
 });
@@ -230,39 +212,11 @@ function admin_matched() {
   console.log('admin matched');
 }
 
-/* function to change accepted from true to false when admin accepts chat */
-/* function to change active to false when user exits out */
-
 $(() => {
   $('#type_msg').html(chatElements(''));
   chatSetup(sendMessage);
 });
 
-function disconnect() {
-  socket.disconnect();
-  socket.connect({'forceNew':true });
-}
-
 function deactivateChat() {
-    chat.active = false;
-    // for (chat of chats) {
-    //     if (userId == chat.userId) {
-    //         chat.active = false;
-    //         chat.typing = false;
-    //         chat.alert = true;
-    //         chat.reconnecting = false;
-    //         foundUser = true;
-    //         updateUserOverview();
-    //     }
-    // }
-    // if (!foundUser) {
-    //     console.log(Error('User with given identifier could not be found'));
-    // }
+  chat.active = false;
 }
-
-var chat = {
-  roomId: '',
-  messages: [],
-  accepted: false,
-  active: false
-};
