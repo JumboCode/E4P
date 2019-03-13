@@ -9,10 +9,15 @@ body {font-family: "Lato", sans-serif;}
   --light-green: #b2fef8;
 }
 
+#footer {
+  font-size: 16px;
+  text-align: center;
+}
+
 .wrapper {
   margin: auto;
   margin-top: 20px;
-  max-width: 800px;
+  max-width: 90%;
   min-width: 600px;
   overflow-x: auto;
 }
@@ -76,9 +81,7 @@ img {
 }
 
 .btn-outline-info:hover {
-  background-color: var(--light-blue);
-  color: #b4bed0;
-  border-color: var(--light-blue);
+  cursor: pointer;
 }
 
 #load {
@@ -118,7 +121,6 @@ img {
 }
 
 #chathistory {
-  background-color: var(--light-blue);
   margin-top: 50px;
   height: 60vh;
   overflow-y: scroll;
@@ -129,7 +131,6 @@ img {
 #chat_admin {
   position: inline-block;
   width: 100%;
-  background: var(--light-blue);
 }
 
 .received_msg {
@@ -163,7 +164,7 @@ img {
   background: #b1c6c4 none repeat scroll 0 0;
   border-radius: 3px;
   font-size: 14px;
-  color: #fff;
+  color: black;
   margin-top: 10px;
   margin-right: 10px;
   padding: 5px;
@@ -173,7 +174,8 @@ img {
 #chatbar {
   visibility: hidden;
   width: 80%;
-  background: var(--light-blue);
+  border-width: 1px;
+  padding-top: 5px;
 }
 
 #e_space {
@@ -183,6 +185,7 @@ img {
 
 #type_msg {
   width: 100%;
+  flex-wrap: nowrap;
 }
 
 @media (min-width: 620px) {
@@ -190,6 +193,8 @@ img {
     min-height: 10px;
     width: 90%;
     resize: none;
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
     border: solid rgb(200, 200, 200) 1px;
   }
 }
@@ -200,7 +205,8 @@ img {
     min-height: 10px;
     width: calc(100% - 50px);
     resize: none;
-    border: solid rgb(200, 200, 200) 1px;
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
   }
 }
 
@@ -209,16 +215,17 @@ img {
     background: var(--dark-green);
     color: white;
     height: 55px;
-    width: 10%;
+    width: 20%;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border: solid rgb(200, 200, 200) 1px;
     cursor: pointer;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
   }
 
   #sendButton:hover {
-    background-color: rgb(200, 200, 200);
+    cursor: pointer;
   }
 
   #sendButtonText {
@@ -235,8 +242,9 @@ img {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border: solid rgb(200, 200, 200) 1px;
     cursor: pointer;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
   }
 
   #sendButton:hover {
@@ -266,8 +274,6 @@ img {
     display: none;
     height: 80%;
     width: 80%;
-    background-color: var(--light-blue);
-    border: solid rgb(200, 200, 200) 1px;
   }
 }
 
@@ -276,8 +282,6 @@ img {
     display: none;
     height: 80%;
     width: 80%;
-    background-color: var(--light-blue);
-    border: solid rgb(200, 200, 200) 1px;
   }
 
   #open.flex-container {
@@ -294,9 +298,45 @@ img {
   }
 
   #chathistory {
-    background-color: var(--light-blue);
     margin-top: 50px;
     height: 500px;
     overflow-y: scroll;
   }
+}
+
+#input-group {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+#delete {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 3px;
+  border: solid rgb(200, 200, 200) 1px;
+  padding: 1em;
+}
+
+#goHomeLink {
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  color: var(--dark-green);
+}
+
+#delete:hover {
+  background-color: var(--dark-green);
+  color: white;
+  transition: 0.3s;
+  cursor: pointer;
 }

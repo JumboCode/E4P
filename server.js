@@ -97,15 +97,11 @@ app.get('/img/:file', (req, res) => {
 });
 
 app.get('/audio/:file', (req, res) => {
-  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});  
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});
 });
 
 app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   admins.push(req.body.admin);
-  res.sendStatus(200);
-});
-
-app.get('/admin/conversations', adminRoutes.ensureAuthenticated, (req, res) => {
   res.json(currentConversations);
 });
 
@@ -119,6 +115,7 @@ let icons = [
   'brownbear', 'marmoset', 'funnylion', 'deer', 'zebra', 'meerkat', 'elephant', 'cat',
   'hare', 'puma', 'owl', 'antelope', 'lion', 'fox', 'wolf', 'hippo'
 ];
+let reconnectionTimeouts = {};
 
 io.on('connection', (socket) => {
   // PHASE I
@@ -138,9 +135,11 @@ io.on('connection', (socket) => {
       { user: socket.id,
         icon: socket.icon,
         room: socket.id,
-        accepted: false,
+        active: false,
+        everAccepted: false,
         connected: true,
-        connected_admin: null
+        connected_admin: null,
+        messages: []
       });
   });
 
@@ -155,12 +154,17 @@ io.on('connection', (socket) => {
 
     for (let conversation of currentConversations) {
       if (conversation.room === user_room_id) {
-        conversation.accepted = true;
+        conversation.active = true;
+        // everAccepted will never be set to false again
+        conversation.everAccepted = true;
         conversation.connected_admin = socket.id;
       }
     }
     console.log(currentConversations);
+    console.log('sending admin matched to:');
+    console.log(user_room_id);
 
+    socket.broadcast.to(user_room_id).emit('invalid');
     socket.broadcast.to(user_room_id).emit('admin matched');
     for (let admin of admins) {
       socket.broadcast.to(admin).emit('user matched', user_room_id);
@@ -170,62 +174,128 @@ io.on('connection', (socket) => {
   // PHASE III
   // receive chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', (data) => {
-    // console.log(data.message);
+    let message = data.message;
+    let room = data.room;
+    let role = data.role;
 
-    let message = data['message'];
-    let receiver = data['room'];
+    // Add message to conversation
+    for (let conversation of currentConversations) {
+      if (conversation.room === room) {
+        conversation.messages.push(
+          { message: message, 
+            timestamp: new Date(), 
+            role: role
+          }
+        );
+      }
+    }
+
     // console.log('receiver: ' + receiver);
-    socket.broadcast.to(receiver).emit('chat message', {message: message, room: receiver});
+    socket.broadcast.to(room).emit('chat message', {message: message, room: room});
   });
 
   // PHASE IV
   // User Disconnects:
   socket.on('disconnect', () => {
-    var user_room_id = socket.id;
-    console.log('disconnect');
-    console.log(socket.id);
+    let socket_is_user = false;
 
-    if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
-      icons.push(socket.icon);
-    }
-    var room = io.sockets.adapter.rooms[user_room_id];
-    if (room) {
-      // room exists, either admin or user left in room, send disconnect
-      socket.broadcast.to(user_room_id).emit('user disconnect', user_room_id);
-    } else {
-      // room DNE, no one else connected, user was pending
-      // TODO what if admin disconnected first, dont need to send 'accept user'
-      for (let admin of admins) {
-        socket.broadcast.to(admin).emit('user matched', user_room_id);
-      }
-    }
-    // Removes admin ID from admins array when an admin disconnects
-    for (let i = 0; i < admins.length; i++) {
-      if (admins[i] == user_room_id) {
-        admins.splice(i, 1);
-
-      }
-    }
-
-    // Disconnect user ID from room
+    // iterate through all the current conversations to figure out who's disconnecting
     for (let conversation of currentConversations) {
-      if (conversation.user === user_room_id) {
+      if (conversation.user === socket.id) {
+        // disconnecting socket was a user
+        console.log('disconnecting user from conversation');
+        
+        /* 
+         * If we know the disconnecting socket was a user in a room,
+         * use conversation.room as the original socketid that admins are tracking
+         */
+        if (conversation.everAccepted || conversation.connected_admin != null) {
+          // notify anyone else in the room the user left
+          io.to(conversation.room).emit('user disconnect', conversation.room);
+        } else {
+          // user was never accepted so we can just let admins remove from menus
+          for (let admin of admins) {
+            io.to(admin).emit('user matched', conversation.room);
+          }
+        }
+
+        socket_is_user = true;
         conversation.connected = false;
-        // TODO: After user reconnect is implemented, we'll want to delay this
-        //       removing for some time
-        removeConversation(conversation.room);
-      }
-      if (conversation.connected_admin == user_room_id) {
-        // Admin of this conversation is disconnecting
+
+        // delete the room after a delayed time
+        reconnectionTimeouts[conversation.room] = setTimeout(() => {
+          // tell anyone connected to room the user didnt reconnect in the allowed time
+          io.to(conversation.room).emit('user gone for good', conversation.room);
+
+          // remove related objects from data structs
+          delete reconnectionTimeouts[conversation.room];
+          removeConversation(conversation.room);
+          let room = io.sockets.adapter.rooms[conversation.room];
+          if (room) {
+            for (let id in room.sockets) {
+              io.sockets.connected[id].leave(conversation.room);
+            }
+          }
+
+          // recycle icon
+          if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
+            icons.push(socket.icon);
+          }
+        }, process.env.DISCONNECT_GRACE_PERIOD || 5 * 60000); // 5 minutes
+      } else if (conversation.connected_admin === socket.id) {
+        // disconnecting socket was an admin
         console.log('disconnecting admin from conversation');
 
         conversation.connected_admin = null;
-        conversation.accepted = false;
+        conversation.active = false;
+
+        // let other admins pick up the conversation
         for (let admin of admins) {
           socket.broadcast.to(admin).emit('user unmatched', conversation);
         }
       }
     }
+
+    // on top of notifying any connected users their admin is gone,
+    // remove the admin from the related admins data structs
+    if (!socket_is_user) {
+      for (let i = 0; i < admins.length; i++) {
+        if (admins[i] == socket.id) {
+          admins.splice(i, 1);
+        }
+      }
+    }
+  });
+
+  socket.on('user reconnect', (old_room_id) => {
+    let foundUser = false;
+    console.log('Old socket ID: ' + old_room_id);
+    console.log('New socket ID: ' + socket.id);
+
+    for (let conversation of currentConversations) {
+      if (conversation.room === old_room_id) {
+        clearTimeout(reconnectionTimeouts[conversation.room]);
+        delete reconnectionTimeouts[conversation.room];
+        foundUser = true;
+        console.log('found user\'s old room');
+        socket.join(conversation.room);
+        conversation.user = socket.id;
+        // socket.broadcast.to(socket.id).emit('admin matched');
+        socket.emit('reconnected with old socket id');
+        io.to(conversation.room).emit('user reconnect', conversation.room);
+      }
+    }
+
+    console.log('foundUser: ');
+    console.log(foundUser);
+
+    if (!foundUser) {
+      console.log('invalid old socket id, current id:');
+      console.log(socket.id);
+      console.log('sending message now');
+      socket.emit('invalid old socket id');
+    }
+    console.log(currentConversations);
   });
 
   //User Typing Event:

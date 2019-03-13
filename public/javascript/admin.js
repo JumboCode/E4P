@@ -1,23 +1,24 @@
 window.onbeforeunload = () => {
-   alert("Are you sure you want to leave? Your chat connections will be lost.");
-}
+  alert('Are you sure you want to leave? Your chat connections will be lost.');
+};
 
 const socket = io();
 
 socket.on('connect', () => {
-  // Load Existing Chats
-  $.get('/admin/conversations', function(conversations) {
+  // Register as Admin
+  $.post('/admin', { admin: socket.id }, (conversations) => {
     for (let conversation of conversations) {
-      if (!conversation.accepted) {
-        newChat(conversation.user, conversation.icon);
+      if (!conversation.active) {
+        newChat(conversation.room, conversation.icon);
+        for (let message of conversation.messages) {
+          addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
+        }
+        reactivateChat(conversation.room);
       }
     }
     socket.emit('sound on');
     updateUserOverview();
   });
-
-  // Register as Admin
-  $.post("/admin", { admin: socket.id });
 });
 
 socket.on('user matched', user_matched);
@@ -26,7 +27,7 @@ socket.on('sound on', () => {
   console.log('sound on');
 });
 
-socket.on('chat message', function(data) {
+socket.on('chat message', (data) => {
   addMessage(data.room, createMessage('user', data.message));
   messageSound();
   // Chat message received, so user is not typing anymore
@@ -40,29 +41,44 @@ function user_matched(user) {
   // remove user from chat list if it exists
   for (let messageStream of chats) {
     if (messageStream.userId == user) {
-        removeChat(user);
-        break;
+      removeChat(user);
+      break;
     }
   }
 }
 
 socket.on('user unmatched', (conversation) => {
-  // TODO: display a message to the ear so they know this person was
-  //       disconnected from an admin
   newChat(conversation.user, conversation.icon);
+  for (let message of conversation.messages) {
+    addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
+  }
+  addMessage(conversation.user, createMessage('status', 'This user was disconnected from a previous Ear.'));
   updateUserOverview();
 });
 
-socket.on('user disconnect', end_chat);
-
-// ends a chat with given user
-function end_chat(user) {
-  console.log('user disconnected ' + user);
-  deactivateChat(user);
-
-  // reload the current window:
+socket.on('user disconnect', (userId) => {
+  // TODO: display a message saying the user disconnected but might come back
+  console.log('user disconnected ' + userId);
+  addMessage(userId, createMessage('status', 'The user has disconnected. They might return soon.'));
+  pauseChat(userId);
   toggleChat(CURRENT_CHAT_USER_ID);
-}
+});
+
+socket.on('user gone for good', (userId) => {
+  // TODO: display a message saying the user disconnected and did not come back in time
+  console.log('user chat being deleted ' + userId);
+  addMessage(userId, createMessage('status', 'The user did not reconnect in time.'));
+  deactivateChat(userId);
+  toggleChat(CURRENT_CHAT_USER_ID);
+});
+
+socket.on('user reconnect', (userId) => {
+  // TODO: display a message saying the user reconnected
+  console.log('user reconnected ' + userId);
+  addMessage(userId, createMessage('status', 'The user has reconnected.'));
+  reactivateChat(userId);
+  toggleChat(CURRENT_CHAT_USER_ID);
+});
 
 socket.on('user waiting', user_waiting);
 
@@ -72,7 +88,6 @@ function user_waiting(user, icon) {
   newChatWithAlert(user, icon);
   updateUserOverview();
 }
-
 
 socket.on('typing', user_typing);
 
@@ -93,7 +108,8 @@ function user_stop_typing(data) {
 function send_message(user, msg) {
   socket.emit('chat message', {
     message: msg,
-    room: user
+    room: user,
+    role: 'admin'
   });
 }
 
@@ -111,23 +127,22 @@ function send_typing_message(user_id, is_typing) {
     socket.emit('stop typing', {
       room: CURRENT_CHAT_USER_ID
     });
-   }
+  }
 }
-
 
 let chats = [];
 let CURRENT_CHAT_USER_ID = '';
-const ICON_SRC = "img/Animal Icons Small.png";
+const ICON_SRC = 'img/Animal Icons Small.png';
 
 /**************************** INITIALIZE ****************************/
 
 function initialize() {
-    // Can be used for testing:
-    // mockChats();
-    // populateChat();
-    updateUserOverview();
-    generateAdminHeader();
-    newChatSoundLoop();
+  // Can be used for testing:
+  // mockChats();
+  // populateChat();
+  updateUserOverview();
+  generateAdminHeader();
+  newChatSoundLoop();
 }
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
@@ -179,6 +194,19 @@ function clearView() {
     $('.messages').html("");
 }
 
+function appendMessageToDiv(message, div) {
+  let toAppend = '';
+  if (message.role == 'status') {
+    toAppend = createStatusDiv(message.message);
+  } else if (message.role == 'admin') {
+    toAppend = createMessageDiv('right', message.message, message.timestamp);
+  } else {
+    toAppend = createMessageDiv('left', message.message, message.timestamp);
+  }
+
+  div.append(toAppend);
+}
+
 function toggleChat(userId) {
   //Update global 'current chat' state.
   updateCurrentInput(CURRENT_CHAT_USER_ID);
@@ -194,9 +222,7 @@ function toggleChat(userId) {
     //Rehydrate message info.
     let currentChat = $('.messages').first();
     currentChat.html('');
-    chat.messages.forEach((msg) => {currentChat.append(
-      createMessageDiv(msg.role === 'admin' ? 'right' : 'left', msg.message, msg.timestamp)
-    );});
+    chat.messages.forEach((msg) => {appendMessageToDiv(msg, currentChat)});
     //Set typing indicator.
     $('#typingIcon').css('display', (chat.typing ? 'block' : 'none'));
     //Update available actions.
@@ -207,6 +233,8 @@ function toggleChat(userId) {
       actionDiv.html(chatElements(chat.currentMessage));
       chatSetup(sendMessage);
       scrollDown();
+    } else if (chat.reconnecting) {
+      actionDiv.html('<div id=\'pause\'>User Disconnected</div>');
     } else {
       actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
     }
@@ -221,12 +249,12 @@ function scrollDown() {
 }
 
 function updateCurrentInput(userId) {
-    for (chat of chats) {
-        if (chat.userId == userId && chat.accepted && chat.active) {
-            currentMessage = $('#inputBox').val();
-            chat.currentMessage = currentMessage;
-        }
+  for (chat of chats) {
+    if (chat.userId == userId && chat.accepted && chat.active) {
+      currentMessage = $('#inputBox').val();
+      chat.currentMessage = currentMessage;
     }
+  }
 }
 
 /**************************** SINGLE CHAT FUNCTIONS ****************************/
@@ -253,9 +281,44 @@ function newChat(userId, icon) {
               typing: false,
               icon: icon,
               alert: true,
+              reconnecting: false,
               currentMessage: "" }
         );
     }
+}
+
+function reactivateChat(userId) {
+  let foundUser = false;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      chat.active = true;
+      chat.typing = false;
+      chat.alert = true;
+      chat.reconnecting = false;
+      foundUser = true;
+      updateUserOverview();
+    }
+  }
+  if (!foundUser) {
+    console.log(Error('User with given identifier could not be found'));
+  }
+}
+
+function pauseChat(userId) {
+  let foundUser = false;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      chat.active = false;
+      chat.typing = false;
+      chat.alert = true;
+      chat.reconnecting = true;
+      foundUser = true;
+      updateUserOverview();
+    }
+  }
+  if (!foundUser) {
+    console.log(Error('User with given identifier could not be found'));
+  }
 }
 
 function newChatWithAlert(userId, icon) {
@@ -270,6 +333,7 @@ function deactivateChat(userId) {
             chat.active = false;
             chat.typing = false;
             chat.alert = true;
+            chat.reconnecting = false;
             foundUser = true;
             updateUserOverview();
         }
@@ -277,7 +341,7 @@ function deactivateChat(userId) {
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }
-}
+} 
 
 function acceptChat(userId) {
   acceptChatUI(userId);
@@ -362,7 +426,10 @@ function showCurrentTyping(userIsTyping) {
     To create a message object, we use the function createMessage. Given a role and a message string,
     this function appends creates a new messageObject that can be sent to addMessage.
 */
-function createMessage(role, messageString) {
+function createMessage(role, messageString, timestamp) {
+  if (typeof timestamp !== 'undefined') {
+    return { role: role, message: escapeMessage(messageString), timestamp: timestamp };
+  }
   return { role: role, message: escapeMessage(messageString), timestamp: new Date() };
 }
 
@@ -386,24 +453,20 @@ function sendMessage() {
     chat if it exists, logs an error if that user chat doesn't exist
 */
 function addMessage(userId, messageObject) {
-    foundUser = false;
-    for (chat of chats) {
+    let foundUser = false;
+    for (let chat of chats) {
         if (userId == chat.userId) {
             chat.messages.push(messageObject);
-            chat.alert = true;
+            messageObject.role == 'admin' ? chat.alert = false : chat.alert = true;
             foundUser = true;
             if (userId == CURRENT_CHAT_USER_ID) {
-                currentChat = document.getElementsByClassName("messages")[0];
-                messageSide = 'left';
-                if (messageObject.role == 'admin') {
-                    chat.alert = false;
-                    messageSide = 'right';
-                }
-                currentChat.innerHTML = currentChat.innerHTML + createMessageDiv(messageSide, messageObject.message, messageObject.timestamp);
+                let currentChat = $('.messages').first();
+                appendMessageToDiv(messageObject, currentChat);
             }
         }
         scrollDown();
     }
+
     if (!foundUser) {
         console.log(Error('User with given identifier could not be found'));
     }

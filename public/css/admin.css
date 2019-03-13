@@ -155,12 +155,12 @@ div.icon {
   width: 70%;
   border-left: none;
   height: 100%;
-  background-color: #def3f3;
+  background-color: white;
 }
 
 /* Style the box that shows all the messages */
 .messagesBox {
-  max-height: 90%;
+  max-height: 75%;
   overflow-y: scroll;
   padding-top: 1em;
   padding-bottom: 0.25em;
@@ -176,19 +176,23 @@ div.icon {
   bottom: 0;
   display: flex;
   flex-direction: row;
+  border: solid;
+  border-width: 1px;
+  border-color: lightgray;
 }
 
 .chatAction #delete,
-#accept {
+#accept,
+#pause {
   height: 100%;
   width: 100%;
   cursor: pointer;
   background-color: white;
   color: var(--dark-green);
+  text-align: center;
 }
 
 .chatAction #inputBox {
-  border: var(--light-blue);
   height: 100%;
   width: 85%;
   resize: none;
@@ -201,8 +205,9 @@ div.icon {
   flex-direction: column;
   justify-content: center;
   background-color: #96d7d2;
-  border: solid rgb(200, 200, 200) 1px;
   cursor: pointer;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 #sendButton:hover,
