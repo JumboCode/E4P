@@ -8,8 +8,12 @@ socket.on('connect', () => {
   // Register as Admin
   $.post('/admin', { admin: socket.id }, (conversations) => {
     for (let conversation of conversations) {
-      if (!conversation.accepted) {
-        newChat(conversation.user, conversation.icon);
+      if (!conversation.active) {
+        newChat(conversation.room, conversation.icon);
+        for (let message of conversation.messages) {
+          addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
+        }
+        reactivateChat(conversation.room);
       }
     }
     
@@ -40,9 +44,10 @@ function user_matched(user) {
 }
 
 socket.on('user unmatched', (conversation) => {
-  // TODO: display a message to the ear so they know this person was
-  //       disconnected from an admin
   newChat(conversation.user, conversation.icon);
+  for (let message of conversation.messages) {
+    addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
+  }
   addMessage(conversation.user, createMessage('status', 'This user was disconnected from a previous Ear.'));
   updateUserOverview();
 });
@@ -99,7 +104,8 @@ function user_stop_typing(data) {
 function send_message(user, msg) {
   socket.emit('chat message', {
     message: msg,
-    room: user
+    room: user,
+    role: 'admin'
   });
 }
 
@@ -415,7 +421,10 @@ function showCurrentTyping(userIsTyping) {
     To create a message object, we use the function createMessage. Given a role and a message string,
     this function appends creates a new messageObject that can be sent to addMessage.
 */
-function createMessage(role, messageString) {
+function createMessage(role, messageString, timestamp) {
+  if (typeof timestamp !== 'undefined') {
+    return { role: role, message: escapeMessage(messageString), timestamp: timestamp };
+  }
   return { role: role, message: escapeMessage(messageString), timestamp: new Date() };
 }
 
