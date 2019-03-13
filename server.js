@@ -308,6 +308,10 @@ io.on('connection', (socket) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
   });
+
+  socket.on('sound on', () => {
+    socket.emit('sound on');
+  });
 });
 
 server.listen(process.env.PORT || 3000, () => {
