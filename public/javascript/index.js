@@ -90,6 +90,10 @@ socket.on('chat message', (data) => {
   updateChat(createMessage('admin', data.message));
   $('#typingIcon').css('display', 'none');
   messageSound();
+  //if we're looking at the message as it comes in, send RR
+  if(isChatHistBottom() && document.hasFocus()) {
+    readMostRecent();
+  }
 });
 
 socket.on('typing', () => {
@@ -108,6 +112,8 @@ function send_message(msg) {
     message: msg,
     room: chat.roomId
   });
+  //since we must be looking at messages we send, send RR
+  readMostRecent();
 }
 
 function user_connect() {
@@ -126,6 +132,18 @@ function send_typing_message(is_typing) {
     socket.emit('stop typing', {
       room: chat.roomId
     });
+  }
+}
+
+var readToTimestamp = new Date(0);
+function sendReadReceipt(timestamp) {
+  if(timestamp > readToTimestamp) {
+    console.log('read receipt', timestamp);
+    socket.emit('read to timestamp', {
+      room: chat.roomId,
+      ts: timestamp
+    });
+    readToTimestamp = timestamp;
   }
 }
 
@@ -224,7 +242,39 @@ function admin_matched() {
 /* function to change accepted from true to false when admin accepts chat */
 /* function to change active to false when user exits out */
 
+// Sends a read reciept for the most recent message.
+function readMostRecent() {
+  let msgs = $('#chathistory .message-container');
+  if (msgs) {
+    sendReadReceipt(new Date(msgs.last().data('time')));
+  }
+}
+
+// Checks if bottom of #chathistory (most recent message) is visible.
+function isChatHistBottom() {
+  let mbox = $('#chathistory');
+  let isScrollable = mbox[0].scrollHeight > mbox[0].clientHeight;
+  if(isScrollable) {
+    let isBottom = mbox.prop('scrollHeight') - mbox.scrollTop() - mbox.outerHeight() < 1;
+    return isBottom;
+  } else {
+    return true;
+  }
+}
+
 $(() => {
   $('#type_msg').html(chatElements(''));
+  // If we start looking at the window & are at the bottom, send RR.
+  $(window).focus(() => {
+    if(isChatHistBottom()) {
+      readMostRecent();
+    }
+  });
+  // If we scroll to see most recent message, send RR.
+  $('#chathistory').scroll(() => {
+    if (isChatHistBottom() && document.hasFocus()) {
+      readMostRecent();
+    }
+  });
   chatSetup(sendMessage);
 });

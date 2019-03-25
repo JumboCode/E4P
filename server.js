@@ -297,6 +297,12 @@ io.on('connection', (socket) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
   });
+
+  socket.on('read to timestamp', (data) => {
+    let receiver = data['room'];
+    let timestamp = data['ts'];
+    socket.broadcast.to(receiver).emit('read to timestamp', {room: receiver, ts: timestamp});
+  });
 });
 
 server.listen(process.env.PORT || 3000, () => {

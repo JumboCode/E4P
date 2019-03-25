@@ -1,11 +1,13 @@
 /*
  * Return a message div based on the role and message string and timestamp.
  */
-function createMessageDiv(side, message, timestamp) {
-  return '<div class= \'message-container\'><div class=\'' + side + '-chat-bubble\'> '
-    +  escapeMessage(message) + ' </div><div class= \'' + side + '-time\'> '
-    + getTimeString(timestamp) + ' </div></div>';
-}
+
+const createMessageDiv = (side, message, timestamp) => `
+  <div class='message-container' data-time='${timestamp}'>
+    <div class='${side}-chat-bubble'> ${escapeMessage(message)} </div>
+    <div class='${side}-time'> ${getTimeString(timestamp)} </div>
+  </div>
+`;
 
 const createStatusDiv = (message) => `
   <div class='status-container'>${message}</div>
