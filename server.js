@@ -74,7 +74,7 @@ var ISAVAILABLE = (process.env.ISAVAILABLE === 'true' ? true : (process.env.ISAV
 const DOAVAILCHECK = (process.env.DOAVAILCHECK === 'true' ? true : false);
 app.get('/available', (req, res) => {
   let now = new Date();
-  const standardAvailability = (now.getHours() < 7 || now.getHours() > 19);
+  const standardAvailability = (now.getHours() < 7 || now.getHours() >= 19);
   const isAvailable = !DOAVAILCHECK || (ISAVAILABLE && standardAvailability);
   res.json({isAvailable: isAvailable});
 });
