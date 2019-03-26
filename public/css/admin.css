@@ -182,11 +182,18 @@ div.icon {
 }
 
 .chatAction #delete,
-#accept,
-#pause {
+#accept {
   height: 100%;
   width: 100%;
   cursor: pointer;
+  background-color: white;
+  color: var(--dark-green);
+  text-align: center;
+}
+
+.chatAction #pause {
+  height: 100%;
+  width: 100%;
   background-color: white;
   color: var(--dark-green);
   text-align: center;
