@@ -182,7 +182,7 @@ div.icon {
 }
 
 .chatAction #delete,
-#accept{
+#accept {
   height: 100%;
   width: 100%;
   cursor: pointer;
