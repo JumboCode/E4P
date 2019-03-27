@@ -3,8 +3,8 @@ body { font-family: "Roboto", sans-serif; }
 
 .wrapper {
   margin: auto;
-  margin-top: 20px;
-  max-width: 800px;
+  margin-bottom: 20px;
+  width: 100%;
   min-width: 600px;
   overflow-x: auto;
   border-radius: 3px;
@@ -12,7 +12,7 @@ body { font-family: "Roboto", sans-serif; }
 }
 
 .main-content {
-  height: 80vh;
+  height: 89vh;
 }
 
 /* Style the tab */
@@ -20,7 +20,7 @@ body { font-family: "Roboto", sans-serif; }
   float: left;
   border: 1px solid #ccc;
   background-color: #fff;
-  width: 30%;
+  width: 20%;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
@@ -152,7 +152,7 @@ div.icon {
   position: relative;
   float: left;
   border: 1px solid #ccc;
-  width: 70%;
+  width: 80%;
   border-left: none;
   height: 100%;
   background-color: white;
@@ -182,11 +182,18 @@ div.icon {
 }
 
 .chatAction #delete,
-#accept,
-#pause {
+#accept {
   height: 100%;
   width: 100%;
   cursor: pointer;
+  background-color: white;
+  color: var(--dark-green);
+  text-align: center;
+}
+
+.chatAction #pause {
+  height: 100%;
+  width: 100%;
   background-color: white;
   color: var(--dark-green);
   text-align: center;
