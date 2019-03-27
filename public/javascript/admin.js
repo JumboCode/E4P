@@ -15,6 +15,9 @@ socket.on('connect', () => {
         }
         reactivateChat(conversation.room);
       }
+      if (!conversation.connected) {
+        pauseChat(conversation.room);
+      }
     }
     socket.emit('sound on');
     updateUserOverview();
