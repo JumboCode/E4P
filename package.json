@@ -4,7 +4,7 @@
   "description": "E4P JumboCode Project",
   "main": "server.js",
   "scripts": {
-    "test": "cp db.sqlite3 backup.sqlite3 && mocha --exit --recursive tests && mv backup.sqlite3 db.sqlite3",
+    "test": "mocha --exit --recursive tests",
     "start": "node server.js",
     "slint-client": "stylelint ./public/**/*.css",
     "hlint-client": "htmlhint ./public/**/*.html",

@@ -16,6 +16,7 @@
 //During the test the env variable is set to test
 process.env.NODE_ENV = 'test';
 process.env.maxAttempts = 2;
+process.env.FIRSTLOGIN = 'true';
 
 //Require the dev-dependencies
 let chai = require('chai');
@@ -26,6 +27,22 @@ let should = chai.should();
 chai.use(chaiHttp);
 
 describe('AUTH TESTS', () => {
+  it('should setup the test account by posting to /admin/first', (done) => {
+    chai.request(server)
+        .post('/admin/first')
+        .redirects(0)
+        .set('content-type', 'application/json')
+        .send({
+          username: 'jumbocode',
+          email: 'steven.dev.email@gmail.com',
+          new_pwd: 'mattlangan',
+          chk_pwd: 'mattlangan'
+      }).end((err, res) => {
+          res.should.have.status(302);
+          res.should.have.header('location', '/admin/logout');
+          done();
+    });
+  });
 
   it('should get /admin/login', (done) => {
     chai.request(server)
