@@ -50,6 +50,7 @@ let FIRSTLOGIN = (process.env.FIRSTLOGIN === 'true' ? true : (process.env.FIRSTL
 router.get('/', ensureAuthenticated, (req, res) => {
   if (FIRSTLOGIN) {
     FIRSTLOGIN = false;
+    process.env.FIRSTLOGIN = 'false';
     res.sendFile('first_login.html', {root: path.join(__dirname, '../public')});
   } else {
     res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
