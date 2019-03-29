@@ -10,14 +10,21 @@ let router = express.Router();
 //        Helper Functions
 ///////////////////////////////////////////////////////////////////////
 
+let FIRSTLOGIN = (process.env.FIRSTLOGIN === 'true' ? true : (process.env.FIRSTLOGIN === 'false' ? false : true));
 function ensureAuthenticated(req, res, next) {
   if (/*process.env.NOAUTH || process.env.NODB*/ false) { return next(); }
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/admin/login');
+  if (FIRSTLOGIN) {
+    FIRSTLOGIN = false;
+    process.env.FIRSTLOGIN = 'false';
+    res.sendFile('first_login.html', {root: path.join(__dirname, '../public')});
+  } else {
+    res.redirect('/admin/login');
+  }
 }
 
 function loggedIn(req, res, next) {
-  if (req.isAuthenticated()) { return res.redirect('/admin'); }
+  if (req.isAuthenticated() || FIRSTLOGIN) { return res.redirect('/admin'); }
   next();
 }
 
@@ -46,15 +53,8 @@ function limitReset(req, res, next) {
 //        Admin Routes
 ///////////////////////////////////////////////////////////////////////
 
-let FIRSTLOGIN = (process.env.FIRSTLOGIN === 'true' ? true : (process.env.FIRSTLOGIN === 'false' ? false : true));
 router.get('/', ensureAuthenticated, (req, res) => {
-  if (FIRSTLOGIN) {
-    FIRSTLOGIN = false;
-    process.env.FIRSTLOGIN = 'false';
-    res.sendFile('first_login.html', {root: path.join(__dirname, '../public')});
-  } else {
-    res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
-  }
+  res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
 });
 
 router.get('/login', loggedIn, (req, res) => {
