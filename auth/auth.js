@@ -5,13 +5,33 @@ const nodemailer = require('nodemailer');
 const querystring = require('querystring');
 const assert = require('assert');
 
-const DB_NAME = 'db.sqlite3'
+const DB_NAME = 'db.sqlite3';
+const SCHEMA_VERSION = 1;
 
 let db = new sqlite3.Database(DB_NAME);
 
-// TODO add schema version check
 // TODO add register routes
 // TODO add testing
+
+///////////////////////////////////////////////////////////////////////
+//        DB Schema Check
+///////////////////////////////////////////////////////////////////////
+
+db.get('SELECT version FROM schema_version', (err, row) => {
+  if (err) {
+    // create table
+    db.run('CREATE TABLE schema_version (version integer)', (err) => {
+      if (err) throw err;
+      db.run('INSERT INTO schema_version VALUES (?)', SCHEMA_VERSION, (err) => { if (err) throw err; });
+    });
+    db.run('CREATE TABLE users (username text primary key, password text, email text)', (err) => { if (err) throw err; });
+    db.run('CREATE TABLE change_requests (request text unique, expires integer, username text unique, foreign key(username) references users (username))', (err) => { if (err) throw err; });
+    db.run('CREATE TABLE login_attempts (ip text unique, attempts integer, next_attempt integer)', (err) => { if (err) throw err; });
+  } else if (!row || row.version != SCHEMA_VERSION) {
+    // error bad schema version
+    throw new Error('Database Schema Version Mismatch');
+  }
+});
 
 ///////////////////////////////////////////////////////////////////////
 //        DB Scrubber
