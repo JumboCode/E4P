@@ -241,7 +241,7 @@ io.on('connection', (socket) => {
           if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
             icons.push(socket.icon);
           }
-        }, process.env.DISCONNECT_GRACE_PERIOD || 5 * 60000); // 5 minutes
+        }, (process.env.DISCONNECT_GRACE_PERIOD || 5) * 60000); // 5 minutes
       } else if (conversation.connected_admin === socket.id) {
         // disconnecting socket was an admin
         console.log('disconnecting admin from conversation');
