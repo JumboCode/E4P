@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const bcrypt = require("bcryptjs");
+const bcrypt = require('bcryptjs');
 const sqlite3 = require('sqlite3');
 const nodemailer = require('nodemailer');
 const querystring = require('querystring');
@@ -36,7 +36,7 @@ let db_scrubber = setInterval(() => {
 
 // TODO make these configurable (document configurability)
 const VALID_DURATION = process.env.validDuration || 5; //minutes
-const URL = (process.env.host || 'http://localhost:3000') + '/admin/change?'
+const URL = (process.env.host || 'http://localhost:3000') + '/admin/change?';
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -93,7 +93,7 @@ function start_password_change(email) {
 //    (any attempt to resolve param in cb will result in 'undefined')
 function valid_password_change(request, cb) {
   assert(typeof request === 'string');
-  let timestamp = Date.now()
+  let timestamp = Date.now();
 
   db.get('SELECT username, expires FROM change_requests WHERE request = ?', request, (err, row) => {
     if (err) throw err;
@@ -131,6 +131,25 @@ function change_password(username, password) {
 module.exports.start_password_change = start_password_change;
 module.exports.valid_password_change = valid_password_change;
 module.exports.change_password = change_password;
+
+///////////////////////////////////////////////////////////////////////
+//        Register User
+///////////////////////////////////////////////////////////////////////
+
+function register_user(username, email, password) {
+  assert(typeof username === 'string');
+  assert(typeof email    === 'string');
+  assert(typeof password === 'string');
+
+  let hash = bcrypt.hashSync(password);
+
+  // TODO switch out replace and do actual checks for conflicts
+  db.run('REPLACE INTO users (username, email, password) VALUES (?, ?, ?)', username, email, hash, (err) => {
+    if (err) throw err;
+  });
+}
+
+module.exports.register_user = register_user;
 
 ///////////////////////////////////////////////////////////////////////
 //        IP Address Limiting

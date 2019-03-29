@@ -46,8 +46,14 @@ function limitReset(req, res, next) {
 //        Admin Routes
 ///////////////////////////////////////////////////////////////////////
 
+let FIRSTLOGIN = (process.env.FIRSTLOGIN === 'true' ? true : (process.env.FIRSTLOGIN === 'false' ? false : true));
 router.get('/', ensureAuthenticated, (req, res) => {
-  res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
+  if (FIRSTLOGIN) {
+    FIRSTLOGIN = false;
+    res.sendFile('first_login.html', {root: path.join(__dirname, '../public')});
+  } else {
+    res.sendFile('admin.html', {root: path.join(__dirname, '../public')});
+  }
 });
 
 router.get('/login', loggedIn, (req, res) => {
@@ -61,6 +67,15 @@ router.post('/login', flagCheck, limitCheck, passport.authenticate('local', { fa
 router.get('/logout', ensureAuthenticated, (req, res) => {
   req.logout();
   res.redirect('/admin/login');
+});
+
+router.post('/first', ensureAuthenticated, (req, res) => {
+  let username = String(req.body.username);
+  let email = String(req.body.email);
+  let password = String(req.body.new_pwd);
+
+  auth.register_user(username, email, password);
+  res.redirect('/admin/logout');
 });
 
 router.get('/wait', (req, res) => {

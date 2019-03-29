@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"> 
+  <title>First Login</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="/css/change_password.css" rel="stylesheet"> 
+</head>
+<body>
+  <div class="wrapper center">
+    <h1 class="banner">Welcome to your new chat app!</h1>
+    <p class="justify">This is the first time you're logging in so please take a second to change your username, password, and email from the defaults given.</p>
+    <form id="first_login" method="post" action="/admin/first">
+      <input class="text_input" type="text" id="username" name="username" required placeholder="Username"><br>
+      <input class="text_input" type="email" id="email" name="email" required placeholder="Email"><br>
+      <input class="text_input" type="password" id="new_pwd" name="new_pwd" required placeholder="Password"><br>
+      <input class="text_input" type="password" id="chk_pwd" name="chk_pwd" required placeholder="Retype Password"><br>
+      <input class="action_button" type="submit" value="Submit">
+    </form>
+  </div>
+
+  <script>
+$('#first_login').on('submit', (e) => {
+  let new_pwd = $('#new_pwd').val();
+  let chk_pwd = $('#chk_pwd').val();
+
+  if (new_pwd !== chk_pwd) {
+    alert('Passwords Don\'t Match!');
+    return false;
+  }
+});
+  </script>
+</body>
+</html>
