@@ -170,6 +170,7 @@ function updateUserOverview() {
         }
 
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
+        messagePreview = messagePreview.split('<br/>').join(' ');
         typing = chat.typing ? ' id=typing' : '';
         alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML
@@ -443,7 +444,6 @@ function sendMessage() {
         message = $('#inputBox').val();
         send_message(CURRENT_CHAT_USER_ID, message);
         messageObject = createMessage("admin", message);
-
         addMessage(CURRENT_CHAT_USER_ID, messageObject);
 
         message = $('#inputBox').val('');

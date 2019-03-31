@@ -193,7 +193,7 @@ function scrollDown() {
 function updateChat(messageObj) {
   let messages = document.getElementById('chathistory');
   const messageSide = (messageObj.role == 'admin' ? 'left' : 'right');
-  const newMessage = createMessageDiv(messageSide, messageObj.message, messageObj.timestamp);
+  const newMessage = createMessageDiv(messageSide, escapeMessage(messageObj.message), messageObj.timestamp);
   $('#typingIcon').before(newMessage);
   scrollDown();
 }
