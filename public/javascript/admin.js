@@ -167,7 +167,7 @@ function updateUserOverview() {
         }
 
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
-        messagePreview = messagePreview.split('<br/>').join();
+        messagePreview = messagePreview.split('<br/>').join(' ');
         typing = chat.typing ? ' id=typing' : '';
         alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML
