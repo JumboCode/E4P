@@ -177,6 +177,7 @@ function startChat() {
 
   $('#typingIcon').before(createStatusDiv('An Ear has accepted your conversation.'));
   $('#typingIcon').before(createStatusDiv('Talk to us about anything that\'s on your mind.'));
+  $('#typingIcon').before(createStatusDiv('Keep this window open to receive notifications!'));
 }
 
 
