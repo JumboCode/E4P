@@ -241,7 +241,7 @@ io.on('connection', (socket) => {
           if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
             icons.push(socket.icon);
           }
-        }, process.env.DISCONNECT_GRACE_PERIOD || 5 * 60000); // 5 minutes
+        }, process.env.DISCONNECT_GRACE_PERIOD || 60 * 60000); // 60 minutes
       } else if (conversation.connected_admin === socket.id) {
         // disconnecting socket was an admin
         console.log('disconnecting admin from conversation');
@@ -280,6 +280,7 @@ io.on('connection', (socket) => {
         console.log('found user\'s old room');
         socket.join(conversation.room);
         conversation.user = socket.id;
+        conversation.connected = true;
         // socket.broadcast.to(socket.id).emit('admin matched');
         socket.emit('reconnected with old socket id');
         io.to(conversation.room).emit('user reconnect', conversation.room);
