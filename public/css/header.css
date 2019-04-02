@@ -35,4 +35,5 @@
 .navbar-button {
   background-color: var(--dark-green);
   border: none;
+  cursor: pointer;
 }
