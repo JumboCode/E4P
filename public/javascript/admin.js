@@ -176,9 +176,9 @@ function updateUserOverview() {
         tab.innerHTML = tab.innerHTML
                       + "<button class='btn btn-light' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                        + "<div class='iconParent'>" + iconTag + "</div>"
+                        + "<div class='iconParent'" + alert + ">" + iconTag + "</div>"
                         + "<div class='notIcon'>"
-                          + "<div class='buttonText'>"
+                          + "<div class='buttonText'" + alert + ">" 
                               + "<div class='buttonId'>" + iconText + "</div>"
                               + "<div class='messagePreview'>" + messagePreview + "</div>"
                           + "</div>"
