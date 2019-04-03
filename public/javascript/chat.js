@@ -3,7 +3,7 @@
  */
 function createMessageDiv(side, message, timestamp) {
   return '<div class= \'message-container\'><div class=\'' + side + '-chat-bubble\'> '
-    +  escapeMessage(message) + ' </div><div class= \'' + side + '-time\'> '
+    +  message + ' </div><div class= \'' + side + '-time\'> '
     + getTimeString(timestamp) + ' </div></div>';
 }
 
@@ -27,6 +27,10 @@ function escapeMessage(message) {
   let gt_re = new RegExp('>', 'g');
   message = message.replace(gt_re, '&gt');
 
+  // Escape "\n"
+  let newline_re = new RegExp('\n', 'g');
+  message = message.replace(newline_re, '<br/>');
+  
   return message;
 }
 
