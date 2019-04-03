@@ -340,3 +340,18 @@ img {
   transition: 0.3s;
   cursor: pointer;
 }
+
+@media (max-width: 820px) {
+  #chatbar {
+    width: 100%;
+    visibility: hidden;
+    border-width: 1px;
+    padding-top: 5px;
+  }
+
+  #chatbox {
+    display: none;
+    height: 80%;
+    width: 100%;
+  }
+}

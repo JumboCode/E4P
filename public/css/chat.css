@@ -14,6 +14,7 @@ textarea {
   float: left;
   padding: 0.3em 1.3em 0.3em 1.3em;
   overflow-wrap: break-word;
+  white-space: pre-line;
 }
 
 .right-chat-bubble {
@@ -28,6 +29,7 @@ textarea {
   float: right;
   overflow-wrap: break-word;
   padding: 0.3em 1.3em 0.3em 1.3em;
+  white-space: pre-line;
 }
 
 .message-container {

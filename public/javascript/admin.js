@@ -170,14 +170,15 @@ function updateUserOverview() {
         }
 
         messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
+        messagePreview = messagePreview.split('<br/>').join(' ');
         typing = chat.typing ? ' id=typing' : '';
         alert = chat.alert ? ' id=alert' : '';
         tab.innerHTML = tab.innerHTML
                       + "<button class='btn btn-light' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                        + "<div class='iconParent'>" + iconTag + "</div>"
+                        + "<div class='iconParent'" + alert + ">" + iconTag + "</div>"
                         + "<div class='notIcon'>"
-                          + "<div class='buttonText'>"
+                          + "<div class='buttonText'" + alert + ">" 
                               + "<div class='buttonId'>" + iconText + "</div>"
                               + "<div class='messagePreview'>" + messagePreview + "</div>"
                           + "</div>"
@@ -443,7 +444,6 @@ function sendMessage() {
         message = $('#inputBox').val();
         send_message(CURRENT_CHAT_USER_ID, message);
         messageObject = createMessage("admin", message);
-
         addMessage(CURRENT_CHAT_USER_ID, messageObject);
 
         message = $('#inputBox').val('');

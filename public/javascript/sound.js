@@ -18,7 +18,6 @@ function messageSound() {
 }
 
 function setupChatSound() {
-  console.log('setup chat sound');
   AudioContextChat = window.AudioContext || window.webkitAudioContext;
   audioContextChat = new AudioContextChat();
   audioElementChat = document.getElementById('newChatSound');
@@ -35,7 +34,6 @@ function setupChatSound() {
 }
 
 function chatSound() {
-  console.log('chatSound');
   document.getElementById('enableNewChatAlert').innerHTML = '';
   if (isChrome()) {
     if (!chatSoundSetup) {
@@ -58,7 +56,6 @@ function enableChromeAlerts() {
 
 function newChatSoundLoop() {
   if (chatSoundSetup) {
-    console.log('newChatSoundLoop');
     let isUnacceptedChat = false;
     for (chat of chats) {
       if (!chat.accepted) {

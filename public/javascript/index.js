@@ -21,7 +21,6 @@ $(document).ready(() => {
         <button type='button' class="btn btn-outline-info" onclick='openChat()'>Connect Me to an Ear</button>
 
       </div>
-      <p id='footer' style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
     `;
   const unavailableUI = `
       <div class='row'>Ears for Peers</div>
@@ -64,7 +63,7 @@ socket.on('invalid old socket id', () => {
   */
   deactivateChat();
   $('#typingIcon').before(createStatusDiv('Tried to reconnect, but your conversation seems to be too old. ' +
-                                          'You usually cannot disconnect for more than 5 minutes.'));
+                                          'You usually cannot disconnect for more than 60 minutes.'));
   $('.input-group').html('<a id="goHomeLink" href="/"><div id="delete">Take me back to the home page</div></a>');
 
   window.localStorage.setItem('roomID', socket.id);
@@ -144,7 +143,8 @@ function openChat() {
   open.innerHTML = '';
   open.innerHTML = '<div class=\'container-fluid text-center\'>Waiting to connect to an Ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div>' +
                    '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 7am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</div></div>' + 
-                   '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">Feel free to call and hang up after a few rings. The Ear on duty might be asleep.</div></div>';
+                   '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">Feel free to call and hang up after a few rings to get our attention.</div></div>' +
+                   '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is an emergency, please call TUPD at (617) 627 3030 and ask to speak with the counselor on call.</div></div>';
   console.log('attempting to connect');
   window.onbeforeunload = () => {
     return 'Are you sure you want to leave? Your chat connection will be lost.';
@@ -177,6 +177,7 @@ function startChat() {
 
   $('#typingIcon').before(createStatusDiv('An Ear has accepted your conversation.'));
   $('#typingIcon').before(createStatusDiv('Talk to us about anything that\'s on your mind.'));
+  $('#typingIcon').before(createStatusDiv('Keep this window open to receive notifications!'));
 }
 
 
@@ -193,7 +194,7 @@ function scrollDown() {
 function updateChat(messageObj) {
   let messages = document.getElementById('chathistory');
   const messageSide = (messageObj.role == 'admin' ? 'left' : 'right');
-  const newMessage = createMessageDiv(messageSide, messageObj.message, messageObj.timestamp);
+  const newMessage = createMessageDiv(messageSide, escapeMessage(messageObj.message), messageObj.timestamp);
   $('#typingIcon').before(newMessage);
   scrollDown();
 }
