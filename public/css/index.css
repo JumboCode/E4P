@@ -82,6 +82,8 @@ img {
 
 .btn-outline-info:hover {
   cursor: pointer;
+  background-color: #248f89;
+  border-color: #248f89;
 }
 
 #load {
