@@ -15,6 +15,9 @@ socket.on('connect', () => {
         }
         reactivateChat(conversation.room);
       }
+      if (!conversation.connected) {
+        pauseChat(conversation.room);
+      }
     }
     socket.emit('sound on');
     updateUserOverview();
@@ -173,9 +176,9 @@ function updateUserOverview() {
         tab.innerHTML = tab.innerHTML
                       + "<button class='btn btn-light' " + selectedChat
                       + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                        + "<div class='iconParent'>" + iconTag + "</div>"
+                        + "<div class='iconParent'" + alert + ">" + iconTag + "</div>"
                         + "<div class='notIcon'>"
-                          + "<div class='buttonText'>"
+                          + "<div class='buttonText'" + alert + ">" 
                               + "<div class='buttonId'>" + iconText + "</div>"
                               + "<div class='messagePreview'>" + messagePreview + "</div>"
                           + "</div>"
@@ -229,7 +232,7 @@ function toggleChat(userId) {
     //Update available actions.
     let actionDiv = $('.chatAction').first();
     if (!chat.accepted) {
-      actionDiv.html('<button id=\'accept\' class=\'btn btn-light\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Thread</button>');
+      actionDiv.html('<button id=\'accept\' class=\'btn btn-light\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Chat</button>');
     } else if (chat.active) {
       actionDiv.html(chatElements(chat.currentMessage));
       chatSetup(sendMessage);
@@ -237,7 +240,7 @@ function toggleChat(userId) {
     } else if (chat.reconnecting) {
       actionDiv.html('<div id=\'pause\'>User Disconnected</div>');
     } else {
-      actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
+      actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Chat</button>');
     }
   }
   scrollDown();

@@ -7,6 +7,7 @@
 
 .navbar {
   background-color: var(--dark-green);
+  z-index: 1;
 }
 
 .navbar-brand {
@@ -34,4 +35,5 @@
 .navbar-button {
   background-color: var(--dark-green);
   border: none;
+  cursor: pointer;
 }
