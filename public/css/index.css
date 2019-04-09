@@ -214,16 +214,8 @@ img {
 
 @media (min-width: 620px) {
   #sendButton {
-    background: var(--dark-green);
-    color: white;
     height: 55px;
     width: 20%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
   }
 
   #sendButton:hover {
@@ -237,16 +229,8 @@ img {
 
 @media (max-width: 620px) {
   #sendButton {
-    background: var(--dark-green);
-    color: white;
     height: 55px;
     width: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
   }
 
   #sendButton:hover {
