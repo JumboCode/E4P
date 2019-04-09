@@ -166,7 +166,7 @@ function startChat() {
 
 
   //add input bar to page
-  $('#e_space').css('height', '10vh');
+  $('#e_space').css('height', '4.3rem');
   $('#chat').attr('style', 'display: flex !important');
   chatbox = document.getElementById('chatbox');
   chatbox.style.display = 'block';
