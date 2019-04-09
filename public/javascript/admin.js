@@ -268,27 +268,27 @@ function updateCurrentInput(userId) {
     and logs an error if it is a duplicate
 */
 function newChat(userId, icon) {
-    console.log("new chat");
-    validUser = true;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            console.log(Error('Cannot have multiple chats with identical user identifiers'));
-            validUser = false;
-        }
+  let validUser = true;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      console.log(Error('Cannot have multiple chats with identical user identifiers'));
+      validUser = false;
     }
-    if (validUser) {
-        chats.push(
-            { userId: userId,
-              messages: [],
-              accepted: false,
-              active: true,
-              typing: false,
-              icon: icon,
-              alert: true,
-              reconnecting: false,
-              currentMessage: "" }
-        );
-    }
+  }
+
+  if (validUser) {
+    chats.unshift(
+      { userId: userId,
+        messages: [],
+        accepted: false,
+        active: true,
+        typing: false,
+        icon: icon,
+        alert: true,
+        reconnecting: false,
+        currentMessage: '' }
+    );
+  }
 }
 
 function reactivateChat(userId) {
