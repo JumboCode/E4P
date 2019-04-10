@@ -82,6 +82,8 @@ img {
 
 .btn-outline-info:hover {
   cursor: pointer;
+  background-color: var(--dark-green);
+  border-color: var(--dark-green);
 }
 
 #load {
@@ -121,7 +123,7 @@ img {
 }
 
 #chathistory {
-  margin-top: 50px;
+  margin-top: 0;
   height: 60vh;
   overflow-y: scroll;
   padding-top: 0.25em;
@@ -212,16 +214,8 @@ img {
 
 @media (min-width: 620px) {
   #sendButton {
-    background: var(--dark-green);
-    color: white;
     height: 55px;
     width: 20%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
   }
 
   #sendButton:hover {
@@ -235,16 +229,8 @@ img {
 
 @media (max-width: 620px) {
   #sendButton {
-    background: var(--dark-green);
-    color: white;
     height: 55px;
     width: 50px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    cursor: pointer;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
   }
 
   #sendButton:hover {
