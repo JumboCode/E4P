@@ -162,7 +162,7 @@ function userOnline() {
 
 function userOffline() {
   $('.connectionIndicator')
-    .html('<p class="connection-offline">No Connection</p>')
+    .html('<p class="connection-offline">No Internet Connection</p>')
     .show();
 }
 
