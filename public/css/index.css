@@ -82,8 +82,8 @@ img {
 
 .btn-outline-info:hover {
   cursor: pointer;
-  background-color: #248f89;
-  border-color: #248f89;
+  background-color: var(--dark-green);
+  border-color: var(--dark-green);
 }
 
 #load {
@@ -123,7 +123,7 @@ img {
 }
 
 #chathistory {
-  margin-top: 50px;
+  margin-top: 0;
   height: 60vh;
   overflow-y: scroll;
   padding-top: 0.25em;
