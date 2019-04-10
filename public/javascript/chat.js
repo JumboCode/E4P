@@ -75,10 +75,14 @@ function chatSetup(sendMessage) {
     if (e.which == 13 && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+      let currentTime = new Date();
+      lastTypingMessage = currentTime;
     }
   });
 
   $('#sendButton').click((e) => {
     sendMessage();
+    let currentTime = new Date();
+    lastTypingMessage = currentTime;
   });
 }
