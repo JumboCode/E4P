@@ -105,6 +105,11 @@ app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   res.json(currentConversations);
 });
 
+app.post('/admin/removeConversation', adminRoutes.ensureAuthenticated, (req, res) => {
+  removeConversation(req.body.userId);
+  res.sendStatus(200);
+});
+
 ///////////////////////////////////////////////////////////////////////
 //        Sockets
 ///////////////////////////////////////////////////////////////////////

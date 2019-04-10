@@ -7,6 +7,10 @@ const socket = io();
 socket.on('connect', () => {
   // Register as Admin
   $.post('/admin', { admin: socket.id }, (conversations) => {
+    if (conversations.constructor !== Array) {
+      window.location.replace(window.location.href + '/login');
+      return;
+    } 
     for (let conversation of conversations) {
       if (!conversation.active) {
         newChat(conversation.room, conversation.icon);
@@ -64,7 +68,9 @@ socket.on('user disconnect', (userId) => {
   console.log('user disconnected ' + userId);
   addMessage(userId, createMessage('status', 'The user has disconnected. They might return soon.'));
   pauseChat(userId);
-  toggleChat(CURRENT_CHAT_USER_ID);
+  if (userId == CURRENT_CHAT_USER_ID) {
+    toggleChat(CURRENT_CHAT_USER_ID);
+  }
 });
 
 socket.on('user gone for good', (userId) => {
@@ -72,7 +78,9 @@ socket.on('user gone for good', (userId) => {
   console.log('user chat being deleted ' + userId);
   addMessage(userId, createMessage('status', 'The user did not reconnect in time.'));
   deactivateChat(userId);
-  toggleChat(CURRENT_CHAT_USER_ID);
+  if (userId == CURRENT_CHAT_USER_ID) {
+    toggleChat(CURRENT_CHAT_USER_ID);
+  }
 });
 
 socket.on('user reconnect', (userId) => {
@@ -153,42 +161,43 @@ function initialize() {
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
-    tab = document.getElementsByClassName("tab")[0];
+  let tab = document.getElementsByClassName('tab')[0];
+  if (typeof tab !== 'undefined') {
     tab.innerHTML = '';
+  }
+  for (let chat of chats) {
+    let selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? 'id="selectedTab"' : '';
+    let iconTag = '';
+    let iconText = '';
 
-    for (chat of chats) {
-        selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
-        let iconTag = "";
-        let iconText = "";
-
-        if (isNaN(parseInt(chat.icon))) {
-            iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
-            iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
-        } else {
-            iconTag = "<div class='icon'>" + chat.icon + "</div>";
-            iconText = "User " + chat.icon;
-        }
-
-        messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
-        messagePreview = messagePreview.split('<br/>').join(' ');
-        typing = chat.typing ? ' id=typing' : '';
-        alert = chat.alert ? ' id=alert' : '';
-        tab.innerHTML = tab.innerHTML
-                      + "<button class='btn btn-light' " + selectedChat
-                      + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                        + "<div class='iconParent'" + alert + ">" + iconTag + "</div>"
-                        + "<div class='notIcon'>"
-                          + "<div class='buttonText'" + alert + ">" 
-                              + "<div class='buttonId'>" + iconText + "</div>"
-                              + "<div class='messagePreview'>" + messagePreview + "</div>"
-                          + "</div>"
-                          + "<div class='buttonTypingDiv'" + typing + ">"
-                              + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
-                          + "</div>"
-                          + "<div class='alertBar'" + alert + "></div>"
-                        + "</div>"
-                      + "</button>";
+    if (isNaN(parseInt(chat.icon))) {
+      iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
+      iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
+    } else {
+      iconTag = "<div class='icon'>" + chat.icon + "</div>";
+      iconText = "User " + chat.icon;
     }
+
+    let messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
+    messagePreview = messagePreview.split('<br/>').join(' ');
+    let typing = chat.typing ? ' id=typing' : '';
+    let alert = chat.alert ? ' id=alert' : '';
+    tab.innerHTML = tab.innerHTML
+                  + "<button class='btn btn-light' " + selectedChat
+                  + " onclick='toggleChat(`" + chat.userId + "`)'>"
+                    + "<div class='iconParent'" + alert + ">" + iconTag + "</div>"
+                    + "<div class='notIcon'>"
+                      + "<div class='buttonText'" + alert + ">" 
+                          + "<div class='buttonId'>" + iconText + "</div>"
+                          + "<div class='messagePreview'>" + messagePreview + "</div>"
+                      + "</div>"
+                      + "<div class='buttonTypingDiv'" + typing + ">"
+                          + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
+                      + "</div>"
+                      + "<div class='alertBar'" + alert + "></div>"
+                    + "</div>"
+                  + "</button>";
+  }
 }
 
 function clearView() {
@@ -238,7 +247,7 @@ function toggleChat(userId) {
       chatSetup(sendMessage);
       scrollDown();
     } else if (chat.reconnecting) {
-      actionDiv.html('<div id=\'pause\'>User Disconnected</div>');
+      actionDiv.html('<span style="width:100%"><span id=\'pause\' style="display:inline-block;width:50%;height:70%">User Disconnected</span><button id=\'delete\' class=\'btn btn-light\' style=\'width:50%\' onclick=\'removeChatRemotely(CURRENT_CHAT_USER_ID)\'>Delete Chat Permanently</button></span>');
     } else {
       actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Chat</button>');
     }
@@ -268,27 +277,26 @@ function updateCurrentInput(userId) {
     and logs an error if it is a duplicate
 */
 function newChat(userId, icon) {
-    console.log("new chat");
-    validUser = true;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            console.log(Error('Cannot have multiple chats with identical user identifiers'));
-            validUser = false;
-        }
+  let validUser = true;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      console.log(Error('Cannot have multiple chats with identical user identifiers'));
+      validUser = false;
     }
-    if (validUser) {
-        chats.push(
-            { userId: userId,
-              messages: [],
-              accepted: false,
-              active: true,
-              typing: false,
-              icon: icon,
-              alert: true,
-              reconnecting: false,
-              currentMessage: "" }
-        );
-    }
+  }
+  if (validUser) {
+    chats.push(
+      { userId: userId,
+        messages: [],
+        accepted: false,
+        active: true,
+        typing: false,
+        icon: icon,
+        alert: true,
+        reconnecting: false,
+        currentMessage: '' }
+    );
+  }
 }
 
 function reactivateChat(userId) {
@@ -388,6 +396,14 @@ function removeChat(userId) {
     if (chats.length > 0) {
         toggleChat(chats[0].userId)
     }
+}
+
+function removeChatRemotely(userId) {
+  $.post('/admin/removeConversation', { userId: userId }, (state) => {
+    console.log(state);
+  });
+
+  removeChat(userId);
 }
 
 function userIsTyping(userId) {
