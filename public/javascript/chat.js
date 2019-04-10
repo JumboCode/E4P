@@ -46,32 +46,29 @@ let lastTypingMessage = new Date();
 function chatSetup(sendMessage) {
   $('#inputBox').keydown((e) => {
     let currentTime = new Date();
-    if (currentTime - lastTypingMessage < 3000) {
-      // user_typing message was sent within 3 seconds, no need to send another one for now
-      return;
-    }
+    if (currentTime - lastTypingMessage > 3000) {
+      lastTypingMessage = currentTime;
 
-    lastTypingMessage = currentTime;
+      // Check if on user side
+      if (typeof(CURRENT_CHAT_USER_ID) == 'undefined' && typeof(chat.roomId) != 'undefined') {
+        send_typing_message(true);
+        // clear timout that would send message "stop typing" message
+        if (typeof(userTypingTimeout) != 'undefined') {
+          clearTimeout(userTypingTimeout);
+        }
 
-    // Check if on user side
-    if (typeof(CURRENT_CHAT_USER_ID) == 'undefined' && typeof(chat.roomId) != 'undefined') {
-      send_typing_message(true);
-      // clear timout that would send message "stop typing" message
-      if (typeof(userTypingTimeout) != 'undefined') {
-        clearTimeout(userTypingTimeout);
+        userTypingTimeout = setTimeout(() => {
+          send_typing_message(false);
+        }, 5000);
+      } else {
+        send_typing_message(CURRENT_CHAT_USER_ID, true);
+        if (typeof(adminTypingTimeout) != 'undefined') {
+          clearTimeout(adminTypingTimeout);
+        }
+        adminTypingTimeout = setTimeout(() => {
+          send_typing_message(CURRENT_CHAT_USER_ID, false);
+        }, 5000);
       }
-
-      userTypingTimeout = setTimeout(() => {
-        send_typing_message(false);
-      }, 5000);
-    } else {
-      send_typing_message(CURRENT_CHAT_USER_ID, true);
-      if (typeof(adminTypingTimeout) != 'undefined') {
-        clearTimeout(adminTypingTimeout);
-      }
-      adminTypingTimeout = setTimeout(() => {
-        send_typing_message(CURRENT_CHAT_USER_ID, false);
-      }, 5000);
     }
 
     // Send text message after userTyping message
