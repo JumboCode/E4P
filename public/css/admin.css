@@ -227,13 +227,6 @@ div.icon {
 .chatAction #sendButton {
   height: 100%;
   width: 15%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #96d7d2;
-  cursor: pointer;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
 }
 
 #sendButton:hover,

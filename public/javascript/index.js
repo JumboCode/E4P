@@ -26,7 +26,7 @@ $(document).ready(() => {
       <div class='row'>Ears for Peers</div>
       <img src='img/baby_elephant.png'>
       <p style="font-size: 16px">Ears for Peers is currently unavailable. </p>
-      <p style="font-size: 16px">Our line is open from 7pm-7am every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
+      <p class='container-fluid text-center' style="font-size: 16px">Our line is open from 7pm-7am every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
     `;
   $.getJSON('/available')
     .done((data) => {
