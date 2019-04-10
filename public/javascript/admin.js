@@ -391,30 +391,32 @@ function removeChat(userId) {
 }
 
 function userIsTyping(userId) {
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.typing = true;
-        }
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      if (chat.typing == false) {
+        chat.typing = true;
+        updateUserOverview();
+      }
     }
-    updateUserOverview();
-    if (userId == CURRENT_CHAT_USER_ID) {
-        showCurrentTyping(true);
-        scrollDown();
-    }
-
+  }
+  if (userId == CURRENT_CHAT_USER_ID) {
+    showCurrentTyping(true);
+    scrollDown();
+  }
 }
 
 function userNotTyping(userId) {
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.typing = false;
-        }
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      if (chat.typing == true) {
+        chat.typing = false;
+        updateUserOverview();
+      }
     }
-    updateUserOverview();
-    if (userId == CURRENT_CHAT_USER_ID) {
-        showCurrentTyping(false);
-    }
-
+  }
+  if (userId == CURRENT_CHAT_USER_ID) {
+    showCurrentTyping(false);
+  }
 }
 
 function showCurrentTyping(userIsTyping) {
