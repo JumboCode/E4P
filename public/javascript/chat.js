@@ -41,8 +41,18 @@ function chatElements(currentMessage) {
        + '<div id="sendButton"><div id="sendButtonText">Send</div></div>';
 }
 
+let lastTypingMessage = new Date();
+
 function chatSetup(sendMessage) {
   $('#inputBox').keydown((e) => {
+    let currentTime = new Date();
+    if (currentTime - lastTypingMessage < 3000) {
+      // user_typing message was sent within 3 seconds, no need to send another one for now
+      return;
+    }
+
+    lastTypingMessage = currentTime;
+
     // Check if on user side
     if (typeof(CURRENT_CHAT_USER_ID) == 'undefined' && typeof(chat.roomId) != 'undefined') {
       send_typing_message(true);
