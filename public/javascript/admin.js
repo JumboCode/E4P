@@ -284,8 +284,9 @@ function newChat(userId, icon) {
       validUser = false;
     }
   }
+  
   if (validUser) {
-    chats.push(
+    chats.unshift(
       { userId: userId,
         messages: [],
         accepted: false,
