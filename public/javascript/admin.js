@@ -154,6 +154,24 @@ function initialize() {
   updateUserOverview();
   generateAdminHeader();
   newChatSoundLoop();
+  connectionListeners();
+}
+
+function connectionListeners() {
+  window.addEventListener('online', userOnline);
+  window.addEventListener('offline', userOffline);
+}
+
+function userOnline() {
+  $('.connectionIndicator')
+    .html('<p class="connection-online">Connected</p>')
+    .show().delay(5000).slideUp(100);
+}
+
+function userOffline() {
+  $('.connectionIndicator')
+    .html('<p class="connection-offline">No Internet Connection</p>')
+    .show();
 }
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
