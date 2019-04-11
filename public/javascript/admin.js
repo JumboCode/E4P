@@ -20,7 +20,7 @@ socket.on('connect', () => {
 socket.on('user matched', user_matched);
 
 socket.on('chat message', (data) => {
-  addMessage(data.room, createMessage('user', data.message));
+  addMessage(data.room, createMessage('user', data.message, new Date(data.timestamp)));
   messageSound();
   // Chat message received, so user is not typing anymore
   userNotTyping(data.room);
@@ -92,14 +92,26 @@ function user_stop_typing(data) {
   userNotTyping(data.room);
 }
 
+socket.on('read to timestamp', (data) => {
+  for (let chat of chats) {
+    if (chat.userId === data.room) {
+      chat.readTo = new Date(data.ts);
+    }
+  }
+  if (data.room === CURRENT_CHAT_USER_ID) {
+    updateReadReceipt();
+  }
+});
+
 // RECEIVE ^^^
 ///////////////////////////////////////
 // SEND    vvv
 
-function send_message(user, msg) {
+function send_message(user, msg, timestamp) {
   socket.emit('chat message', {
     message: msg,
-    room: user
+    room: user,
+    timestamp: timestamp
   });
 }
 
@@ -196,6 +208,19 @@ function appendMessageToDiv(message, div) {
   div.append(toAppend);
 }
 
+function updateReadReceipt() {
+  $('#readReceipt').remove();
+  //find most recent message with timestamp <= ts and push read receipt as last child
+  let currChat = chats.find((cht) => cht.userId === CURRENT_CHAT_USER_ID);
+  let leTs = $('.message-container').filter((i, e) => {
+    return (new Date(Number(e.dataset.time))) <= currChat.readTo;
+  }
+  ).last();
+  if (leTs.length) {
+    leTs.after(`<div class='${leTs[0].dataset.side}-readReceipt' id='readReceipt'>Read</div>`);
+  }
+}
+
 function toggleChat(userId) {
   //Update global 'current chat' state.
   updateCurrentInput(CURRENT_CHAT_USER_ID);
@@ -228,6 +253,7 @@ function toggleChat(userId) {
       actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
     }
   }
+  updateReadReceipt();
   scrollDown();
   updateUserOverview();
 }
@@ -253,27 +279,28 @@ function updateCurrentInput(userId) {
     and logs an error if it is a duplicate
 */
 function newChat(userId, icon) {
-    console.log("new chat");
-    validUser = true;
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            console.log(Error('Cannot have multiple chats with identical user identifiers'));
-            validUser = false;
-        }
+  console.log('new chat');
+  let validUser = true;
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      console.log(Error('Cannot have multiple chats with identical user identifiers'));
+      validUser = false;
     }
-    if (validUser) {
-        chats.push(
-            { userId: userId,
-              messages: [],
-              accepted: false,
-              active: true,
-              typing: false,
-              icon: icon,
-              alert: true,
-              reconnecting: false,
-              currentMessage: "" }
-        );
-    }
+  }
+  if (validUser) {
+    chats.push(
+      { userId: userId,
+        messages: [],
+        accepted: false,
+        active: true,
+        typing: false,
+        readTo: new Date(0),
+        icon: icon,
+        alert: true,
+        reconnecting: false,
+        currentMessage: '' }
+    );
+  }
 }
 
 function reactivateChat(userId) {
@@ -415,23 +442,24 @@ function showCurrentTyping(userIsTyping) {
     To create a message object, we use the function createMessage. Given a role and a message string,
     this function appends creates a new messageObject that can be sent to addMessage.
 */
-function createMessage(role, messageString) {
-  return { role: role, message: escapeMessage(messageString), timestamp: new Date() };
+function createMessage(role, messageString, timestamp) {
+  return {
+    role: role,
+    message: escapeMessage(messageString),
+    timestamp: (timestamp || new Date())
+  };
 }
 
 function sendMessage() {
+  let message = $('#inputBox').val();
+  if (message != '') {
+    console.log('sending message');
     message = $('#inputBox').val();
-    if (message != '') {
-        console.log("sending message")
-        message = $('#inputBox').val();
-        send_message(CURRENT_CHAT_USER_ID, message);
-        messageObject = createMessage("admin", message);
-
-        addMessage(CURRENT_CHAT_USER_ID, messageObject);
-
-        message = $('#inputBox').val('');
-    }
-
+    send_message(CURRENT_CHAT_USER_ID, message, new Date());
+    let messageObject = createMessage('admin', message);
+    addMessage(CURRENT_CHAT_USER_ID, messageObject);
+    message = $('#inputBox').val('');
+  }
 }
 
 /*
