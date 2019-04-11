@@ -86,8 +86,7 @@ socket.on('admin disconnect', () => {
 });
 
 socket.on('chat message', (data) => {
-  console.log('recieved chat message on index: ' + data);
-  updateChat(createMessage('admin', data.message));
+  updateChat(createMessage('admin', data.message, new Date(data.timestamp)));
   $('#typingIcon').css('display', 'none');
   messageSound();
   //if we're looking at the message as it comes in, send RR
@@ -107,17 +106,17 @@ socket.on('stop typing', () => {
   $('#typingIcon').css('display', 'none');
 });
 
-function send_message(msg) {
+function send_message(msg, timestamp) {
   socket.emit('chat message', {
     message: msg,
-    room: chat.roomId
+    room: chat.roomId,
+    timestamp: timestamp
   });
   //since we must be looking at messages we send, send RR
   readMostRecent();
 }
 
 function user_connect() {
-  console.log(socket);
   socket.emit('user connect');
 }
 
@@ -138,10 +137,9 @@ function send_typing_message(is_typing) {
 var readToTimestamp = new Date(0);
 function sendReadReceipt(timestamp) {
   if(timestamp > readToTimestamp) {
-    console.log('read receipt', timestamp);
     socket.emit('read to timestamp', {
       room: chat.roomId,
-      ts: timestamp
+      ts: timestamp.valueOf()
     });
     readToTimestamp = timestamp;
   }
@@ -219,17 +217,21 @@ function updateChat(messageObj) {
 }
 
 
-function createMessage(role, messageString) {
-  return { role: role, message: messageString, timestamp: new Date() };
+function createMessage(role, messageString, timestamp) {
+  return {
+    role: role,
+    message: messageString,
+    timestamp: (timestamp || new Date())
+  };
 }
 
 function sendMessage() {
   let message = $('#inputBox').val();
   if (message != '') {
-    send_message(message);
     let messageObject = createMessage('user', message);
     chat.messages.push(messageObject);
     updateChat(messageObject);
+    send_message(message, messageObject.timestamp);
     message = $('#inputBox').val('');
   }
 }
