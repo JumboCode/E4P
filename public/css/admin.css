@@ -253,3 +253,19 @@ div.icon {
   color: #bababa;
   font-size: 6px;
 }
+
+#readReceipt {
+  font-size: 0.7rem;
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  top: -0.5rem;
+  position: relative;
+}
+
+.left-readReceipt {
+  text-align: left;
+}
+
+.right-readReceipt {
+  text-align: right;
+}
