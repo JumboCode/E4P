@@ -3,7 +3,7 @@
  */
 
 const createMessageDiv = (side, message, timestamp) => `
-  <div class='message-container' data-time='${timestamp}'>
+  <div class='message-container' data-time='${timestamp.valueOf()}' data-side='${side}'>
     <div class='${side}-chat-bubble'> ${escapeMessage(message)} </div>
     <div class='${side}-time'> ${getTimeString(timestamp)} </div>
   </div>
