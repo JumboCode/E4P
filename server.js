@@ -174,12 +174,16 @@ io.on('connection', (socket) => {
 
     let message = data['message'];
     let receiver = data['room'];
+    let timestamp = data['timestamp'];
 
-    console.log(message);
-    console.log(receiver);
+    console.log(message, receiver, timestamp);
 
     // console.log('receiver: ' + receiver);
-    socket.broadcast.to(receiver).emit('chat message', {message: message, room: receiver});
+    socket.broadcast.to(receiver).emit('chat message', {
+      message: message,
+      room: receiver,
+      timestamp: timestamp
+    });
   });
 
   // PHASE IV
