@@ -179,28 +179,13 @@ io.on('connection', (socket) => {
   // PHASE III
   // receive chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', (data) => {
-    let message = data.message;
-    let room = data.room;
-    let role = data.role;
-
-    let message = data['message'];
-    let receiver = data['room'];
-    let timestamp = data['timestamp'];
     // Add message to conversation
     for (let conversation of currentConversations) {
-      if (conversation.room === room) {
-        conversation.messages.push({ 
-            message: message, 
-            timestamp: timestamp, 
-            role: role 
-        });
+      if (conversation.room === data.room) {
+        conversation.messages.push(data);
       }
     }
-    socket.broadcast.to(receiver).emit('chat message', {
-      message: message,
-      room: receiver,
-      timestamp: timestamp
-    });
+    socket.broadcast.to(data.room).emit('chat message', data);
   });
 
   // PHASE IV
@@ -213,8 +198,8 @@ io.on('connection', (socket) => {
       if (conversation.user === socket.id) {
         // disconnecting socket was a user
         console.log('disconnecting user from conversation');
-        
-        /* 
+
+        /*
          * If we know the disconnecting socket was a user in a room,
          * use conversation.room as the original socketid that admins are tracking
          */
