@@ -14,6 +14,7 @@ textarea {
   float: left;
   padding: 0.3em 1.3em 0.3em 1.3em;
   overflow-wrap: break-word;
+  white-space: pre-line;
 }
 
 .right-chat-bubble {
@@ -28,6 +29,7 @@ textarea {
   float: right;
   overflow-wrap: break-word;
   padding: 0.3em 1.3em 0.3em 1.3em;
+  white-space: pre-line;
 }
 
 .message-container {
@@ -64,4 +66,16 @@ textarea {
   right: 10px;
   float: right;
   font-size: 0.7rem;
+}
+
+#sendButton {
+  background: var(--white);
+  color: #248f89;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  border: solid rgb(200, 200, 200) 1px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }

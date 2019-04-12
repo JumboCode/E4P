@@ -74,7 +74,7 @@ var ISAVAILABLE = (process.env.ISAVAILABLE === 'true' ? true : (process.env.ISAV
 const DOAVAILCHECK = (process.env.DOAVAILCHECK === 'true' ? true : false);
 app.get('/available', (req, res) => {
   let now = new Date();
-  const standardAvailability = (now.getHours() < 7 || now.getHours() > 19);
+  const standardAvailability = (now.getHours() < 7 || now.getHours() >= 19);
   const isAvailable = !DOAVAILCHECK || (ISAVAILABLE && standardAvailability);
   res.json({isAvailable: isAvailable});
 });
@@ -97,12 +97,17 @@ app.get('/img/:file', (req, res) => {
 });
 
 app.get('/audio/:file', (req, res) => {
-  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});  
+  res.sendFile(req.params.file, {root: path.join(__dirname, 'public', 'audio')});
 });
 
 app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   admins.push(req.body.admin);
   res.json(currentConversations);
+});
+
+app.post('/admin/removeConversation', adminRoutes.ensureAuthenticated, (req, res) => {
+  removeConversation(req.body.userId);
+  res.sendStatus(200);
 });
 
 ///////////////////////////////////////////////////////////////////////
@@ -135,9 +140,11 @@ io.on('connection', (socket) => {
       { user: socket.id,
         icon: socket.icon,
         room: socket.id,
-        accepted: false,
+        active: false,
+        everAccepted: false,
         connected: true,
-        connected_admin: null
+        connected_admin: null,
+        messages: []
       });
   });
 
@@ -152,7 +159,9 @@ io.on('connection', (socket) => {
 
     for (let conversation of currentConversations) {
       if (conversation.room === user_room_id) {
-        conversation.accepted = true;
+        conversation.active = true;
+        // everAccepted will never be set to false again
+        conversation.everAccepted = true;
         conversation.connected_admin = socket.id;
       }
     }
@@ -170,15 +179,23 @@ io.on('connection', (socket) => {
   // PHASE III
   // receive chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', (data) => {
-    // console.log(data.message);
+    let message = data.message;
+    let room = data.room;
+    let role = data.role;
 
     let message = data['message'];
     let receiver = data['room'];
     let timestamp = data['timestamp'];
-
-    console.log(message, receiver, timestamp);
-
-    // console.log('receiver: ' + receiver);
+    // Add message to conversation
+    for (let conversation of currentConversations) {
+      if (conversation.room === room) {
+        conversation.messages.push({ 
+            message: message, 
+            timestamp: timestamp, 
+            role: role 
+        });
+      }
+    }
     socket.broadcast.to(receiver).emit('chat message', {
       message: message,
       room: receiver,
@@ -198,20 +215,19 @@ io.on('connection', (socket) => {
         console.log('disconnecting user from conversation');
         
         /* 
-         * if we know the disconnecting socket was a user in a room, 
+         * If we know the disconnecting socket was a user in a room,
          * use conversation.room as the original socketid that admins are tracking
          */
-
-        if (conversation.accepted) {
-          // user was previously accepted so notify anyone else in the room the user left
+        if (conversation.everAccepted || conversation.connected_admin != null) {
+          // notify anyone else in the room the user left
           io.to(conversation.room).emit('user disconnect', conversation.room);
         } else {
-          // user was not accepted so we can just let admins remove from menus
+          // user was never accepted so we can just let admins remove from menus
           for (let admin of admins) {
             io.to(admin).emit('user matched', conversation.room);
           }
         }
-        
+
         socket_is_user = true;
         conversation.connected = false;
 
@@ -234,13 +250,13 @@ io.on('connection', (socket) => {
           if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
             icons.push(socket.icon);
           }
-        }, process.env.DISCONNECT_GRACE_PERIOD || 60000);
+        }, process.env.DISCONNECT_GRACE_PERIOD || 60 * 60000); // 60 minutes
       } else if (conversation.connected_admin === socket.id) {
         // disconnecting socket was an admin
         console.log('disconnecting admin from conversation');
 
         conversation.connected_admin = null;
-        conversation.accepted = false;
+        conversation.active = false;
 
         // let other admins pick up the conversation
         for (let admin of admins) {
@@ -273,6 +289,7 @@ io.on('connection', (socket) => {
         console.log('found user\'s old room');
         socket.join(conversation.room);
         conversation.user = socket.id;
+        conversation.connected = true;
         // socket.broadcast.to(socket.id).emit('admin matched');
         socket.emit('reconnected with old socket id');
         io.to(conversation.room).emit('user reconnect', conversation.room);
@@ -306,6 +323,10 @@ io.on('connection', (socket) => {
     let receiver = data['room'];
     let timestamp = data['ts'];
     socket.broadcast.to(receiver).emit('read to timestamp', {room: receiver, ts: timestamp});
+  });
+
+  socket.on('sound on', () => {
+    socket.emit('sound on');
   });
 });
 

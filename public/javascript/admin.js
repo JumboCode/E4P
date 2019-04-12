@@ -7,17 +7,32 @@ const socket = io();
 socket.on('connect', () => {
   // Register as Admin
   $.post('/admin', { admin: socket.id }, (conversations) => {
+    if (conversations.constructor !== Array) {
+      window.location.replace(window.location.href + '/login');
+      return;
+    } 
     for (let conversation of conversations) {
-      if (!conversation.accepted) {
-        newChat(conversation.user, conversation.icon);
+      if (!conversation.active) {
+        newChat(conversation.room, conversation.icon);
+        for (let message of conversation.messages) {
+          addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
+        }
+        reactivateChat(conversation.room);
+      }
+      if (!conversation.connected) {
+        pauseChat(conversation.room);
       }
     }
-    
+    socket.emit('sound on');
     updateUserOverview();
   });
 });
 
 socket.on('user matched', user_matched);
+
+socket.on('sound on', () => {
+  console.log('sound on');
+});
 
 socket.on('chat message', (data) => {
   addMessage(data.room, createMessage('user', data.message, new Date(data.timestamp)));
@@ -40,9 +55,10 @@ function user_matched(user) {
 }
 
 socket.on('user unmatched', (conversation) => {
-  // TODO: display a message to the ear so they know this person was
-  //       disconnected from an admin
   newChat(conversation.user, conversation.icon);
+  for (let message of conversation.messages) {
+    addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
+  }
   addMessage(conversation.user, createMessage('status', 'This user was disconnected from a previous Ear.'));
   updateUserOverview();
 });
@@ -52,7 +68,9 @@ socket.on('user disconnect', (userId) => {
   console.log('user disconnected ' + userId);
   addMessage(userId, createMessage('status', 'The user has disconnected. They might return soon.'));
   pauseChat(userId);
-  toggleChat(CURRENT_CHAT_USER_ID);
+  if (userId == CURRENT_CHAT_USER_ID) {
+    toggleChat(CURRENT_CHAT_USER_ID);
+  }
 });
 
 socket.on('user gone for good', (userId) => {
@@ -60,7 +78,9 @@ socket.on('user gone for good', (userId) => {
   console.log('user chat being deleted ' + userId);
   addMessage(userId, createMessage('status', 'The user did not reconnect in time.'));
   deactivateChat(userId);
-  toggleChat(CURRENT_CHAT_USER_ID);
+  if (userId == CURRENT_CHAT_USER_ID) {
+    toggleChat(CURRENT_CHAT_USER_ID);
+  }
 });
 
 socket.on('user reconnect', (userId) => {
@@ -110,8 +130,9 @@ socket.on('read to timestamp', (data) => {
 function send_message(user, msg, timestamp) {
   socket.emit('chat message', {
     message: msg,
+    timestamp: timestamp,
     room: user,
-    timestamp: timestamp
+    role: 'admin'
   });
 }
 
@@ -144,6 +165,25 @@ function initialize() {
   // populateChat();
   updateUserOverview();
   generateAdminHeader();
+  newChatSoundLoop();
+  connectionListeners();
+}
+
+function connectionListeners() {
+  window.addEventListener('online', userOnline);
+  window.addEventListener('offline', userOffline);
+}
+
+function userOnline() {
+  $('.connectionIndicator')
+    .html('<p class="connection-online">Connected</p>')
+    .show().delay(5000).slideUp(100);
+}
+
+function userOffline() {
+  $('.connectionIndicator')
+    .html('<p class="connection-offline">No Internet Connection</p>')
+    .show();
 }
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
@@ -151,41 +191,43 @@ function initialize() {
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
-    tab = document.getElementsByClassName("tab")[0];
+  let tab = document.getElementsByClassName('tab')[0];
+  if (typeof tab !== 'undefined') {
     tab.innerHTML = '';
+  }
+  for (let chat of chats) {
+    let selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? 'id="selectedTab"' : '';
+    let iconTag = '';
+    let iconText = '';
 
-    for (chat of chats) {
-        selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? "id='selectedTab'" : "";
-        let iconTag = "";
-        let iconText = "";
-
-        if (isNaN(parseInt(chat.icon))) {
-            iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
-            iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
-        } else {
-            iconTag = "<div class='icon'>" + chat.icon + "</div>";
-            iconText = "User " + chat.icon;
-        }
-
-        messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
-        typing = chat.typing ? ' id=typing' : '';
-        alert = chat.alert ? ' id=alert' : '';
-        tab.innerHTML = tab.innerHTML
-                      + "<button class='btn btn-light' " + selectedChat
-                      + " onclick='toggleChat(`" + chat.userId + "`)'>"
-                        + "<div class='iconParent'>" + iconTag + "</div>"
-                        + "<div class='notIcon'>"
-                          + "<div class='buttonText'>"
-                              + "<div class='buttonId'>" + iconText + "</div>"
-                              + "<div class='messagePreview'>" + messagePreview + "</div>"
-                          + "</div>"
-                          + "<div class='buttonTypingDiv'" + typing + ">"
-                              + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
-                          + "</div>"
-                          + "<div class='alertBar'" + alert + "></div>"
-                        + "</div>"
-                      + "</button>";
+    if (isNaN(parseInt(chat.icon))) {
+      iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
+      iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
+    } else {
+      iconTag = "<div class='icon'>" + chat.icon + "</div>";
+      iconText = "User " + chat.icon;
     }
+
+    let messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
+    messagePreview = messagePreview.split('<br/>').join(' ');
+    let typing = chat.typing ? ' id=typing' : '';
+    let alert = chat.alert ? ' id=alert' : '';
+    tab.innerHTML = tab.innerHTML
+                  + "<button class='btn btn-light' " + selectedChat
+                  + " onclick='toggleChat(`" + chat.userId + "`)'>"
+                    + "<div class='iconParent'" + alert + ">" + iconTag + "</div>"
+                    + "<div class='notIcon'>"
+                      + "<div class='buttonText'" + alert + ">" 
+                          + "<div class='buttonId'>" + iconText + "</div>"
+                          + "<div class='messagePreview'>" + messagePreview + "</div>"
+                      + "</div>"
+                      + "<div class='buttonTypingDiv'" + typing + ">"
+                          + "<img class='buttonTypingIcon' src='img/typing_icon.png'>"
+                      + "</div>"
+                      + "<div class='alertBar'" + alert + "></div>"
+                    + "</div>"
+                  + "</button>";
+  }
 }
 
 function clearView() {
@@ -242,15 +284,15 @@ function toggleChat(userId) {
     //Update available actions.
     let actionDiv = $('.chatAction').first();
     if (!chat.accepted) {
-      actionDiv.html('<button id=\'accept\' class=\'btn btn-light\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Thread</button>');
+      actionDiv.html('<button id=\'accept\' class=\'btn btn-light\' onclick=\'acceptChat(CURRENT_CHAT_USER_ID)\'>Accept Chat</button>');
     } else if (chat.active) {
       actionDiv.html(chatElements(chat.currentMessage));
       chatSetup(sendMessage);
       scrollDown();
     } else if (chat.reconnecting) {
-      actionDiv.html('<div id=\'pause\'>User Disconnected</div>');
+      actionDiv.html('<span style="width:100%"><span id=\'pause\' style="display:inline-block;width:50%;height:70%">User Disconnected</span><button id=\'delete\' class=\'btn btn-light\' style=\'width:50%\' onclick=\'removeChatRemotely(CURRENT_CHAT_USER_ID)\'>Delete Chat Permanently</button></span>');
     } else {
-      actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Thread</button>');
+      actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Chat</button>');
     }
   }
   updateReadReceipt();
@@ -279,7 +321,6 @@ function updateCurrentInput(userId) {
     and logs an error if it is a duplicate
 */
 function newChat(userId, icon) {
-  console.log('new chat');
   let validUser = true;
   for (let chat of chats) {
     if (userId == chat.userId) {
@@ -288,7 +329,7 @@ function newChat(userId, icon) {
     }
   }
   if (validUser) {
-    chats.push(
+    chats.unshift(
       { userId: userId,
         messages: [],
         accepted: false,
@@ -402,31 +443,41 @@ function removeChat(userId) {
     }
 }
 
-function userIsTyping(userId) {
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.typing = true;
-        }
-    }
-    updateUserOverview();
-    if (userId == CURRENT_CHAT_USER_ID) {
-        showCurrentTyping(true);
-        scrollDown();
-    }
+function removeChatRemotely(userId) {
+  $.post('/admin/removeConversation', { userId: userId }, (state) => {
+    console.log(state);
+  });
 
+  removeChat(userId);
+}
+
+function userIsTyping(userId) {
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      if (chat.typing == false) {
+        chat.typing = true;
+        updateUserOverview();
+      }
+    }
+  }
+  if (userId == CURRENT_CHAT_USER_ID) {
+    showCurrentTyping(true);
+    scrollDown();
+  }
 }
 
 function userNotTyping(userId) {
-    for (chat of chats) {
-        if (userId == chat.userId) {
-            chat.typing = false;
-        }
+  for (let chat of chats) {
+    if (userId == chat.userId) {
+      if (chat.typing == true) {
+        chat.typing = false;
+        updateUserOverview();
+      }
     }
-    updateUserOverview();
-    if (userId == CURRENT_CHAT_USER_ID) {
-        showCurrentTyping(false);
-    }
-
+  }
+  if (userId == CURRENT_CHAT_USER_ID) {
+    showCurrentTyping(false);
+  }
 }
 
 function showCurrentTyping(userIsTyping) {

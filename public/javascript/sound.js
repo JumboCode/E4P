@@ -18,17 +18,53 @@ function messageSound() {
 }
 
 function setupChatSound() {
-  if (!chatSoundSetup) {
-    AudioContextChat = window.AudioContext || window.webkitAudioContext;
-    audioContextChat = new AudioContextChat();
-    audioElementChat = document.getElementById('newChatSound');
-    trackChat = audioContextChat.createMediaElementSource(audioElementChat);
-    trackChat.connect(audioContextChat.destination);
-    chatSoundSetup = true;
-  } 
+  AudioContextChat = window.AudioContext || window.webkitAudioContext;
+  audioContextChat = new AudioContextChat();
+  audioElementChat = document.getElementById('newChatSound');
+  trackChat = audioContextChat.createMediaElementSource(audioElementChat);
+  trackChat.connect(audioContextChat.destination);
+  chatSoundSetup = true;
+  document.getElementById('enableNewChatAlert').innerHTML = '';
+
+  audioElementChat.addEventListener('ended', () => {
+    newChatSoundLoop();
+  }, false);
+
+
 }
 
 function chatSound() {
-  setupChatSound();
-  audioElementChat.play();
+  document.getElementById('enableNewChatAlert').innerHTML = '';
+  if (isChrome()) {
+    if (!chatSoundSetup) {
+      document.getElementById('enableNewChatAlert').innerHTML = chromeAlertButton();
+    } else {
+      audioElementChat.play();
+    }
+  } else{
+    if (!chatSoundSetup) {
+      setupChatSound();
+    }
+    audioElementChat.play();
+  }
 }
+
+function enableChromeAlerts() {
+  setupChatSound();
+  newChatSoundLoop();
+}
+
+function newChatSoundLoop() {
+  if (chatSoundSetup) {
+    let isUnacceptedChat = false;
+    for (chat of chats) {
+      if (!chat.accepted) {
+        isUnacceptedChat = true;
+      }
+    }
+    if (isUnacceptedChat) {
+      audioElementChat.play();
+    }
+  }
+}
+
