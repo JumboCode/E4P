@@ -144,7 +144,8 @@ io.on('connection', (socket) => {
         everAccepted: false,
         connected: true,
         connected_admin: null,
-        messages: []
+        messages: [],
+        readTo: new Date(0)
       });
   });
 
@@ -305,9 +306,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('read to timestamp', (data) => {
-    let receiver = data['room'];
-    let timestamp = data['ts'];
-    socket.broadcast.to(receiver).emit('read to timestamp', {room: receiver, ts: timestamp});
+    currentConversations.forEach((conv) => {
+      if (conv.room === data.room) {
+        conv.readTo = data.ts;
+      }
+    });
+    socket.broadcast.to(data.room).emit('read to timestamp', data);
   });
 
   socket.on('sound on', () => {

@@ -10,10 +10,10 @@ socket.on('connect', () => {
     if (conversations.constructor !== Array) {
       window.location.replace(window.location.href + '/login');
       return;
-    } 
+    }
     for (let conversation of conversations) {
       if (!conversation.active) {
-        newChat(conversation.room, conversation.icon);
+        newChat(conversation.room, conversation.icon, conversation.readTo);
         for (let message of conversation.messages) {
           addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
         }
@@ -320,7 +320,7 @@ function updateCurrentInput(userId) {
     Given a user identifier, creates a new chat for that user if the identifier is unique
     and logs an error if it is a duplicate
 */
-function newChat(userId, icon) {
+function newChat(userId, icon, readTo) {
   let validUser = true;
   for (let chat of chats) {
     if (userId == chat.userId) {
@@ -329,18 +329,18 @@ function newChat(userId, icon) {
     }
   }
   if (validUser) {
-    chats.unshift(
-      { userId: userId,
-        messages: [],
-        accepted: false,
-        active: true,
-        typing: false,
-        readTo: new Date(0),
-        icon: icon,
-        alert: true,
-        reconnecting: false,
-        currentMessage: '' }
-    );
+    chats.unshift({
+      userId: userId,
+      messages: [],
+      accepted: false,
+      active: true,
+      typing: false,
+      readTo: new Date(readTo || 0),
+      icon: icon,
+      alert: true,
+      reconnecting: false,
+      currentMessage: ''
+    });
   }
 }
 
