@@ -7,10 +7,10 @@ const socket = io();
 socket.on('connect', () => {
   // Register as Admin
   $.post('/admin', { admin: socket.id }, (conversations) => {
-    /*if (conversations.constructor !== Array) {
+    if (conversations.constructor !== Array) {
       window.location.replace(window.location.href + '/login');
       return;
-    } */
+    }
     for (let conversation of conversations) {
       if (!conversation.active) {
         newChat(conversation.room, conversation.icon);
