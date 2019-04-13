@@ -79,6 +79,11 @@ app.get('/available', (req, res) => {
   res.json({isAvailable: isAvailable});
 });
 
+app.get('/keepalive', (req, res) => {
+  console.log('keepalive');
+  res.sendStatus(200);
+});
+
 app.post('/setavailable', adminRoutes.ensureAuthenticated, (req, res) => {
   ISAVAILABLE = req.body.isAvailable;
   res.sendStatus(200);
