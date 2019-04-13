@@ -2,6 +2,11 @@ window.onbeforeunload = () => {
   alert('Are you sure you want to leave? Your chat connections will be lost.');
 };
 
+// keep heroku instance alive every 20 minutes
+setInterval(() => {
+  $.get('/keepalive');
+}, 1000 * 60 * 20);
+
 const socket = io();
 
 socket.on('connect', () => {

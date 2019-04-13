@@ -79,6 +79,11 @@ app.get('/available', (req, res) => {
   res.json({isAvailable: isAvailable});
 });
 
+app.get('/keepalive', (req, res) => {
+  console.log('keepalive');
+  res.sendStatus(200);
+});
+
 app.post('/setavailable', adminRoutes.ensureAuthenticated, (req, res) => {
   ISAVAILABLE = req.body.isAvailable;
   res.sendStatus(200);
@@ -218,9 +223,12 @@ io.on('connection', (socket) => {
           // notify anyone else in the room the user left
           io.to(conversation.room).emit('user disconnect', conversation.room);
         } else {
-          // user was never accepted so we can just let admins remove from menus
+          // user was never accepted so we can just let admins remove from menus and delete from currentConversations
           for (let admin of admins) {
             io.to(admin).emit('user matched', conversation.room);
+            delete reconnectionTimeouts[conversation.room];
+            removeConversation(conversation.room);
+            return;
           }
         }
 
