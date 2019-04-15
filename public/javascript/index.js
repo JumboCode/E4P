@@ -21,13 +21,12 @@ $(document).ready(() => {
         <button type='button' class="btn btn-outline-info" onclick='openChat()'>Connect Me to an Ear</button>
 
       </div>
-      <p id='footer' style="font-size: 16px">To reach out to Ears for Peers, see their <a href="http://sites.tufts.edu/ears4peers/contact-us">Contact Us Page</a>.</p>
     `;
   const unavailableUI = `
       <div class='row'>Ears for Peers</div>
       <img src='img/baby_elephant.png'>
       <p style="font-size: 16px">Ears for Peers is currently unavailable. </p>
-      <p style="font-size: 16px">Our line is open from 7pm-7am every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
+      <p class='container-fluid text-center' style="font-size: 16px">Our line is open from 7pm-7am every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
     `;
   $.getJSON('/available')
     .done((data) => {
@@ -64,7 +63,7 @@ socket.on('invalid old socket id', () => {
   */
   deactivateChat();
   $('#typingIcon').before(createStatusDiv('Tried to reconnect, but your conversation seems to be too old. ' +
-                                          'You usually cannot disconnect for more than 5 minutes.'));
+                                          'You usually cannot disconnect for more than 60 minutes.'));
   $('.input-group').html('<a id="goHomeLink" href="/"><div id="delete">Take me back to the home page</div></a>');
 
   window.localStorage.setItem('roomID', socket.id);
@@ -144,7 +143,8 @@ function openChat() {
   open.innerHTML = '';
   open.innerHTML = '<div class=\'container-fluid text-center\'>Waiting to connect to an Ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div>' +
                    '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 7am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</div></div>' + 
-                   '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">Feel free to call and hang up after a few rings. The Ear on duty might be asleep.</div></div>';
+                   '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">Feel free to call and hang up after a few rings to get our attention.</div></div>' +
+                   '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is an emergency, please call TUPD at (617) 627 3030 and ask to speak with the counselor on call.</div></div>';
   console.log('attempting to connect');
   window.onbeforeunload = () => {
     return 'Are you sure you want to leave? Your chat connection will be lost.';
@@ -166,7 +166,7 @@ function startChat() {
 
 
   //add input bar to page
-  $('#e_space').css('height', '10vh');
+  $('#e_space').css('height', '4.3rem');
   $('#chat').attr('style', 'display: flex !important');
   chatbox = document.getElementById('chatbox');
   chatbox.style.display = 'block';

@@ -79,6 +79,11 @@ app.get('/available', (req, res) => {
   res.json({isAvailable: isAvailable});
 });
 
+app.get('/keepalive', (req, res) => {
+  console.log('keepalive');
+  res.sendStatus(200);
+});
+
 app.post('/setavailable', adminRoutes.ensureAuthenticated, (req, res) => {
   ISAVAILABLE = req.body.isAvailable;
   res.sendStatus(200);
@@ -103,6 +108,11 @@ app.get('/audio/:file', (req, res) => {
 app.post('/admin', adminRoutes.ensureAuthenticated, (req, res) => {
   admins.push(req.body.admin);
   res.json(currentConversations);
+});
+
+app.post('/admin/removeConversation', adminRoutes.ensureAuthenticated, (req, res) => {
+  removeConversation(req.body.userId);
+  res.sendStatus(200);
 });
 
 ///////////////////////////////////////////////////////////////////////
@@ -213,9 +223,12 @@ io.on('connection', (socket) => {
           // notify anyone else in the room the user left
           io.to(conversation.room).emit('user disconnect', conversation.room);
         } else {
-          // user was never accepted so we can just let admins remove from menus
+          // user was never accepted so we can just let admins remove from menus and delete from currentConversations
           for (let admin of admins) {
             io.to(admin).emit('user matched', conversation.room);
+            delete reconnectionTimeouts[conversation.room];
+            removeConversation(conversation.room);
+            return;
           }
         }
 
@@ -241,7 +254,7 @@ io.on('connection', (socket) => {
           if (typeof socket.icon !== 'undefined' && isNaN(parseInt(socket.icon))) {
             icons.push(socket.icon);
           }
-        }, (process.env.DISCONNECT_GRACE_PERIOD || 5) * 60000); // 5 minutes
+        }, process.env.DISCONNECT_GRACE_PERIOD || 60 * 60000); // 60 minutes
       } else if (conversation.connected_admin === socket.id) {
         // disconnecting socket was an admin
         console.log('disconnecting admin from conversation');
@@ -280,6 +293,7 @@ io.on('connection', (socket) => {
         console.log('found user\'s old room');
         socket.join(conversation.room);
         conversation.user = socket.id;
+        conversation.connected = true;
         // socket.broadcast.to(socket.id).emit('admin matched');
         socket.emit('reconnected with old socket id');
         io.to(conversation.room).emit('user reconnect', conversation.room);

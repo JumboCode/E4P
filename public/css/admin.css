@@ -15,6 +15,23 @@ body { font-family: "Roboto", sans-serif; }
   height: 89vh;
 }
 
+.connectionIndicator * {
+  color: white;
+  text-align: center;
+  font-size: 20px;
+  padding: 10px 0;
+  margin: 0;
+  height: 100%;
+}
+
+.connection-online {
+  background-color: green;
+}
+
+.connection-offline {
+  background-color: red;
+}
+
 /* Style the tab */
 .tab {
   float: left;
@@ -144,8 +161,26 @@ div.icon {
   max-height: 60px;
 }
 
+@-webkit-keyframes pulsate {
+  0% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.2;
+  }
+}
+
 .alertBar#alert {
   background-color: var(--dark-green);
+  animation: pulsate 1s ease-out;
+  animation-iteration-count: infinite;
+  opacity: 1;
+  border-radius: 3px;
 }
 
 /* Style the tab content */
@@ -209,13 +244,6 @@ div.icon {
 .chatAction #sendButton {
   height: 100%;
   width: 15%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #96d7d2;
-  cursor: pointer;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
 }
 
 #sendButton:hover,
