@@ -185,8 +185,14 @@ io.on('connection', (socket) => {
       if (conversation.room === data.room) {
         conversation.messages.push(data);
       }
+      if (conversation.connected_admin === null) {
+        admins.forEach((adminId) => {
+          socket.broadcast.to(adminId).emit('chat message', data);
+        });
+      } else {
+        socket.broadcast.to(data.room).emit('chat message', data);
+      }
     }
-    socket.broadcast.to(data.room).emit('chat message', data);
   });
 
   // PHASE IV
@@ -309,9 +315,15 @@ io.on('connection', (socket) => {
     currentConversations.forEach((conv) => {
       if (conv.room === data.room) {
         conv.readTo = data.ts;
+        if (conv.connected_admin === null) {
+          admins.forEach((adminId) => {
+            socket.broadcast.to(adminId).emit('read to timestamp', data);
+          });
+        } else {
+          socket.broadcast.to(data.room).emit('read to timestamp', data);
+        }
       }
     });
-    socket.broadcast.to(data.room).emit('read to timestamp', data);
   });
 
   socket.on('sound on', () => {

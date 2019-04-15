@@ -240,9 +240,6 @@ function admin_matched() {
   console.log('admin matched');
 }
 
-/* function to change accepted from true to false when admin accepts chat */
-/* function to change active to false when user exits out */
-
 // Sends a read reciept for the most recent message.
 function readMostRecent() {
   let msgs = $('#chathistory .message-container');

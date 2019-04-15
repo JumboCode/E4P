@@ -3,7 +3,7 @@ body { font-family: "Roboto", sans-serif; }
 
 .wrapper {
   margin: auto;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   width: 100%;
   min-width: 600px;
   overflow-x: auto;
