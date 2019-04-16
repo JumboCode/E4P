@@ -58,7 +58,6 @@ let db_scrubber = setInterval(() => {
 //        Password Change
 ///////////////////////////////////////////////////////////////////////
 
-// TODO make these configurable (document configurability)
 const VALID_DURATION = process.env.validDuration || 5; //minutes
 const URL = (process.env.host || 'http://localhost:3000') + '/admin/change?';
 
@@ -68,11 +67,10 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     type: 'OAuth2',
-    // TODO remove hard coded elements in dev
-    user: process.env.email || 'steven.dev.email@gmail.com',
-    clientId: process.env.emailId || '345888905186-junsh1mfvrurcd5t2m5kapkdggi2e6tf.apps.googleusercontent.com',
-    clientSecret: process.env.emailSecret || 'OGbdzRpdmF-edJk1U4N6dSw4',
-    refreshToken: process.env.emailRefresh || '1/TIEIoYkYQoHoaDEsc3dE3J90n8wiHPbc6Xx2kKHPPRY',
+    user: process.env.email,
+    clientId: process.env.emailId,
+    clientSecret: process.env.emailSecret,
+    refreshToken: process.env.emailRefresh,
   }
 });
 
@@ -179,7 +177,6 @@ module.exports.register_user = register_user;
 //        IP Address Limiting
 ///////////////////////////////////////////////////////////////////////
 
-// TODO make these configurable (document configurability)
 const MAX_ATTEMPTS = process.env.maxAttempts || 10;
 const RETRY_WAIT_DURATION = process.env.retryWait || 5; // minutes
 
@@ -210,34 +207,32 @@ function can_attempt_login(ip, cb) {
   assert(typeof ip === 'string');
   let timestamp = Date.now();
 
-  // db.serialize(() => {
-    // insert or replace handles if this is the first attempt and no entry exists
-    //
-    // ip value is always just the passed in ip
-    //
-    // attempts is incremented only when there was a previous attempt and when
-    //          we haven't waited long enough. if we haven't attempted login 
-    //          before or if we've waited long enough, set attempts to 1
-    //
-    // next_attempt is adjusted only when there was not a previous attempt or
-    //              if we are below the max attempts. if we have attempted 
-    //              login before and if we've already tried more than allowed, 
-    //              we leave the timestamp unchanged
+  // insert or replace handles if this is the first attempt and no entry exists
+  //
+  // ip value is always just the passed in ip
+  //
+  // attempts is incremented only when there was a previous attempt and when
+  //          we haven't waited long enough. if we haven't attempted login 
+  //          before or if we've waited long enough, set attempts to 1
+  //
+  // next_attempt is adjusted only when there was not a previous attempt or
+  //              if we are below the max attempts. if we have attempted 
+  //              login before and if we've already tried more than allowed, 
+  //              we leave the timestamp unchanged
 
-    db.query('REPLACE INTO login_attempts (ip, attempts, next_attempt) \
-            VALUES (?,\
-                    CASE WHEN EXISTS (SELECT 1 FROM login_attempts WHERE ip = ?) AND \
-                              (SELECT next_attempt FROM login_attempts WHERE ip = ?) > ? \
-                         THEN (SELECT attempts FROM login_attempts WHERE ip = ?) + 1 \
+  db.query('REPLACE INTO login_attempts (ip, attempts, next_attempt) \
+            VALUES ($1,\
+                    CASE WHEN EXISTS (SELECT 1 FROM login_attempts WHERE ip = $2) AND \
+                              (SELECT next_attempt FROM login_attempts WHERE ip = $3) > $4 \
+                         THEN (SELECT attempts FROM login_attempts WHERE ip = $5) + 1 \
                          ELSE 1 \
                     END,\
-                    CASE WHEN EXISTS (SELECT 1 FROM login_attempts WHERE ip = ?) AND \
-                              (SELECT attempts FROM login_attempts WHERE ip = ?) > ? \
-                         THEN (SELECT next_attempt FROM login_attempts WHERE ip = ?) \
-                         ELSE ? \
-                    END)', 
-           ip, ip, ip, timestamp, ip, ip, ip, MAX_ATTEMPTS, ip, timestamp + RETRY_WAIT_DURATION * 60 * 1000, (err) => {
-      if (err) throw err;
+                    CASE WHEN EXISTS (SELECT 1 FROM login_attempts WHERE ip = $6) AND \
+                              (SELECT attempts FROM login_attempts WHERE ip = $7) > $8 \
+                         THEN (SELECT next_attempt FROM login_attempts WHERE ip = $9) \
+                         ELSE $10 \
+                    END)', [ip, ip, ip, timestamp, ip, ip, ip, MAX_ATTEMPTS, ip, timestamp + RETRY_WAIT_DURATION * 60 * 1000], (err) => {
+    if (err) throw err;
 
     db.query('SELECT attempts, next_attempt FROM login_attempts WHERE ip = $1', [ip], (err, res) => {
       if (err) throw err;
@@ -255,8 +250,7 @@ function can_attempt_login(ip, cb) {
       let wait_time = res.rows[0].next_attempt - timestamp;
       return cb(false, wait_time);
     });
-    });
-  // });
+  });
 }
 
 module.exports.can_attempt_login = can_attempt_login;
