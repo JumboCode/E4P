@@ -37,3 +37,8 @@
   border: none;
   cursor: pointer;
 }
+
+.home_icon {
+  height: 47px;
+  width: 47px;
+}

@@ -30,7 +30,7 @@ function generateHeader(role) {
   }
 
   document.getElementsByClassName('navbar')[0].innerHTML = 
-    '<a class="navbar-brand" href="' + home + '">E4P</a>'
+    '<a class="navbar-brand" href="' + home + '"><img src = "img/home_icon.png" class = "home_icon" alt = "Home icon" ></a>'
     + chatAlertButton
     + '<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">'
     + '<span class="navbar-toggler-icon"></span></button>'
