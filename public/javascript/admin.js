@@ -4,8 +4,14 @@ window.onbeforeunload = () => {
 
 // keep heroku instance alive every 20 minutes
 setInterval(() => {
-  $.get('/keepalive');
-}, 1000 * 60 * 20);
+  let currentDate = new Date();
+  let currentUTCTime = currentDate.getUTCHours();
+
+  if (currentUTCTime >= 23 || currentUTCTime <= 11) {
+    $.get('/keepalive');
+  }
+
+}, 1000 * 60 * 0.1);
 
 const socket = io();
 

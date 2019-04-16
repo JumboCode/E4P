@@ -20,7 +20,12 @@ const adminRoutes = require('./routes/adminRoutes');
 ///////////////////////////////////////////////////////////////////////
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(session({ secret: 'secret', resave: true, saveUninitialized: true }));
+app.use(session(
+  { secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+    cookie: { maxAge : 3600000 * 24 } // 24 hours
+  }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
