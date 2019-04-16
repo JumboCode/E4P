@@ -60,7 +60,9 @@ function sendMail(username, email, request) {
     subject: 'Ears for Peers Password Change',
     html: 'Hi ' + username + ',<br><br>Someone has requested a password change for your account.<br>If this was you, <a href="' + URL + query + '">click here to change your password</a>.',
   }, (err, res) => {
-    if (err) throw err;
+    if (process.env.NODE_ENV !== 'test') {
+      if (err) throw err;
+    }
   });
 }
 
