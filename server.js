@@ -184,13 +184,13 @@ io.on('connection', (socket) => {
     for (let conversation of currentConversations) {
       if (conversation.room === data.room) {
         conversation.messages.push(data);
-      }
-      if (conversation.connected_admin === null) {
-        admins.forEach((adminId) => {
-          socket.broadcast.to(adminId).emit('chat message', data);
-        });
-      } else {
-        socket.broadcast.to(data.room).emit('chat message', data);
+        if (conversation.connected_admin === null) {
+          admins.forEach((adminId) => {
+            socket.broadcast.to(adminId).emit('chat message', data);
+          });
+        } else {
+          socket.broadcast.to(data.room).emit('chat message', data);
+        }
       }
     }
   });
