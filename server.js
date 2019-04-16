@@ -154,7 +154,8 @@ io.on('connection', (socket) => {
         everAccepted: false,
         connected: true,
         connected_admin: null,
-        messages: []
+        messages: [],
+        readTo: new Date(0)
       });
   });
 
@@ -189,24 +190,19 @@ io.on('connection', (socket) => {
   // PHASE III
   // receive chat message from admin or user, and send it to a specific user's room
   socket.on('chat message', (data) => {
-    let message = data.message;
-    let room = data.room;
-    let role = data.role;
-
     // Add message to conversation
     for (let conversation of currentConversations) {
-      if (conversation.room === room) {
-        conversation.messages.push(
-          { message: message, 
-            timestamp: new Date(), 
-            role: role
-          }
-        );
+      if (conversation.room === data.room) {
+        conversation.messages.push(data);
+        if (conversation.connected_admin === null) {
+          admins.forEach((adminId) => {
+            socket.broadcast.to(adminId).emit('chat message', data);
+          });
+        } else {
+          socket.broadcast.to(data.room).emit('chat message', data);
+        }
       }
     }
-
-    // console.log('receiver: ' + receiver);
-    socket.broadcast.to(room).emit('chat message', {message: message, room: room});
   });
 
   // PHASE IV
@@ -219,8 +215,8 @@ io.on('connection', (socket) => {
       if (conversation.user === socket.id) {
         // disconnecting socket was a user
         console.log('disconnecting user from conversation');
-        
-        /* 
+
+        /*
          * If we know the disconnecting socket was a user in a room,
          * use conversation.room as the original socketid that admins are tracking
          */
@@ -326,6 +322,21 @@ io.on('connection', (socket) => {
   socket.on('stop typing', (data) => {
     let receiver = data['room'];
     socket.broadcast.to(receiver).emit('stop typing', {room: receiver});
+  });
+
+  socket.on('read to timestamp', (data) => {
+    currentConversations.forEach((conv) => {
+      if (conv.room === data.room) {
+        conv.readTo = data.ts;
+        if (conv.connected_admin === null) {
+          admins.forEach((adminId) => {
+            socket.broadcast.to(adminId).emit('read to timestamp', data);
+          });
+        } else {
+          socket.broadcast.to(data.room).emit('read to timestamp', data);
+        }
+      }
+    });
   });
 
   socket.on('sound on', () => {
