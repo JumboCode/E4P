@@ -12,7 +12,6 @@ let router = express.Router();
 
 let FIRSTLOGIN = (process.env.FIRSTLOGIN === 'true' ? true : false);
 function ensureAuthenticated(req, res, next) {
-  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return next(); }
   if (req.isAuthenticated()) { return next(); }
   if (FIRSTLOGIN) {
     res.sendFile('first_login.html', {root: path.join(__dirname, '../public')});
@@ -29,11 +28,6 @@ function ensureFirst(req, res, next) {
 
 function loggedIn(req, res, next) {
   if (req.isAuthenticated() || FIRSTLOGIN) { return res.redirect('/admin'); }
-  next();
-}
-
-function flagCheck(req, res, next) {
-  if (/*process.env.NOAUTH || process.env.NODB*/ false) { return res.redirect('/admin'); }
   next();
 }
 
@@ -65,7 +59,7 @@ router.get('/login', loggedIn, (req, res) => {
   res.sendFile('login_page.html', {root: path.join(__dirname, '../public')});
 });
 
-router.post('/login', flagCheck, limitCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), limitReset, (req, res) => {
+router.post('/login', limitCheck, passport.authenticate('local', { failureRedirect: '/admin/login' }), limitReset, (req, res) => {
   res.redirect('/admin');
 });
 
