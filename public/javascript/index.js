@@ -82,10 +82,13 @@ socket.on('admin disconnect', () => {
 });
 
 socket.on('chat message', (data) => {
-  console.log('recieved chat message on index: ' + data);
-  updateChat(createMessage('admin', data.message));
+  updateChat(createMessage('admin', data.message, new Date(data.timestamp)));
   $('#typingIcon').css('display', 'none');
   messageSound();
+  //if we're looking at the message as it comes in, send RR
+  if(isChatHistBottom() && document.hasFocus()) {
+    readMostRecent();
+  }
 });
 
 socket.on('typing', () => {
@@ -99,16 +102,18 @@ socket.on('stop typing', () => {
   $('#typingIcon').css('display', 'none');
 });
 
-function send_message(msg) {
+function send_message(msg, timestamp) {
   socket.emit('chat message', {
     message: msg,
     room: chat.roomId,
+    timestamp: timestamp,
     role: 'user'
   });
+  //since we must be looking at messages we send, send RR
+  readMostRecent();
 }
 
 function user_connect() {
-  console.log(socket);
   socket.emit('user connect');
 }
 
@@ -123,6 +128,17 @@ function send_typing_message(is_typing) {
     socket.emit('stop typing', {
       room: chat.roomId
     });
+  }
+}
+
+var readToTimestamp = new Date(0);
+function sendReadReceipt(timestamp) {
+  if(timestamp > readToTimestamp) {
+    socket.emit('read to timestamp', {
+      room: chat.roomId,
+      ts: timestamp.valueOf()
+    });
+    readToTimestamp = timestamp;
   }
 }
 
@@ -200,17 +216,21 @@ function updateChat(messageObj) {
 }
 
 
-function createMessage(role, messageString) {
-  return { role: role, message: messageString, timestamp: new Date() };
+function createMessage(role, messageString, timestamp) {
+  return {
+    role: role,
+    message: messageString,
+    timestamp: (timestamp || new Date())
+  };
 }
 
 function sendMessage() {
   let message = $('#inputBox').val();
   if (message != '') {
-    send_message(message);
     let messageObject = createMessage('user', message);
     chat.messages.push(messageObject);
     updateChat(messageObject);
+    send_message(message, messageObject.timestamp);
     message = $('#inputBox').val('');
   }
 }
@@ -220,8 +240,40 @@ function admin_matched() {
   console.log('admin matched');
 }
 
+// Sends a read reciept for the most recent message.
+function readMostRecent() {
+  let msgs = $('#chathistory .message-container');
+  if (msgs) {
+    sendReadReceipt(new Date(msgs.last().data('time')));
+  }
+}
+
+// Checks if bottom of #chathistory (most recent message) is visible.
+function isChatHistBottom() {
+  let mbox = $('#chathistory');
+  let isScrollable = mbox[0].scrollHeight > mbox[0].clientHeight;
+  if(isScrollable) {
+    let isBottom = mbox.prop('scrollHeight') - mbox.scrollTop() - mbox.outerHeight() < 1;
+    return isBottom;
+  } else {
+    return true;
+  }
+}
+
 $(() => {
   $('#type_msg').html(chatElements(''));
+  // If we start looking at the window & are at the bottom, send RR.
+  $(window).focus(() => {
+    if(isChatHistBottom()) {
+      readMostRecent();
+    }
+  });
+  // If we scroll to see most recent message, send RR.
+  $('#chathistory').scroll(() => {
+    if (isChatHistBottom() && document.hasFocus()) {
+      readMostRecent();
+    }
+  });
   chatSetup(sendMessage);
 });
 
