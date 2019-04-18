@@ -1,11 +1,14 @@
 /*
  * Return a message div based on the role and message string and timestamp.
+ * Message must already be escaped when given to this function.
  */
-function createMessageDiv(side, message, timestamp) {
-  return '<div class= \'message-container\'><div class=\'' + side + '-chat-bubble\'> '
-    +  message + ' </div><div class= \'' + side + '-time\'> '
-    + getTimeString(timestamp) + ' </div></div>';
-}
+
+const createMessageDiv = (side, message, timestamp) => `
+  <div class='message-container' data-time='${timestamp.valueOf()}' data-side='${side}'>
+    <div class='${side}-chat-bubble'> ${message} </div>
+    <div class='${side}-time'> ${getTimeString(timestamp)} </div>
+  </div>
+`;
 
 const createStatusDiv = (message) => `
   <div class='status-container'>${message}</div>
@@ -75,10 +78,14 @@ function chatSetup(sendMessage) {
     if (e.which == 13 && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+      let currentTime = new Date();
+      lastTypingMessage = currentTime;
     }
   });
 
   $('#sendButton').click((e) => {
     sendMessage();
+    let currentTime = new Date();
+    lastTypingMessage = currentTime;
   });
 }

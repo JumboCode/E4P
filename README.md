@@ -19,22 +19,12 @@ git clone https://github.com/JumboCode/E4P.git
 npm install
 ```
 ### Run
-#### Run the Database (in a Separate Tab)
-```sh
-mongod
-```
-#### Run the Server
 - Run normally with the authentication module:
   ```sh
-  npm start
+  DATABASE_URL=<db_url> npm start
   ```
 
-- Run without the authentication module (to register the initial user)
-  ```sh
-  NOAUTH=true npm start
-  ```
-  
-  Run without the database module (you don't need the mongod tab and disables database and authentication)
+- Run without the database module (you don't need the mongod tab and disables database and authentication)
   ```sh
   NODB=true npm start
   ```

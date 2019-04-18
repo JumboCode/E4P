@@ -2,6 +2,17 @@ window.onbeforeunload = () => {
   alert('Are you sure you want to leave? Your chat connections will be lost.');
 };
 
+// keep heroku instance alive every 20 minutes
+setInterval(() => {
+  let currentDate = new Date();
+  let currentUTCTime = currentDate.getUTCHours();
+
+  if (currentUTCTime >= 23 || currentUTCTime <= 11) {
+    $.get('/keepalive');
+  }
+
+}, 1000 * 60 * 0.1);
+
 const socket = io();
 
 socket.on('connect', () => {
@@ -10,10 +21,10 @@ socket.on('connect', () => {
     if (conversations.constructor !== Array) {
       window.location.replace(window.location.href + '/login');
       return;
-    } 
+    }
     for (let conversation of conversations) {
       if (!conversation.active) {
-        newChat(conversation.room, conversation.icon);
+        newChat(conversation.room, conversation.icon, conversation.readTo);
         for (let message of conversation.messages) {
           addMessage(conversation.room, createMessage(message.role, message.message, new Date(message.timestamp)));
         }
@@ -35,7 +46,7 @@ socket.on('sound on', () => {
 });
 
 socket.on('chat message', (data) => {
-  addMessage(data.room, createMessage('user', data.message));
+  addMessage(data.room, createMessage('user', data.message, new Date(data.timestamp)));
   messageSound();
   // Chat message received, so user is not typing anymore
   userNotTyping(data.room);
@@ -112,13 +123,25 @@ function user_stop_typing(data) {
   userNotTyping(data.room);
 }
 
+socket.on('read to timestamp', (data) => {
+  for (let chat of chats) {
+    if (chat.userId === data.room) {
+      chat.readTo = new Date(data.ts);
+    }
+  }
+  if (data.room === CURRENT_CHAT_USER_ID) {
+    updateReadReceipt();
+  }
+});
+
 // RECEIVE ^^^
 ///////////////////////////////////////
 // SEND    vvv
 
-function send_message(user, msg) {
+function send_message(user, msg, timestamp) {
   socket.emit('chat message', {
     message: msg,
+    timestamp: timestamp,
     room: user,
     role: 'admin'
   });
@@ -238,6 +261,19 @@ function appendMessageToDiv(message, div) {
   div.append(toAppend);
 }
 
+function updateReadReceipt() {
+  $('#readReceipt').remove();
+  //find most recent message with timestamp <= ts and push read receipt as last child
+  let currChat = chats.find((cht) => cht.userId === CURRENT_CHAT_USER_ID);
+  let leTs = $('.message-container').filter((i, e) => {
+    return (new Date(Number(e.dataset.time))) <= currChat.readTo;
+  }
+  ).last();
+  if (leTs.length) {
+    leTs.after(`<div class='${leTs[0].dataset.side}-readReceipt' id='readReceipt'>Read</div>`);
+  }
+}
+
 function toggleChat(userId) {
   //Update global 'current chat' state.
   updateCurrentInput(CURRENT_CHAT_USER_ID);
@@ -270,6 +306,7 @@ function toggleChat(userId) {
       actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Chat</button>');
     }
   }
+  updateReadReceipt();
   scrollDown();
   updateUserOverview();
 }
@@ -294,7 +331,7 @@ function updateCurrentInput(userId) {
     Given a user identifier, creates a new chat for that user if the identifier is unique
     and logs an error if it is a duplicate
 */
-function newChat(userId, icon) {
+function newChat(userId, icon, readTo) {
   let validUser = true;
   for (let chat of chats) {
     if (userId == chat.userId) {
@@ -302,19 +339,19 @@ function newChat(userId, icon) {
       validUser = false;
     }
   }
-  
   if (validUser) {
-    chats.unshift(
-      { userId: userId,
-        messages: [],
-        accepted: false,
-        active: true,
-        typing: false,
-        icon: icon,
-        alert: true,
-        reconnecting: false,
-        currentMessage: '' }
-    );
+    chats.unshift({
+      userId: userId,
+      messages: [],
+      accepted: false,
+      active: true,
+      typing: false,
+      readTo: new Date(readTo || 0),
+      icon: icon,
+      alert: true,
+      reconnecting: false,
+      currentMessage: ''
+    });
   }
 }
 
@@ -468,24 +505,23 @@ function showCurrentTyping(userIsTyping) {
     this function appends creates a new messageObject that can be sent to addMessage.
 */
 function createMessage(role, messageString, timestamp) {
-  if (typeof timestamp !== 'undefined') {
-    return { role: role, message: escapeMessage(messageString), timestamp: timestamp };
-  }
-  return { role: role, message: escapeMessage(messageString), timestamp: new Date() };
+  return {
+    role: role,
+    message: escapeMessage(messageString),
+    timestamp: (timestamp || new Date())
+  };
 }
 
 function sendMessage() {
+  let message = $('#inputBox').val();
+  if (message != '') {
+    console.log('sending message');
     message = $('#inputBox').val();
-    if (message != '') {
-        console.log("sending message")
-        message = $('#inputBox').val();
-        send_message(CURRENT_CHAT_USER_ID, message);
-        messageObject = createMessage("admin", message);
-        addMessage(CURRENT_CHAT_USER_ID, messageObject);
-
-        message = $('#inputBox').val('');
-    }
-
+    send_message(CURRENT_CHAT_USER_ID, message, new Date());
+    let messageObject = createMessage('admin', message);
+    addMessage(CURRENT_CHAT_USER_ID, messageObject);
+    message = $('#inputBox').val('');
+  }
 }
 
 /*
