@@ -6,7 +6,7 @@ const assert = require('assert');
 
 const SCHEMA_VERSION = 2;
 
-if (process.env.NODB != 'true' && process.env.NODE_ENV != 'test') {
+if (process.env.NODB != 'true' && process.env.NODE_ENV != 'test' && process.env.DATABASE_URL != undefined) {
   const { Client } = require('pg');
   const db = new Client({
     connectionString: process.env.DATABASE_URL,
@@ -282,6 +282,7 @@ if (process.env.NODB != 'true' && process.env.NODE_ENV != 'test') {
   module.exports.serialize = serialize;
   module.exports.deserialize = deserialize;
 } else {
+  console.log("NOT USING DATABASE");
   module.exports.start_password_change = () => { return; };
   module.exports.valid_password_change = (request, cb) => { return cb(true); };
   module.exports.change_password = () => { return; };
