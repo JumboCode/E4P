@@ -339,7 +339,6 @@ function newChat(userId, icon, readTo) {
       validUser = false;
     }
   }
-
   if (validUser) {
     chats.unshift({
       userId: userId,
