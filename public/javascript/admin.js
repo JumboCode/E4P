@@ -304,7 +304,7 @@ function toggleChat(userId) {
       chatSetup(sendMessage);
       scrollDown();
     } else if (chat.reconnecting) {
-      actionDiv.html(chatElements(chat.currentMessage));
+      actionDiv.html(chatElements(chat.currentMessage) + '<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChatRemotely(CURRENT_CHAT_USER_ID)\'>Delete Chat Permanently</button>');
       chatSetup(sendMessage);
       scrollDown();
     } else {
