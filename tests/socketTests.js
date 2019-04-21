@@ -8,6 +8,7 @@ let should = chai.should();
 let server = require('../server');
 let admins = require('../server').admins;
 let currentConversations = require('../server').currentConversations;
+let unsentMessageBuffer = require('../server').unsentMessageBuffer;
 let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
@@ -211,13 +212,6 @@ describe('socket tests', () => {
     });
 
     it('should add messages to currentConversations', (done) => {
-      /*admin1.on('chat message', (id1) => {
-        admin1.emit('accept user', id1);
-        expect(currentConversations.length).to.not.equal(0);
-        let currentIndex = currentConversations.length - 1;
-        done();
-      });
-*/
       admin1.on('user waiting', (id1) => {
         admin1.emit('accept user', id1);
       });
@@ -250,10 +244,59 @@ describe('socket tests', () => {
       });
 
       setTimeout(() => { user1.emit('user connect'); }, 50);
-
-
-      
     });
   });
 
+  describe('Update unsentMessageBuffer', () => {
+    it('should add messages to unsentMessageBuffer when user disconnected', (done) => {
+      admin1.on('user waiting', (userId) => {
+        admin1.emit('accept user', userId);
+      });
+
+      user1.on('admin matched', () => {
+        user1.disconnect();
+      });
+
+      admin1.on('user disconnect', (oldRoomId) => {
+        admin1.emit('chat message', { message: 'foo', room: oldRoomId, role: 'admin'});
+        setTimeout(() => {
+          expect(unsentMessageBuffer[oldRoomId][0].message).to.equal('foo');
+          expect(unsentMessageBuffer[oldRoomId][0].role).to.equal('admin');
+
+          done();
+        }, 50);
+      });
+
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+    });
+
+    it('should update user with unsentMessageBuffer messages when reconnected', (done) => {
+      admin1.on('user waiting', (userId) => {
+        admin1.emit('accept user', userId);
+      });
+
+      user1.on('admin matched', () => {
+        user1.disconnect();
+      });
+
+      admin1.on('user disconnect', (oldRoomId) => {
+        admin1.emit('chat message', { message: 'bar', room: oldRoomId, role: 'admin'});
+        setTimeout(() => {
+          // reconnect user with different socket
+          user2.emit('user reconnect', oldRoomId);
+        }, 50);
+      });
+
+      user2.on('chat message', (msg) => {
+        expect(msg.message).to.equal('bar');
+        expect(msg.role).to.equal('admin');
+        expect(unsentMessageBuffer[msg.room].length).to.equal(0);
+
+        done();
+      });
+
+      setTimeout(() => { user1.emit('user connect'); }, 50);
+    });
+
+  });
 });

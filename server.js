@@ -43,11 +43,13 @@ app.use(bodyParser.json());
 // initialize admin id array
 let admins = [];
 let currentConversations = [];
+let unsentMessageBuffer = {};
 
 function removeConversation(room) {
   currentConversations = currentConversations.filter((ele) => {
     return ele.room != room;
   });
+  console.log(currentConversations);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -135,6 +137,8 @@ let reconnectionTimeouts = {};
 io.on('connection', (socket) => {
   // PHASE I
   socket.on('user connect', () => {
+    console.log(unsentMessageBuffer);
+
     console.log(socket.id);
     if (icons.length == 0) {
       overflow_id++;
@@ -176,9 +180,6 @@ io.on('connection', (socket) => {
         conversation.connected_admin = socket.id;
       }
     }
-    console.log(currentConversations);
-    console.log('sending admin matched to:');
-    console.log(user_room_id);
 
     socket.broadcast.to(user_room_id).emit('invalid');
     socket.broadcast.to(user_room_id).emit('admin matched');
@@ -194,12 +195,27 @@ io.on('connection', (socket) => {
     for (let conversation of currentConversations) {
       if (conversation.room === data.room) {
         conversation.messages.push(data);
-        if (conversation.connected_admin === null) {
-          admins.forEach((adminId) => {
-            socket.broadcast.to(adminId).emit('chat message', data);
-          });
+        if (data.role == 'user') {
+          if (conversation.connected_admin === null) {
+            // no specific admin connected, update all admins with the new message
+            admins.forEach((adminId) => {
+              socket.broadcast.to(adminId).emit('chat message', data);
+            });
+          } else {
+            // send message to the specific connected admin
+            socket.broadcast.to(data.room).emit('chat message', data);
+          }
         } else {
-          socket.broadcast.to(data.room).emit('chat message', data);
+          if (conversation.connected) {
+            console.log(data.room);
+
+            socket.broadcast.to(data.room).emit('chat message', data);
+          } else {
+            if (typeof unsentMessageBuffer[data.room] === 'undefined') {
+              unsentMessageBuffer[data.room] = [];
+            }
+            unsentMessageBuffer[data.room].push(data);
+          }
         }
       }
     }
@@ -283,34 +299,40 @@ io.on('connection', (socket) => {
 
   socket.on('user reconnect', (old_room_id) => {
     let foundUser = false;
-    console.log('Old socket ID: ' + old_room_id);
-    console.log('New socket ID: ' + socket.id);
 
     for (let conversation of currentConversations) {
       if (conversation.room === old_room_id) {
         clearTimeout(reconnectionTimeouts[conversation.room]);
         delete reconnectionTimeouts[conversation.room];
         foundUser = true;
-        console.log('found user\'s old room');
         socket.join(conversation.room);
         conversation.user = socket.id;
         conversation.connected = true;
-        // socket.broadcast.to(socket.id).emit('admin matched');
         socket.emit('reconnected with old socket id');
-        io.to(conversation.room).emit('user reconnect', conversation.room);
+
+        if (conversation.connected_admin === null) {
+          // no specific admin connected, update all admins with the new message
+          admins.forEach((adminId) => {
+            socket.broadcast.to(adminId).emit('user reconnect', conversation.room);
+          });
+        } else {
+          // send message to the specific connected admin
+          socket.broadcast.to(conversation.room).emit('user reconnect', conversation.room);
+        }
+
+        if (typeof unsentMessageBuffer[conversation.room] !== 'undefined') {
+          for (let message of unsentMessageBuffer[conversation.room]) {
+            socket.emit('chat message', message);
+          }
+          unsentMessageBuffer[conversation.room] = [];
+        }
       }
     }
 
-    console.log('foundUser: ');
-    console.log(foundUser);
 
     if (!foundUser) {
-      console.log('invalid old socket id, current id:');
-      console.log(socket.id);
-      console.log('sending message now');
       socket.emit('invalid old socket id');
     }
-    console.log(currentConversations);
   });
 
   //User Typing Event:
@@ -351,3 +373,4 @@ server.listen(process.env.PORT || 3000, () => {
 module.exports = app;
 module.exports.admins = admins;
 module.exports.currentConversations = currentConversations;
+module.exports.unsentMessageBuffer = unsentMessageBuffer;
