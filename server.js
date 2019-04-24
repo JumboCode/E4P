@@ -50,6 +50,8 @@ function removeConversation(room) {
     return ele.room != room;
   });
   console.log(currentConversations);
+  delete unsentMessageBuffer[room];
+
 }
 
 ///////////////////////////////////////////////////////////////////////
