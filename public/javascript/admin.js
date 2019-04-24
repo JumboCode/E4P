@@ -23,6 +23,7 @@ socket.on('connect', () => {
       return;
     }
     for (let conversation of conversations) {
+      // Show non-active, unaccepted chats
       if (!conversation.active) {
         newChat(conversation.room, conversation.icon, conversation.readTo);
         for (let message of conversation.messages) {
@@ -30,8 +31,10 @@ socket.on('connect', () => {
         }
         reactivateChat(conversation.room);
       }
+
       if (!conversation.connected) {
         pauseChat(conversation.room);
+        addMessage(conversation.room, createMessage('status', 'The user has disconnected. You can still send messages, but the user won\'t see them unless the user returns.'));
       }
     }
     socket.emit('sound on');
@@ -77,7 +80,7 @@ socket.on('user unmatched', (conversation) => {
 socket.on('user disconnect', (userId) => {
   // TODO: display a message saying the user disconnected but might come back
   console.log('user disconnected ' + userId);
-  addMessage(userId, createMessage('status', 'The user has disconnected. They might return soon.'));
+  addMessage(userId, createMessage('status', 'The user has disconnected. You can still send messages, but the user won\'t see them unless the user returns.'));
   pauseChat(userId);
   if (userId == CURRENT_CHAT_USER_ID) {
     toggleChat(CURRENT_CHAT_USER_ID);
@@ -301,10 +304,13 @@ function toggleChat(userId) {
       chatSetup(sendMessage);
       scrollDown();
     } else if (chat.reconnecting) {
-      actionDiv.html('<span style="width:100%"><span id=\'pause\' style="display:inline-block;width:50%;height:70%">User Disconnected</span><button id=\'delete\' class=\'btn btn-light\' style=\'width:50%\' onclick=\'removeChatRemotely(CURRENT_CHAT_USER_ID)\'>Delete Chat Permanently</button></span>');
+      actionDiv.html(chatElements(chat.currentMessage) + '<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChatRemotely(CURRENT_CHAT_USER_ID)\'>Delete Chat Permanently</button>');
+      chatSetup(sendMessage);
+      scrollDown();
     } else {
       actionDiv.html('<button id=\'delete\' class=\'btn btn-light\' onclick=\'removeChat(CURRENT_CHAT_USER_ID)\'>Delete Chat</button>');
     }
+    
   }
   updateReadReceipt();
   scrollDown();
