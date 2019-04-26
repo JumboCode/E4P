@@ -202,6 +202,24 @@ function userOffline() {
 
 /**************************** FUNCTIONS FOR DISPLAY UPDATES ****************************/
 
+function getIconTagAndText(icon) {
+  let iconTag = '';
+  let iconText = '';
+
+  if (isNaN(parseInt(icon))) {
+    iconTag = `<img class='icon' src='img/icons/${icon}.png'>`;
+    iconText = icon.charAt(0).toUpperCase() + icon.slice(1);
+  } else {
+    iconTag = `<div class='icon'>${icon}</div>`;
+    iconText = `User ${icon}`;
+  }
+
+  return {
+    iconTag: iconTag,
+    iconText: iconText
+  };
+}
+
 
 // updates the left chat menu to catch newly added users
 function updateUserOverview() {
@@ -211,16 +229,10 @@ function updateUserOverview() {
   }
   for (let chat of chats) {
     let selectedChat = chat.userId == CURRENT_CHAT_USER_ID ? 'id="selectedTab"' : '';
-    let iconTag = '';
-    let iconText = '';
 
-    if (isNaN(parseInt(chat.icon))) {
-      iconTag = "<img class='icon' src='" + ICON_SRC + "' id='" + chat.icon + "'>";
-      iconText = chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1);
-    } else {
-      iconTag = "<div class='icon'>" + chat.icon + "</div>";
-      iconText = "User " + chat.icon;
-    }
+    let temp = getIconTagAndText(chat.icon);
+    let iconTag = temp.iconTag;
+    let iconText = temp.iconText;
 
     let messagePreview = chat.messages.length == 0 ? '' : chat.messages[chat.messages.length - 1].message;
     messagePreview = messagePreview.split('<br/>').join(' ');
@@ -287,8 +299,9 @@ function toggleChat(userId) {
     //Get the current chat object.
     let chat = chats[tabId];
     //Set chat header.
-    $('#chatHeader-icon').html(`<img class='icon' src='${ICON_SRC}' id='${chat.icon}'>`);
-    $('#chatHeader-pseudonym').text(chat.icon.charAt(0).toUpperCase() + chat.icon.slice(1));
+    let temp = getIconTagAndText(chat.icon);
+    $('#chatHeader-icon').html(temp.iconTag);
+    $('#chatHeader-pseudonym').text(temp.iconText);
     //Rehydrate message info.
     let currentChat = $('.messages').first();
     currentChat.html('');
