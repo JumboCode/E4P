@@ -1,4 +1,4 @@
-window.onbeforeunload = () => {
+ window.onbeforeunload = () => {
   alert('Are you sure you want to leave? Your chat connections will be lost.');
 };
 
@@ -276,6 +276,8 @@ function toggleChat(userId) {
 
 function scrollDown() {
   let mbox = $('.messagesBox').first();
+  // console.log(mbox.prop('scrollHeight'));
+  // console.log(mbox.prop('clientHeight'));
   mbox.scrollTop(mbox.prop('scrollHeight') - mbox.prop('clientHeight'));
 }
 
@@ -504,7 +506,17 @@ function addMessage(userId, messageObject) {
                 appendMessageToDiv(messageObject, currentChat);
             }
         }
-        scrollDown();
+        if(messageObject.role == 'admin') {
+          scrollDown();
+        }
+        if (messageObject.role == 'user') {
+        let currChat = $('.messages').last();
+        console.log(currChat, messageObject);
+        console.log(currChat.prop('clientHeight'), currChat.prop('scrollHeight'));
+        if(currChat.prop('clientHeight') < 472) {
+          scrollDown();
+        }
+      }
     }
 
     if (!foundUser) {
