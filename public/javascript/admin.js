@@ -461,11 +461,12 @@ function removeChat(userId) {
 }
 
 function removeChatRemotely(userId) {
-  $.post('/admin/removeConversation', { userId: userId }, (state) => {
-    console.log(state);
-  });
-
-  removeChat(userId);
+  if (confirm('Are you sure you want to delete this chat permanently?')) {
+    $.post('/admin/removeConversation', { userId: userId }, (state) => {
+      console.log(state);
+    });
+    removeChat(userId);
+  }
 }
 
 function userIsTyping(userId) {
