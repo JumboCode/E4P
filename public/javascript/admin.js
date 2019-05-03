@@ -78,7 +78,6 @@ socket.on('user unmatched', (conversation) => {
 });
 
 socket.on('user disconnect', (userId) => {
-  // TODO: display a message saying the user disconnected but might come back
   console.log('user disconnected ' + userId);
   addMessage(userId, createMessage('status', 'The user has disconnected. You can still send messages, but the user won\'t see them unless the user returns.'));
   pauseChat(userId);
@@ -88,7 +87,6 @@ socket.on('user disconnect', (userId) => {
 });
 
 socket.on('user gone for good', (userId) => {
-  // TODO: display a message saying the user disconnected and did not come back in time
   console.log('user chat being deleted ' + userId);
   addMessage(userId, createMessage('status', 'The user did not reconnect in time.'));
   deactivateChat(userId);
@@ -337,7 +335,7 @@ function scrollDown() {
 
 function updateCurrentInput(userId) {
   for (chat of chats) {
-    if (chat.userId == userId && chat.accepted && chat.active) {
+    if (chat.userId == userId && chat.accepted) {
       currentMessage = $('#inputBox').val();
       chat.currentMessage = currentMessage;
     }
