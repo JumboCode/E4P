@@ -49,7 +49,6 @@ function removeConversation(room) {
   currentConversations = currentConversations.filter((ele) => {
     return ele.room != room;
   });
-  console.log(currentConversations);
   delete unsentMessageBuffer[room];
 
 }
@@ -89,7 +88,6 @@ app.get('/available', (req, res) => {
 });
 
 app.get('/keepalive', (req, res) => {
-  console.log('keepalive');
   res.sendStatus(200);
 });
 
@@ -143,9 +141,6 @@ let reconnectionTimeouts = {};
 io.on('connection', (socket) => {
   // PHASE I
   socket.on('user connect', () => {
-    console.log(unsentMessageBuffer);
-
-    console.log(socket.id);
     if (icons.length == 0) {
       overflow_id++;
       socket.icon = overflow_id.toString();
@@ -213,8 +208,6 @@ io.on('connection', (socket) => {
           }
         } else {
           if (conversation.connected) {
-            console.log(data.room);
-
             socket.broadcast.to(data.room).emit('chat message', data);
           } else {
             if (typeof unsentMessageBuffer[data.room] === 'undefined') {
@@ -236,8 +229,6 @@ io.on('connection', (socket) => {
     for (let conversation of currentConversations) {
       if (conversation.user === socket.id) {
         // disconnecting socket was a user
-        console.log('disconnecting user from conversation');
-
         /*
          * If we know the disconnecting socket was a user in a room,
          * use conversation.room as the original socketid that admins are tracking
@@ -280,8 +271,6 @@ io.on('connection', (socket) => {
         }, process.env.DISCONNECT_GRACE_PERIOD || 60 * 60000); // 60 minutes
       } else if (conversation.connected_admin === socket.id) {
         // disconnecting socket was an admin
-        console.log('disconnecting admin from conversation');
-
         conversation.connected_admin = null;
         conversation.active = false;
 
