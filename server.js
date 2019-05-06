@@ -231,18 +231,16 @@ io.on('connection', (socket) => {
         // disconnecting socket was a user
         /*
          * If we know the disconnecting socket was a user in a room,
-         * use conversation.room as the original socketid that admins are tracking
+         * use conversation.room as the original socketid that admins are tracking.
+         * Let room know if user has been accepted, else tell all admins.
          */
         if (conversation.everAccepted || conversation.connected_admin != null) {
           // notify anyone else in the room the user left
           io.to(conversation.room).emit('user disconnect', conversation.room);
         } else {
-          // user was never accepted so we can just let admins remove from menus and delete from currentConversations
+          // user was never accepted so let admins all admins know
           for (let admin of admins) {
-            io.to(admin).emit('user matched', conversation.room);
-            delete reconnectionTimeouts[conversation.room];
-            removeConversation(conversation.room);
-            return;
+            io.to(admin).emit('user disconnect', conversation.room);
           }
         }
 
@@ -315,6 +313,10 @@ io.on('connection', (socket) => {
           socket.broadcast.to(conversation.room).emit('user reconnect', conversation.room);
         }
 
+        if (conversation.everAccepted == true) {
+          socket.emit('admin matched');
+        }
+
         if (typeof unsentMessageBuffer[conversation.room] !== 'undefined') {
           for (let message of unsentMessageBuffer[conversation.room]) {
             socket.emit('chat message', message);
@@ -323,7 +325,6 @@ io.on('connection', (socket) => {
         }
       }
     }
-
 
     if (!foundUser) {
       socket.emit('invalid old socket id');
