@@ -1,6 +1,6 @@
-branches: 
-  only: 
-  - master
-  - production
+branches:
+  only:
+    - master
+    - production
 language: node_js
-node_js: "7"
+node_js: '10'
