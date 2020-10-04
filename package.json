@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "E4P JumboCode Project",
   "main": "server.js",
+  "engines": {
+    "node": "10.x"
+  },
   "scripts": {
     "test": "mocha --exit --recursive tests",
     "start": "node server.js",
