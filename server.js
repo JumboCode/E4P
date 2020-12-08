@@ -15,6 +15,9 @@ const bodyParser = require('body-parser');
 const auth = require('./auth/auth');
 const adminRoutes = require('./routes/adminRoutes');
 
+const START_HOUR = 19;
+const END_HOUR = 2;
+
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
@@ -82,13 +85,17 @@ var ISAVAILABLE = (process.env.ISAVAILABLE === 'true' ? true : (process.env.ISAV
 const DOAVAILCHECK = (process.env.DOAVAILCHECK === 'true' ? true : false);
 app.get('/available', (req, res) => {
   let now = new Date();
-  const standardAvailability = (now.getHours() < 7 || now.getHours() >= 19);
+  const standardAvailability = (now.getHours() < END_HOUR || now.getHours() >= START_HOUR);
   const isAvailable = !DOAVAILCHECK || (ISAVAILABLE && standardAvailability);
   res.json({isAvailable: isAvailable});
 });
 
 app.get('/keepalive', (req, res) => {
   res.sendStatus(200);
+});
+
+app.get('/hours', (req, res) => {
+  res.json({hours: process.env.operatingHours})
 });
 
 app.post('/setavailable', adminRoutes.ensureAuthenticated, (req, res) => {
