@@ -12,6 +12,15 @@ function connectWithStoredID() {
   }
 }
 
+let operatingHours = "7pm - 2am";
+$.getJSON('/hours')
+  .done((data) => {
+    operatingHours = data.hours;
+  })
+  .fail(() => {
+    window.alert("Failed to get hours of operation!");
+  });
+
 $(document).ready(() => {
   const availableUI = `
       <div class='row'>Ears for Peers</div>
@@ -25,7 +34,7 @@ $(document).ready(() => {
       <div class='row'>Ears for Peers</div>
       <img src='img/baby_elephant.png'>
       <p style="font-size: 16px">Ears for Peers is currently unavailable. </p>
-      <p class='container-fluid text-center' style="font-size: 16px">Our line is open from 7pm-2am every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
+      <p class='container-fluid text-center' style="font-size: 16px">Our line is open from ` + operatingHours + ` every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
     `;
   $.getJSON('/available')
     .done((data) => {
@@ -166,7 +175,7 @@ function openChat() {
   open.innerHTML = '';
   open.innerHTML =
     "<div class='container-fluid text-center'>Waiting to connect to an Ear!</div><div class='row'><div class='loader' id='load'></div></div>" +
-    '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from 7pm - 2am. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</div></div>' +
+    '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from ' + process.env.operatingHours + '. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</div></div>' +
     '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">Feel free to call and hang up after a few rings to get our attention.</div></div>' +
     '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is an emergency, please call TUPD at (617) 627 3030 and ask to speak with the counselor on call.</div></div>';
   console.log('attempting to connect');
