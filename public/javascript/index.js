@@ -40,12 +40,11 @@ $(document).ready(() => {
     `;
   $.getJSON('/available')
     .done((data) => {
-      // if (data.isAvailable) {
-      //   $('#open').html(availableUI);
-      // } else {
-      //   $('#open').html(unavailableUI);
-      // }
-      $('#open').html(unavailableUI);
+      if (data.isAvailable) {
+        $('#open').html(availableUI);
+      } else {
+        $('#open').html(unavailableUI);
+      }
     })
     .fail(() => {
       $('#open').html(unavailableUI);
