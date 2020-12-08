@@ -16,11 +16,9 @@ let operatingHours = "7pm - 2am";
 $.getJSON('/hours')
   .done((data) => {
     operatingHours = data.hours
-    window.alert(data)
-    window.alert(operatingHours)
   })
   .fail(() => {
-    window.alert("Faild to get hours")
+    window.alert("Failed to get hours of operation!")
   });
 
 $(document).ready(() => {
