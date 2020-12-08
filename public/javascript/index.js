@@ -15,10 +15,10 @@ function connectWithStoredID() {
 let operatingHours = "7pm - 2am";
 $.getJSON('/hours')
   .done((data) => {
-    operatingHours = data.hours
+    operatingHours = data.hours;
   })
   .fail(() => {
-    window.alert("Failed to get hours of operation!")
+    window.alert("Failed to get hours of operation!");
   });
 
 $(document).ready(() => {
