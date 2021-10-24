@@ -16,7 +16,7 @@ const auth = require('./auth/auth');
 const adminRoutes = require('./routes/adminRoutes');
 
 const START_HOUR = 19;
-const END_HOUR = 2;
+const END_HOUR = 7;
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
