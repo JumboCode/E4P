@@ -12,7 +12,7 @@ function connectWithStoredID() {
   }
 }
 
-let operatingHours = "7pm - 2am";
+let operatingHours = "7pm - 7am";
 $.getJSON('/hours')
   .done((data) => {
     operatingHours = data.hours;
