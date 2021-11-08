@@ -16,6 +16,7 @@ let operatingHours = "7pm - 2am";
 $.getJSON('/hours')
   .done((data) => {
     operatingHours = data.hours;
+    if (document.getElementById('hours-list')) document.getElementById('hours-list').innerText = operatingHours;
   })
   .fail(() => {
     window.alert("Failed to get hours of operation!");
@@ -34,7 +35,7 @@ $(document).ready(() => {
       <div class='row'>Ears for Peers</div>
       <img src='img/baby_elephant.png'>
       <p style="font-size: 16px">Ears for Peers is currently unavailable. </p>
-      <p class='container-fluid text-center' style="font-size: 16px">Our line is open from ` + operatingHours + ` every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
+      <p class='container-fluid text-center' style="font-size: 16px">Our line is open from <span id="hours-list">` + operatingHours + `</span> every night, unless we tell you otherwise on our <a href="https://www.facebook.com/ears4peers/">Facebook Page</a>.</p>
     `;
   $.getJSON('/available')
     .done((data) => {
@@ -68,7 +69,7 @@ socket.on('reconnected with old socket id', () => {
 });
 
 socket.on('invalid old socket id', () => {
-  /* 
+  /*
       This function only gets called when a user was in the middle of a
       conversation. If the user presses the "Connect me to an Ear" button,
       their id is saved in localStorage, and this function does not get
