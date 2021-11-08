@@ -15,8 +15,25 @@ const bodyParser = require('body-parser');
 const auth = require('./auth/auth');
 const adminRoutes = require('./routes/adminRoutes');
 
-const START_HOUR = 19;
-const END_HOUR = 2;
+// Parse process.env.operatingHours to figure out start hour and end hour
+const operatingHoursString = process.env.operatingHours;
+const matches = /(\d{1,2})(am|pm)\s*[-–—]\s*(\d{1,2})(am|pm)/i.exec(operatingHoursString);
+const startHour = parseInt(matches[1]);
+const startAmPm = matches[2];
+const endHour = parseInt(matches[3]);
+const endAmPm = matches[4];
+
+function hourWithAmPmTo24H(hour, amPm) {
+  if (amPm == 'pm' && hour != 12) {
+    return hour + 12;
+  } else if (amPm == 'am' && hour == 12) {
+    return 0;
+  }
+  return hour;
+}
+
+const START_HOUR = hourWithAmPmTo24H(startHour, startAmPm);
+const END_HOUR = hourWithAmPmTo24H(endHour, endAmPm);
 
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
