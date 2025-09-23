@@ -5,6 +5,7 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+require('dotenv').config();
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -17,7 +18,14 @@ const adminRoutes = require('./routes/adminRoutes');
 
 // Parse process.env.operatingHours to figure out start hour and end hour
 const operatingHoursString = process.env.operatingHours;
+
+if (!operatingHoursString) {
+  console.error("Error: operatingHours environment variable not set");
+  process.exit(1);
+}
+
 const matches = /(\d{1,2})(am|pm)\s*[-–—]\s*(\d{1,2})(am|pm)/i.exec(operatingHoursString);
+
 const startHour = parseInt(matches[1]);
 const startAmPm = matches[2];
 const endHour = parseInt(matches[3]);
