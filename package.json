@@ -4,7 +4,7 @@
   "description": "E4P JumboCode Project",
   "main": "server.js",
   "engines": {
-    "node": "10.x"
+    "node": "22.x"
   },
   "scripts": {
     "test": "mocha --exit --recursive tests",
@@ -33,6 +33,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "*",
     "cookie-parser": "*",
+    "dotenv": "^17.2.2",
     "express": "^4.16.3",
     "express-session": "*",
     "nodemailer": "^4.7.0",
