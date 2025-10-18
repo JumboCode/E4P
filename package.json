@@ -4,7 +4,7 @@
   "description": "E4P JumboCode Project",
   "main": "server.js",
   "engines": {
-    "node": "10.x"
+    "node": "22.x"
   },
   "scripts": {
     "test": "mocha --exit --recursive tests",
