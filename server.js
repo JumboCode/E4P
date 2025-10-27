@@ -20,7 +20,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const operatingHoursString = process.env.operatingHours;
 
 if (!operatingHoursString) {
-  console.error("Error: operatingHours environment variable not set");
+  console.error('Error: operatingHours environment variable not set');
   process.exit(1);
 }
 
@@ -120,7 +120,7 @@ app.get('/keepalive', (req, res) => {
 });
 
 app.get('/hours', (req, res) => {
-  res.json({hours: process.env.operatingHours})
+  res.json({hours: process.env.operatingHours});
 });
 
 app.post('/setavailable', adminRoutes.ensureAuthenticated, (req, res) => {

@@ -12,14 +12,14 @@ function connectWithStoredID() {
   }
 }
 
-let operatingHours = "7pm–7am";
+let operatingHours = '11pm-7am';
 $.getJSON('/hours')
   .done((data) => {
     operatingHours = data.hours;
     if (document.getElementById('hours-list')) document.getElementById('hours-list').innerText = operatingHours;
   })
   .fail(() => {
-    window.alert("Failed to get hours of operation!");
+    window.alert('Failed to get hours of operation!');
   });
 
 $(document).ready(() => {
@@ -59,7 +59,7 @@ socket.on('connect', () => {
 
 socket.on('reconnected with old socket id', () => {
   $('#typingIcon').before(
-    createStatusDiv("You've been reconnected to your chat.")
+    createStatusDiv('You\'ve been reconnected to your chat.')
   );
   $('#typingIcon').before(
     createStatusDiv(
@@ -175,7 +175,7 @@ function openChat() {
   let open = document.getElementById('open');
   open.innerHTML = '';
   open.innerHTML =
-    "<div class='container-fluid text-center'>Waiting to connect to an Ear!</div><div class='row'><div class='loader' id='load'></div></div>" +
+    '<div class=\'container-fluid text-center\'>Waiting to connect to an Ear!</div><div class=\'row\'><div class=\'loader\' id=\'load\'></div></div>' +
     '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is taking too long to load, try calling Ears 4 Peers at (617) 627-3888.<br>Ears 4 Peers operates from ' + operatingHours + '. For more information, <a href="https://sites.tufts.edu/ears4peers/">click here</a>.</div></div>' +
     '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">Feel free to call and hang up after a few rings to get our attention.</div></div>' +
     '<div class=\'container-fluid text-center\' style="margin-top: 16px"><div style="font-size: 16px">If this is an emergency, please call TUPD at (617) 627 3030 and ask to speak with the counselor on call.</div></div>';
@@ -212,7 +212,7 @@ function startChat() {
     createStatusDiv('An Ear has accepted your conversation.')
   );
   $('#typingIcon').before(
-    createStatusDiv("Talk to us about anything that's on your mind.")
+    createStatusDiv('Talk to us about anything that\'s on your mind.')
   );
   $('#typingIcon').before(
     createStatusDiv('Keep this window open to receive notifications!')
