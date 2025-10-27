@@ -9,7 +9,11 @@ require('dotenv').config();
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+
 const session = require('express-session');
+const PgSession = require('connect-pg-simple')(session);
+const { Pool } = require('pg');
+
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
@@ -23,6 +27,10 @@ if (!operatingHoursString) {
   console.error('Error: operatingHours environment variable not set');
   process.exit(1);
 }
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 const matches = /(\d{1,2})(am|pm)\s*[-–—]\s*(\d{1,2})(am|pm)/i.exec(operatingHoursString);
 
@@ -48,12 +56,27 @@ const END_HOUR = hourWithAmPmTo24H(endHour, endAmPm);
 ///////////////////////////////////////////////////////////////////////
 
 app.use(bodyParser.urlencoded({extended: true}));
+// app.use(session(
+//   { secret: 'secret',
+//     resave: true,
+//     saveUninitialized: true,
+//     cookie: { maxAge : 3600000 * 24 } // 24 hours
+//   }));
+
 app.use(session(
-  { secret: 'secret',
-    resave: true,
-    saveUninitialized: true,
-    cookie: { maxAge : 3600000 * 24 } // 24 hours
-  }));
+  { store: new PgSession({
+    pool: pool,
+    tableName: 'session',
+    pruneSessionInterval: 60 * 60
+  }),
+  name: 'sessionId',
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge : 3600000 * 24 } // 24 hours
+  }
+));
+
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
