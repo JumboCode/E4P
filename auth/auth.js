@@ -282,7 +282,7 @@ if (process.env.NODB != 'true' && process.env.NODE_ENV != 'test' && process.env.
   module.exports.serialize = serialize;
   module.exports.deserialize = deserialize;
 } else {
-  console.log("NOT USING DATABASE");
+  console.log('NOT USING DATABASE');
   module.exports.start_password_change = () => { return; };
   module.exports.valid_password_change = (request, cb) => { return cb(true); };
   module.exports.change_password = () => { return; };
