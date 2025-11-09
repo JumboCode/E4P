@@ -5,14 +5,16 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
-require('dotenv').config();
+
+// Load .env file with explicit path
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 const session = require('express-session');
-const PgSession = require('connect-pg-simple')(session);
-const { Pool } = require('pg');
+const MongoStore = require('connect-mongo');
+const { MongoClient } = require('mongodb');
 
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -27,10 +29,6 @@ if (!operatingHoursString) {
   console.error('Error: operatingHours environment variable not set');
   process.exit(1);
 }
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
 
 const matches = /(\d{1,2})(am|pm)\s*[-–—]\s*(\d{1,2})(am|pm)/i.exec(operatingHoursString);
 
@@ -51,6 +49,25 @@ function hourWithAmPmTo24H(hour, amPm) {
 const START_HOUR = hourWithAmPmTo24H(startHour, startAmPm);
 const END_HOUR = hourWithAmPmTo24H(endHour, endAmPm);
 
+// Create a shared MongoDB client for better performance
+let mongoClient = null;
+async function getMongoClient() {
+  if (!mongoClient) {
+    const mongoUrl = process.env.MONGO_PUBLIC_URL || process.env.DATABASE_URL;
+    mongoClient = new MongoClient(mongoUrl, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    await mongoClient.connect();
+  }
+  return mongoClient;
+}
+
+// Simple in-memory cache for user sessions to reduce DB calls
+const userCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 ///////////////////////////////////////////////////////////////////////
 //        Passport Config
 ///////////////////////////////////////////////////////////////////////
@@ -63,27 +80,89 @@ app.use(bodyParser.urlencoded({extended: true}));
 //     cookie: { maxAge : 3600000 * 24 } // 24 hours
 //   }));
 
-app.use(session(
-  { store: new PgSession({
-    pool: pool,
-    tableName: 'session',
-    pruneSessionInterval: 60 * 60
-  }),
+// Use DATABASE_URL as fallback if MONGO_PUBLIC_URL is not available
+const mongoUrl = process.env.MONGO_PUBLIC_URL || process.env.DATABASE_URL;
+
+// Session configuration with fallback
+let sessionConfig = {
   name: 'sessionId',
   secret: 'secret',
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge : 3600000 * 24 } // 24 hours
+};
+
+if (mongoUrl) {
+  try {
+    sessionConfig.store = MongoStore.create({
+      mongoUrl: mongoUrl,
+      touchAfter: 24 * 3600 // lazy session update
+    });
+  } catch (error) {
+    // Fall back to memory session store on error
   }
-));
+}
+
+app.use(session(sessionConfig));
 
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(auth.strategy));
-passport.serializeUser(auth.serialize);
-passport.deserializeUser(auth.deserialize);
+passport.use(new LocalStrategy((username, password, done) => {
+  try {
+    auth.strategy(username, password, (err, user) => {
+      done(err, user);
+    });
+  } catch (error) {
+    done(error);
+  }
+}));
+
+passport.serializeUser((user, done) => {
+  try {
+    auth.serialize(user, (err, result) => {
+      done(err, result);
+    });
+  } catch (error) {
+    done(error);
+  }
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    // Check cache first
+    const cached = userCache.get(id);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return done(null, cached.user);
+    }
+    
+    // If not in cache or expired, fetch from database
+    const client = await getMongoClient();
+    const db = client.db();
+    const adminsCollection = db.collection('admins');
+    
+    const user = await adminsCollection.findOne({ username: id });
+    
+    if (user) {
+      const userObj = { id: user._id, username: user.username, email: user.email, role: user.role };
+      
+      // Cache the user
+      userCache.set(id, {
+        user: userObj,
+        timestamp: Date.now()
+      });
+      
+      done(null, userObj);
+    } else {
+      // Remove from cache if user not found
+      userCache.delete(id);
+      done(null, false);
+    }
+  } catch (error) {
+    done(error);
+  }
+});
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -108,20 +187,97 @@ function removeConversation(room) {
 //        Server Configuration
 ///////////////////////////////////////////////////////////////////////
 
-// Redirect http requests to https when in production
-if (app.get('env') == 'production') {
+// Trust proxy for Railway deployment
+app.set('trust proxy', 1);
+
+// Force HTTPS only when explicitly enabled (not for local development)
+const forceHttps = process.env.FORCE_HTTPS === 'true';
+
+if (forceHttps) {
   app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(`https://${req.header('host')}${req.url}`);
-    } else {
-      next();
+    if (!req.secure) {
+      return res.redirect(301, 'https://' + req.headers.host + req.url);
     }
+    next();
   });
 }
+
+
 
 ///////////////////////////////////////////////////////////////////////
 //        Routes
 ///////////////////////////////////////////////////////////////////////
+
+
+
+// Original login route with MongoDB lookup
+app.post('/admin/login', async (req, res, next) => {
+  const { username, password } = req.body;
+  
+  try {
+    // Direct MongoDB authentication instead of using auth.js
+    const client = await getMongoClient();
+    const db = client.db();
+    const adminsCollection = db.collection('admins');
+    
+    const user = await adminsCollection.findOne({ username });
+    
+    if (!user) {
+      
+      // Check if it's an AJAX request or form submission
+      if (req.xhr || req.headers.accept?.indexOf('json') > -1) {
+        return res.status(401).json({ ok: false, error: 'Invalid credentials' });
+      } else {
+        return res.redirect('/admin/login?error=invalid');
+      }
+    }
+    
+    const bcrypt = require('bcrypt');
+    const isValid = await bcrypt.compare(password, user.password);
+    
+    if (!isValid) {
+      
+      // Check if it's an AJAX request or form submission
+      if (req.xhr || req.headers.accept?.indexOf('json') > -1) {
+        return res.status(401).json({ ok: false, error: 'Invalid credentials' });
+      } else {
+        return res.redirect('/admin/login?error=invalid');
+      }
+    }
+    
+    // Login the user
+    req.logIn(user, (err) => {
+      if (err) {
+        
+        if (req.xhr || req.headers.accept?.indexOf('json') > -1) {
+          return res.status(500).json({ ok: false, error: 'Login error' });
+        } else {
+          return res.redirect('/admin/login?error=server');
+        }
+      }
+      
+      // Check if it's explicitly an AJAX request
+      const isAjax = req.xhr || 
+                    req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+                    (req.headers.accept && req.headers.accept.includes('application/json'));
+      
+      if (isAjax) {
+        return res.json({ ok: true, user: { id: user._id, username: user.username, email: user.email } });
+      } else {
+        // Always redirect for form submissions
+        return res.redirect('/admin');
+      }
+    });
+    
+  } catch (error) {
+    
+    if (req.xhr || req.headers.accept?.indexOf('json') > -1) {
+      return res.status(500).json({ ok: false, error: 'Authentication error' });
+    } else {
+      return res.redirect('/admin/login?error=server');
+    }
+  }
+});
 
 app.use('/admin', adminRoutes);
 
